@@ -1,0 +1,43 @@
+plugins {
+    id 'java'
+    id 'io.quarkus'
+}
+
+repositories {
+     mavenLocal()
+     mavenCentral()
+}
+
+dependencies {
+    implementation 'org.apache.kafka:kafka-clients:2.5.0'
+    implementation 'io.quarkus:quarkus-picocli'
+    implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
+    implementation 'info.picocli:picocli-codegen'
+    implementation 'org.yaml:snakeyaml:1.27'
+
+    testImplementation 'io.quarkus:quarkus-junit5'
+
+    annotationProcessor enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
+    annotationProcessor 'info.picocli:picocli-codegen'
+}
+
+group 'org.acme'
+version '1.0-SNAPSHOT'
+
+compileJava {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-parameters'
+}
+
+compileTestJava {
+    options.encoding = 'UTF-8'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+test {
+    systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
+}
