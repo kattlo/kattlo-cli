@@ -1,0 +1,4 @@
+remove:
+  dev:
+    config:
+      - min.in.sync.replicas

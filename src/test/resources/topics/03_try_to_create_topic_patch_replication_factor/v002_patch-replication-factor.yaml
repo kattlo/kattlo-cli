@@ -1,0 +1,4 @@
+patch:
+  notes: 'Describe this patch migration'
+  topic: 03_try_to_create_topic_patch_replication_factor
+  replication-factor: 2

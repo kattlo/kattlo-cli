@@ -1,0 +1,5 @@
+patch:
+  notes: 'Describe this patch migration'
+  topic: 04_try_to_create_topic_patch_new_config
+  config:
+    compression.type: snappy

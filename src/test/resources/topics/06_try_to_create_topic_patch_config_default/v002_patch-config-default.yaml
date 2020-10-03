@@ -1,0 +1,5 @@
+patch:
+  notes: 'Describe this patch migration'
+  topic: 06_try_to_create_topic_patch_config_default
+  config:
+    compression.type: $default

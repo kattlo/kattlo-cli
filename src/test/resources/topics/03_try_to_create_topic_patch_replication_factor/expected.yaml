@@ -1,0 +1,5 @@
+topic: 03_try_to_create_topic_patch_replication_factor
+status: available
+timestamp: 2020-09-03T05:37:37Z
+partitions: 1
+replication-factor: 2

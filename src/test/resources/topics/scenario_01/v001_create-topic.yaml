@@ -1,0 +1,6 @@
+create:
+  name: meu-topico
+  partitions: 3
+  replication-factor: 1
+  config:
+    compression.type: snappy

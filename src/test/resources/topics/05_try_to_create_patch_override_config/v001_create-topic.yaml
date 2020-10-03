@@ -1,0 +1,5 @@
+create:
+  notes: 'Notes about this topic creation'
+  topic: 05_try_to_create_topic_patch_override_config
+  config:
+    compression.type: snappy
