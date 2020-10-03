@@ -6,7 +6,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Objects;
 
+import javax.inject.Inject;
+
 import com.github.kattlo.EntryCommand;
+import com.github.kattlo.core.backend.Backend;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -29,6 +32,9 @@ public class TopicCommand implements Runnable {
 
     @Spec
     private CommandSpec spec;
+
+    @Inject
+    private Backend backend;
 
     private File directory;
 
@@ -58,7 +64,7 @@ public class TopicCommand implements Runnable {
     public void run() {
         validate();
 
-        // TODO fetch the 'topic' latest migration from __kattlo_migrations
+        // TODO fetch the 'topic' latest migration
 
         try {
             Files.list(Paths.get(directory.getAbsolutePath()))

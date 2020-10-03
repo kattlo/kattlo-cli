@@ -5,8 +5,10 @@ import java.util.Optional;
 /**
  * @author fabiojose
  */
-public interface LatestMigrationFetcher {
+public interface Backend {
 
     Optional<Migration> latest(ResourceType type, String name);
+
+    Migration commit(MigrationToApply migration);
 
 }

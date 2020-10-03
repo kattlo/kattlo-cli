@@ -5,9 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import com.github.kattlo.core.backend.LatestMigrationFetcher;
+import com.github.kattlo.core.backend.Backend;
 import com.github.kattlo.core.backend.Migration;
-import com.github.kattlo.core.backend.MigrationCommitter;
 import com.github.kattlo.core.backend.MigrationStatus;
 import com.github.kattlo.core.backend.MigrationToApply;
 import com.github.kattlo.core.backend.ResourceType;
@@ -16,7 +15,7 @@ import com.github.kattlo.core.backend.ResourceType;
  * @author fabiojose
  */
 public class InMemoryMigrationBackend implements
-        LatestMigrationFetcher, MigrationCommitter {
+        Backend {
 
     static final Map<String, Migration> MIGRATIONS =
             new HashMap<>();
