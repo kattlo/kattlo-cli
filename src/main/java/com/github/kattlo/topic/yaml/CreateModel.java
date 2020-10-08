@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import com.github.kattlo.util.StringUtil;
+
 import lombok.Builder;
 
 /**
@@ -22,8 +24,8 @@ public class CreateModel {
     CreateModel(String notes, String topic, int partitions,
         int replicationFactor, Map<String, Object> config){
 
-        this.notes = Objects.requireNonNull(notes);
-        this.topic = Objects.requireNonNull(topic);
+        this.notes = notes;
+        this.topic = StringUtil.requireNonBlank(topic);
 
         if(partitions < 1){
             throw new IllegalArgumentException(
