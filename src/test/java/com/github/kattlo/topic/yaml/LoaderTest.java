@@ -5,6 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
 
@@ -69,7 +72,7 @@ public class LoaderTest {
     @Test
     public void should_load_create_migration() throws Exception {
 
-        final String fileName = "./src/test/resources/topics/create.yaml";
+        final String fileName = "./src/test/resources/topics/create0.yaml";
 
         Model actual =
             Loader.load(Path.of(fileName));
@@ -81,5 +84,63 @@ public class LoaderTest {
 
         assertFalse(actual.getConfig().isEmpty());
         assertEquals(2, actual.getConfig().size());
+    }
+
+    @Test
+    public void should_load_topic_config_string() throws Exception {
+
+        final String fileName = "./src/test/resources/topics/create1.yaml";
+
+        Model actual =
+            Loader.load(Path.of(fileName));
+
+
+        assertThat(
+            actual.getConfig().get("compression.type"),
+            instanceOf(String.class));
+
+        assertEquals("snappy", actual.getConfig().get("compression.type"));
+    }
+
+    @Test
+    public void should_load_topic_config_long() throws Exception {
+
+        final String fileName = "./src/test/resources/topics/create1.yaml";
+
+        Model actual =
+            Loader.load(Path.of(fileName));
+
+        assertThat(actual.getConfig().get("retention.ms"),
+            instanceOf(Long.class));
+
+        assertEquals(24324324234242L, actual.getConfig().get("retention.ms"));
+    }
+
+    @Test
+    public void should_load_topic_config_double() throws Exception {
+
+        final String fileName = "./src/test/resources/topics/create1.yaml";
+
+        Model actual =
+            Loader.load(Path.of(fileName));
+
+        assertThat(actual.getConfig().get("min.cleanable.dirty.ratio"),
+            instanceOf(Double.class));
+
+        assertEquals(0.2D, actual.getConfig().get("min.cleanable.dirty.ratio"));
+    }
+
+    @Test
+    public void should_load_topic_config_boolean() throws Exception {
+
+        final String fileName = "./src/test/resources/topics/create1.yaml";
+
+        Model actual =
+            Loader.load(Path.of(fileName));
+
+        assertThat(actual.getConfig().get("preallocate"),
+            instanceOf(Boolean.class));
+
+        assertEquals(Boolean.TRUE, actual.getConfig().get("preallocate"));
     }
 }
