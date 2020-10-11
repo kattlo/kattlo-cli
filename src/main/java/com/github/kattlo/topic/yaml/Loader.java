@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
@@ -19,14 +18,6 @@ public class Loader {
 
     private static final Constructor CONSTRUCTOR =
         new Constructor(Model.class);
-
-    private static final TypeDescription DESCRIPTION =
-        new TypeDescription(Model.class);
-
-    static {
-        //DESCRIPTION.addPropertyParameters("config", Map.class);
-        //CONSTRUCTOR.addTypeDescription(DESCRIPTION);
-    };
 
     private static final Yaml YAML =
         new Yaml(CONSTRUCTOR);
