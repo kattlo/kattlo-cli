@@ -1,0 +1,8 @@
+operation: create
+notes: 'This is a note'
+topic: topic-name
+partitions: 1
+replicationFactor: 1
+config:
+  compression.type: snappy
+  retention.ms: -1
