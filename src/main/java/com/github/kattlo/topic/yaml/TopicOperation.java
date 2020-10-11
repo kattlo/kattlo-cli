@@ -16,6 +16,7 @@ import lombok.Builder;
  */
 public class TopicOperation {
 
+    private String version;
     private String operation;
     private String notes;
     private String topic;
@@ -25,8 +26,10 @@ public class TopicOperation {
     private Map<String, Object> config;
 
     @Builder(toBuilder = true)
-    TopicOperation(String operation, String notes, String topic, int partitions,
+    TopicOperation(String version, String operation, String notes, String topic, int partitions,
         int replicationFactor, Map<String, Object> config){
+
+        this.version = StringUtil.requireNonBlank(version);
 
         this.operation = StringUtil.requireNonBlank(operation);
         if(!Arrays.asList(OperationType.values()).stream()
