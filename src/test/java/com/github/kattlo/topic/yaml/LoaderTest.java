@@ -54,7 +54,7 @@ public class LoaderTest {
     @Test
     public void should_throw_when_migration_file_not_found() {
 
-        final String fileName = "./src/test/resources/topics/file-not-exists.yaml";
+        final String fileName = "./src/test/resources/topics/v0000_file-not-exists.yaml";
 
         assertThrows(FileNotFoundException.class, () ->
             Loader.load(Path.of(fileName)));
@@ -63,7 +63,7 @@ public class LoaderTest {
     @Test
     public void should_throw_when_migration_is_an_invalid_yaml() {
 
-        final String fileName = "./src/test/resources/topics/invalid.yaml";
+        final String fileName = "./src/test/resources/topics/v0000_invalid.yaml";
 
         assertThrows(YAMLException.class, () ->
             Loader.load(Path.of(fileName)));
@@ -72,7 +72,7 @@ public class LoaderTest {
     @Test
     public void should_load_create_migration() throws Exception {
 
-        final String fileName = "./src/test/resources/topics/create0.yaml";
+        final String fileName = "./src/test/resources/topics/v0000_create0.yaml";
 
         Model actual =
             Loader.load(Path.of(fileName));
@@ -89,7 +89,7 @@ public class LoaderTest {
     @Test
     public void should_load_topic_config_string() throws Exception {
 
-        final String fileName = "./src/test/resources/topics/create1.yaml";
+        final String fileName = "./src/test/resources/topics/v0000_create1.yaml";
 
         Model actual =
             Loader.load(Path.of(fileName));
@@ -105,7 +105,7 @@ public class LoaderTest {
     @Test
     public void should_load_topic_config_long() throws Exception {
 
-        final String fileName = "./src/test/resources/topics/create1.yaml";
+        final String fileName = "./src/test/resources/topics/v0000_create1.yaml";
 
         Model actual =
             Loader.load(Path.of(fileName));
@@ -119,7 +119,7 @@ public class LoaderTest {
     @Test
     public void should_load_topic_config_double() throws Exception {
 
-        final String fileName = "./src/test/resources/topics/create1.yaml";
+        final String fileName = "./src/test/resources/topics/v0000_create1.yaml";
 
         Model actual =
             Loader.load(Path.of(fileName));
@@ -133,7 +133,7 @@ public class LoaderTest {
     @Test
     public void should_load_topic_config_boolean() throws Exception {
 
-        final String fileName = "./src/test/resources/topics/create1.yaml";
+        final String fileName = "./src/test/resources/topics/v0000_create1.yaml";
 
         Model actual =
             Loader.load(Path.of(fileName));
