@@ -10,10 +10,16 @@ import com.github.kattlo.core.backend.OperationType;
 import com.github.kattlo.util.StringUtil;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.ToString;
 
 /**
  * @author fabiojose
  */
+@Getter
+@EqualsAndHashCode
+@ToString
 public class TopicOperation {
 
     private String version;
