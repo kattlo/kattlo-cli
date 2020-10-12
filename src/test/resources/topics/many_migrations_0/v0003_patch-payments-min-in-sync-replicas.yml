@@ -1,0 +1,5 @@
+operation: patch
+notes: 'Increase to 2 the in sync replicas'
+topic: payments
+config:
+  min.in.sync.replicas: 2

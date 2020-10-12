@@ -1,13 +1,20 @@
 package com.github.kattlo.topic.yaml;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.mapstruct.factory.Mappers;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
@@ -24,11 +31,29 @@ public class Loader {
     private static final Yaml YAML =
         new Yaml(CONSTRUCTOR);
 
+    private static final TopicOperationMapper MAPPER =
+        Mappers.getMapper(TopicOperationMapper.class);
+
     public static final Pattern VERSION_PATTERN =
         Pattern.compile("(v[0-9]{4})");
 
     public static final Pattern FILE_NAME_PATTERN =
         Pattern.compile("v[0-9]{4}_[\\w\\-]{0,246}\\.ya?ml");
+
+    public static final Pattern FILE_EXT_PATTERN =
+        Pattern.compile(".*\\.ya?ml");
+
+    static Stream<Path> list(final Path directory) throws IOException {
+        return Files.list(directory)
+            .filter(f ->
+                FILE_EXT_PATTERN.matcher(
+                    f.getFileName().toString())
+                        .matches());
+    }
+
+    public static Stream<Path> list(final File directory) throws IOException {
+        return list(Path.of(directory.getAbsolutePath()));
+    }
 
     /**
      * @throws IllegalArgumentException When the file name does not follow the pattern {@link #FILE_NAME_PATTERN}
@@ -52,16 +77,36 @@ public class Loader {
     }
 
     /**
-     *
-     * @param file
-     * @return
-     * @throws FileNotFoundException When the file path does not exists
+     * @throws LoadException When any problem happens to load the file
      * @throws IllegalArgumentException When the file name does not follow the pattern {@link #FILE_NAME_PATTERN}
      */
-    public static Model load(Path file) throws FileNotFoundException {
+    public static Model load(Path file) {
         matches(file);
 
-        return YAML.load(new FileReader(file.toFile()));
+        try {
+            return YAML.load(new FileReader(file.toFile()));
+        }catch(FileNotFoundException e){
+            throw new LoadException(e);
+        }
+    }
+
+    /**
+     * Search for the next migration file version from the current one
+     * @throws LoadException When any problem happen during the search
+     */
+    public static Optional<TopicOperation> next(
+            final String currentVersion,
+            final String topic,
+            final Path directory) throws IOException {
+
+        return
+            list(directory)
+                .map(file ->
+                    MAPPER.map(load(file), file))
+                .filter(o -> o.getTopic().equals(topic))
+                .sorted(Comparator.comparing(TopicOperation::getVersion))
+                .filter(o -> o.getVersion().compareTo(currentVersion) > 0)
+                .findFirst();
 
     }
 
@@ -70,8 +115,8 @@ public class Loader {
         private String operation;
         private String notes;
         private String topic;
-        private int partitions;
-        private int replicationFactor;
+        private Integer partitions;
+        private Integer replicationFactor;
 
         private Map<String, Object> config;
     }

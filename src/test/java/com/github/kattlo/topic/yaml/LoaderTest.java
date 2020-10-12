@@ -8,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.io.FileNotFoundException;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import com.github.kattlo.topic.yaml.Loader.Model;
 
@@ -56,7 +56,7 @@ public class LoaderTest {
 
         final String fileName = "./src/test/resources/topics/v0000_file-not-exists.yaml";
 
-        assertThrows(FileNotFoundException.class, () ->
+        assertThrows(LoadException.class, () ->
             Loader.load(Path.of(fileName)));
     }
 
@@ -142,5 +142,64 @@ public class LoaderTest {
             instanceOf(Boolean.class));
 
         assertEquals(Boolean.TRUE, actual.getConfig().get("preallocate"));
+    }
+
+    @Test
+    public void should_list_all_yaml_directory() throws Exception {
+
+        final Path directory = Path.of("./src/test/resources/topics/many_migrations_0/");
+
+        var actual =
+            Loader.list(directory)
+                .count();
+
+        assertEquals(5, actual);
+
+    }
+
+    @Test
+    public void should_result_empty_when_thereis_no_next_version() throws Exception {
+
+        final Path directory = Path.of("./src/test/resources/topics/many_migrations_0/");
+        final String currentVersion = "v0001";
+        final String topic = "undefined";
+
+        Optional<TopicOperation> actual =
+            Loader.next(currentVersion, topic, directory);
+
+        assertTrue(actual.isEmpty());
+
+    }
+
+    @Test
+    public void should_result_the_next_version() throws Exception {
+
+        final String expected = "v0002";
+
+        final Path directory = Path.of("./src/test/resources/topics/many_migrations_0/");
+        final String currentVersion = "v0001";
+        final String topic = "payments";
+
+        Optional<TopicOperation> actual =
+            Loader.next(currentVersion, topic, directory);
+
+        assertFalse(actual.isEmpty());
+        assertEquals(expected, actual.get().getVersion());
+    }
+
+    @Test
+    public void should_result_the_last_version() throws Exception {
+
+        final String expected = "v0005";
+
+        final Path directory = Path.of("./src/test/resources/topics/many_migrations_0/");
+        final String currentVersion = "v0004";
+        final String topic = "payments";
+
+        Optional<TopicOperation> actual =
+            Loader.next(currentVersion, topic, directory);
+
+        assertFalse(actual.isEmpty());
+        assertEquals(expected, actual.get().getVersion());
     }
 }
