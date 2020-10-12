@@ -202,4 +202,17 @@ public class LoaderTest {
         assertFalse(actual.isEmpty());
         assertEquals(expected, actual.get().getVersion());
     }
+
+    @Test
+    public void should_result_no_next_version() throws Exception {
+
+        final Path directory = Path.of("./src/test/resources/topics/many_migrations_0/");
+        final String currentVersion = "v0005";
+        final String topic = "payments";
+
+        Optional<TopicOperation> actual =
+            Loader.next(currentVersion, topic, directory);
+
+        assertTrue(actual.isEmpty());
+    }
 }
