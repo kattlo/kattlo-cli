@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.kafka.common.internals.Topic;
 import org.mapstruct.factory.Mappers;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -107,7 +108,29 @@ public class Loader {
                 .sorted(Comparator.comparing(TopicOperation::getVersion))
                 .filter(o -> o.getVersion().compareTo(currentVersion) > 0)
                 .findFirst();
+    }
 
+    static boolean greater(Path file, String currentVersion){
+        return
+            versionOf(file)
+                .filter(version -> version.compareTo(currentVersion) > 0)
+                .map(v -> Boolean.TRUE)
+                .orElse(Boolean.FALSE);
+    }
+
+    public static Stream<TopicOperation> newer(
+            final String currentVersion,
+            final String topic,
+            final Path directory) throws IOException {
+
+        return
+            list(directory)
+                .filter(file -> greater(file, currentVersion))
+                .map(file ->
+                    MAPPER.map(load(file), file))
+                .filter(o -> o.getTopic().equals(topic))
+                .sorted(Comparator.comparing(TopicOperation::getVersion))
+                .filter(o -> o.getVersion().compareTo(currentVersion) > 0);
     }
 
     @Data

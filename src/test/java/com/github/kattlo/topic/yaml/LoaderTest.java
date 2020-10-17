@@ -10,6 +10,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import com.github.kattlo.topic.yaml.Loader.Model;
 
@@ -230,5 +231,64 @@ public class LoaderTest {
 
         assertFalse(actual.isEmpty());
         assertEquals(expected, actual.get().getVersion());
+    }
+
+    @Test
+    public void should_result_true_when_file_version_is_greater() {
+
+        final Path file = Path.of("v0003_my-migration.yml");
+
+        boolean actual = Loader.greater(file, "v0002");
+
+        assertTrue(actual);
+    }
+
+    @Test
+    public void should_result_false_when_file_version_is_not_greater() {
+
+        final Path file = Path.of("v0002_my-migration.yml");
+
+        boolean actual = Loader.greater(file, "v0002");
+
+        assertFalse(actual);
+    }
+
+    @Test
+    public void should_load_all_newer_migrations_when_no_version() throws Exception {
+
+        final Path directory = Path.of("./src/test/resources/topics/many_migrations_0/");
+        final String currentVersion = "v0000";
+        final String topic = "payments";
+
+        final Stream<TopicOperation> actual =
+            Loader.newer(currentVersion, topic, directory);
+
+        assertEquals(5, actual.count());
+    }
+
+    @Test
+    public void should_load_newer_migrations_from_v0003() throws Exception {
+
+        final Path directory = Path.of("./src/test/resources/topics/many_migrations_0/");
+        final String currentVersion = "v0003";
+        final String topic = "payments";
+
+        final Stream<TopicOperation> actual =
+            Loader.newer(currentVersion, topic, directory);
+
+        assertEquals(2, actual.count());
+    }
+
+    @Test
+    public void should_load_empty_stream_when_there_is_no_newer() throws Exception {
+
+        final Path directory = Path.of("./src/test/resources/topics/many_migrations_0/");
+        final String currentVersion = "v0005";
+        final String topic = "payments";
+
+        final Stream<TopicOperation> actual =
+            Loader.newer(currentVersion, topic, directory);
+
+        assertEquals(0, actual.count());
     }
 }
