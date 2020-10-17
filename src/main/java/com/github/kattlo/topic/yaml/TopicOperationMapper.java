@@ -15,6 +15,7 @@ public interface TopicOperationMapper {
     String NO_VERSION = null;
 
     @Mapping(target = "version", source = "file", qualifiedByName = "versionOf")
+    @Mapping(target = "file", source = "file")
     TopicOperation map(Loader.Model model, Path file);
 
     @Named("versionOf")

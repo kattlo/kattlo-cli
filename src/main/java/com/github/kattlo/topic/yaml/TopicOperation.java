@@ -1,5 +1,6 @@
 package com.github.kattlo.topic.yaml;
 
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,14 +27,17 @@ public class TopicOperation {
     private String operation;
     private String notes;
     private String topic;
-    private int partitions;
-    private int replicationFactor;
+    private Integer partitions;
+    private Integer replicationFactor;
 
     private Map<String, Object> config;
 
+    private Path file;
+
     @Builder(toBuilder = true)
-    TopicOperation(String version, String operation, String notes, String topic, int partitions,
-        int replicationFactor, Map<String, Object> config){
+    TopicOperation(String version, String operation, String notes,
+        String topic, Integer partitions, Integer replicationFactor,
+        Map<String, Object> config, Path file){
 
         this.version = StringUtil.requireNonBlank(version);
 
@@ -50,11 +54,11 @@ public class TopicOperation {
         this.notes = notes;
         this.topic = StringUtil.requireNonBlank(topic);
 
-        if(partitions < 1){
+        if(!Objects.isNull(partitions) && partitions < 1){
             throw new IllegalArgumentException(
                     "partitions must be greater than zero");
         }
-        if(replicationFactor < 1){
+        if(!Objects.isNull(replicationFactor) && replicationFactor < 1){
             throw new IllegalArgumentException(
                     "replication factor must be greater than zero");
         }
@@ -62,5 +66,7 @@ public class TopicOperation {
         this.partitions = partitions;
         this.replicationFactor = replicationFactor;
         this.config = Objects.requireNonNullElse(config, new HashMap<>());
+
+        this.file = Objects.requireNonNull(file);
     }
 }

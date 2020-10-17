@@ -1,5 +1,7 @@
 package com.github.kattlo.topic.migration;
 
+import java.nio.file.Path;
+
 import com.github.kattlo.topic.yaml.TopicOperation;
 
 import org.hamcrest.CoreMatchers;
@@ -21,6 +23,7 @@ public class StrategyTest {
             .topic("topic")
             .partitions(1)
             .replicationFactor(1)
+            .file(Path.of("first"))
             .build();
 
         Strategy actual = Strategy.of(operation);
@@ -39,6 +42,7 @@ public class StrategyTest {
             .topic("topic")
             .partitions(1)
             .replicationFactor(1)
+            .file(Path.of("first"))
             .build();
 
         Strategy actual = Strategy.of(operation);
@@ -57,6 +61,7 @@ public class StrategyTest {
             .topic("topic")
             .partitions(1)
             .replicationFactor(1)
+            .file(Path.of("first"))
             .build();
 
         Strategy actual = Strategy.of(operation);
