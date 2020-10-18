@@ -133,6 +133,17 @@ public class Loader {
                 .filter(o -> o.getVersion().compareTo(currentVersion) > 0);
     }
 
+    public static Stream<TopicOperation> all(final String topic,
+        final Path directory) throws IOException {
+
+        return
+            list(directory)
+                .map(file -> MAPPER.map(load(file), file))
+                .filter(o -> o.getTopic().equals(topic))
+                .sorted(Comparator.comparing(TopicOperation::getVersion));
+
+    }
+
     @Data
     public static class Model {
         private String operation;

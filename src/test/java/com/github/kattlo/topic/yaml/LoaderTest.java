@@ -291,4 +291,28 @@ public class LoaderTest {
 
         assertEquals(0, actual.count());
     }
+
+    @Test
+    public void should_load_all_migrations_for_a_topic() throws Exception {
+
+        final Path directory = Path.of("./src/test/resources/topics/many_migrations_0/");
+        final String topic = "payments";
+
+        final Stream<TopicOperation> actual =
+            Loader.all(topic, directory);
+
+        assertEquals(5, actual.count());
+    }
+
+    @Test
+    public void should_load_nothing_when_no_migrations() throws Exception {
+
+        final Path directory = Path.of("./src/test/resources/topics/many_migrations_0/");
+        final String topic = "not-found-topic";
+
+        final Stream<TopicOperation> actual =
+            Loader.all(topic, directory);
+
+        assertEquals(0, actual.count());
+    }
 }
