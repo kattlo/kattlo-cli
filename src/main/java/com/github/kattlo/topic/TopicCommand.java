@@ -93,10 +93,10 @@ public class TopicCommand implements Runnable {
             final var migrationFiles =
                 Loader.list(directory)
                     .collect(Collectors.toList());
+
             for(int i = 0; i < migrationFiles.size(); i++){
                 var migrationFile = migrationFiles.get(i);
 
-            //for(var migrationFile : migrationFiles) {
                 //TODO Validate yaml against schema??
                 final var migrationModel =
                     Loader.load(migrationFile);
