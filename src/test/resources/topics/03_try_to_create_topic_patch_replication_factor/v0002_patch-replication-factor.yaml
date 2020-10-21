@@ -1,0 +1,4 @@
+operation: patch
+notes: 'Path the replication factor to 2'
+topic: 03_try_to_create_topic_patch_replication_factor
+replicationFactor: 2

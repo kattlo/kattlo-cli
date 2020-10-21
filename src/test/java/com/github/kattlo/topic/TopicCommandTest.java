@@ -9,9 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.Optional;
-import java.util.Properties;
 
 import com.github.kattlo.EntryCommand;
 import com.github.kattlo.core.backend.Backend;
@@ -37,7 +35,6 @@ import picocli.CommandLine.Model.CommandSpec;
 /**
  * @author fabiojose
  */
-//@QuarkusTest
 @ExtendWith(MockitoExtension.class)
 public class TopicCommandTest {
 
@@ -163,6 +160,41 @@ public class TopicCommandTest {
         assertEquals(3, patch.getPartitions());
         assertNull(patch.getReplicationFactor());
 
+    }
+
+    @Test
+    public void should_create_with_default_and_patch_replication_factor_strategies() {
+
+        // setup
+        final String topic = "03_try_to_create_topic_patch_replication_factor";
+        final File directory = new File("./src/test/resources/topics/03_try_to_create_topic_patch_replication_factor/");
+
+        when(backend.latest(any(), anyString()))
+            .thenReturn(Optional.empty());
+
+        when(kafka.adminFor(any()))
+            .thenReturn(admin);
+
+        command.setDirectory(directory);
+
+        // act
+        command.run();
+
+        verify(command, times(2)).strategyOf(topicOperationCaptor.capture());
+        var actual = topicOperationCaptor.getAllValues();
+
+        // assert
+        assertEquals(2, actual.size());
+
+        var create = actual.get(0);
+        assertEquals(topic, create.getTopic());
+        assertNull(create.getPartitions());
+        assertNull(create.getReplicationFactor());
+
+        var patch = actual.get(1);
+        assertEquals(topic, patch.getTopic());
+        assertNull(patch.getPartitions());
+        assertEquals(2, patch.getReplicationFactor());
     }
 
     @Test

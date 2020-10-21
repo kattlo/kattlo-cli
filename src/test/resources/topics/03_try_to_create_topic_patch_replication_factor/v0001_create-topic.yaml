@@ -1,0 +1,5 @@
+operation: create
+notes: >-
+  Create a topic with Cluster default for patitions,
+  replication factor and config
+topic: 03_try_to_create_topic_patch_replication_factor
