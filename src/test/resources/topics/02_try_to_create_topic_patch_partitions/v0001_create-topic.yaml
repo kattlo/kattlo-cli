@@ -1,0 +1,5 @@
+operation: create
+notes: 'Notes about this topic creation'
+topic: 02_try_to_create_topic_patch_partitions
+partitions: 2
+replicationFactor: 1

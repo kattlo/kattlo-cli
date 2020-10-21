@@ -2,4 +2,4 @@ topic: 02_try_to_create_topic_patch_partitions
 status: available
 timestamp: 2020-09-03T05:37:37Z
 partitions: 3
-replication-factor: 1
+replicationFactor: 1

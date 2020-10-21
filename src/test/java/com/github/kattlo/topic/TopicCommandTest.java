@@ -1,8 +1,10 @@
 package com.github.kattlo.topic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -120,6 +122,48 @@ public class TopicCommandTest {
 
     }
 
+
+    @Test
+    public void should_execute_create_and_patch_strategies() {
+
+        // setup
+        final String topic = "02_try_to_create_topic_patch_partitions";
+        final File directory = new File("./src/test/resources/topics/02_try_to_create_topic_patch_partitions/");
+
+        //when(parent.getConfiguration())
+        //    .thenReturn(new Properties());
+
+        when(backend.latest(any(), anyString()))
+            .thenReturn(Optional.empty());
+
+        when(kafka.adminFor(any()))
+            .thenReturn(admin);
+
+        //when(command.strategyOf(to))
+        //    .thenReturn(strategy);
+
+        command.setDirectory(directory);
+
+        // act
+        command.run();
+
+        verify(command, times(2)).strategyOf(topicOperationCaptor.capture());
+        var actual = topicOperationCaptor.getAllValues();
+
+        // assert
+        assertEquals(2, actual.size());
+
+        var create = actual.get(0);
+        assertEquals(topic, create.getTopic());
+        assertEquals(2, create.getPartitions());
+        assertEquals(1, create.getReplicationFactor());
+
+        var patch = actual.get(1);
+        assertEquals(topic, patch.getTopic());
+        assertEquals(3, patch.getPartitions());
+        assertNull(patch.getReplicationFactor());
+
+    }
 
     @Test
     public void should_create_topic() {
