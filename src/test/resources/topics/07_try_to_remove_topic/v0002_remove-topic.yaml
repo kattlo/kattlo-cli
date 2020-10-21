@@ -1,0 +1,3 @@
+operation: remove
+notes: Delete the topic and its entire data
+topic: 07_try_to_remove_topic

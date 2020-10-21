@@ -1,0 +1,5 @@
+operation: create
+notes: >-
+  Create topic with cluster default for partitions,
+  replication factor and config
+topic: 07_try_to_remove_topic

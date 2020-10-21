@@ -1,7 +1,9 @@
 package com.github.kattlo.topic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
@@ -195,6 +197,49 @@ public class TopicCommandTest {
         assertEquals(topic, patch.getTopic());
         assertNull(patch.getPartitions());
         assertEquals(2, patch.getReplicationFactor());
+    }
+
+    @Test
+    public void should_create_patch_and_remove_strategies() {
+
+        // setup
+        final String topic = "08_try_to_create_patch_remove";
+        final File directory = new File("./src/test/resources/topics/08_try_to_create_patch_remove/");
+
+        when(backend.latest(any(), anyString()))
+            .thenReturn(Optional.empty());
+
+        when(kafka.adminFor(any()))
+            .thenReturn(admin);
+
+        command.setDirectory(directory);
+
+        // act
+        command.run();
+
+        verify(command, times(3)).strategyOf(topicOperationCaptor.capture());
+        var actual = topicOperationCaptor.getAllValues();
+
+        // assert
+        assertEquals(3, actual.size());
+
+        var create = actual.get(0);
+        assertEquals("create", create.getOperation());
+        assertEquals(topic, create.getTopic());
+        assertNull(create.getPartitions());
+        assertNull(create.getReplicationFactor());
+
+        var patch = actual.get(1);
+        assertEquals("patch", patch.getOperation());
+        assertEquals(topic, patch.getTopic());
+        assertNull(patch.getPartitions());
+        assertNull(patch.getReplicationFactor());
+        assertNotNull(patch.getConfig());
+        assertTrue(patch.getConfig().containsKey("compression.type"));
+
+        var remove = actual.get(2);
+        assertEquals("remove", remove.getOperation());
+        assertEquals(topic, remove.getTopic());
     }
 
     @Test
