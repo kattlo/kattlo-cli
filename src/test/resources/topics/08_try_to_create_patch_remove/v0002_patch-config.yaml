@@ -1,0 +1,5 @@
+operation: patch
+notes: Patch compression to snappy
+topic: 08_try_to_create_patch_remove
+config:
+  compression.type: snappy

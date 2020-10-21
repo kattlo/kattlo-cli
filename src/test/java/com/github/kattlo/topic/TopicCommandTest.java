@@ -15,6 +15,8 @@ import java.util.Optional;
 
 import com.github.kattlo.EntryCommand;
 import com.github.kattlo.core.backend.Backend;
+import com.github.kattlo.core.backend.Migration;
+import com.github.kattlo.core.backend.MigrationToApply;
 import com.github.kattlo.core.kafka.Kafka;
 import com.github.kattlo.topic.migration.Strategy;
 import com.github.kattlo.topic.yaml.TopicOperation;
@@ -243,7 +245,36 @@ public class TopicCommandTest {
     }
 
     @Test
-    public void should_create_topic() {
+    public void should_execute_just_the_newest_migration_strategy() {
 
+        // setup
+        final String topic = "08_try_to_create_patch_remove";
+        final File directory = new File("./src/test/resources/topics/08_try_to_create_patch_remove/");
+
+        final var applied = new MigrationToApply();
+        applied.setVersion("v0002");
+        final var latest = new Migration();
+        latest.setApplied(applied);
+
+        when(backend.latest(any(), anyString()))
+            .thenReturn(Optional.of(latest));
+
+        when(kafka.adminFor(any()))
+            .thenReturn(admin);
+
+        command.setDirectory(directory);
+
+        // act
+        command.run();
+
+        verify(command).strategyOf(topicOperationCaptor.capture());
+        var actual = topicOperationCaptor.getAllValues();
+
+        // assert
+        assertEquals(1, actual.size());
+
+        var remove = actual.get(0);
+        assertEquals("remove", remove.getOperation());
+        assertEquals(topic, remove.getTopic());
     }
 }
