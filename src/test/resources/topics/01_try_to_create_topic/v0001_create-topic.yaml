@@ -1,0 +1,5 @@
+operation: create
+notes: 'Notes about this topic creation'
+topic: 01_try_to_create_topic
+partitions: 1
+replicationFactor: 1
