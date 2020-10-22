@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -12,6 +13,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 import com.github.kattlo.EntryCommand;
 import com.github.kattlo.core.backend.Backend;
@@ -23,6 +25,8 @@ import com.github.kattlo.topic.yaml.TopicOperation;
 import com.github.kattlo.topic.yaml.TopicOperationMapper;
 
 import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.CreateTopicsResult;
+import org.apache.kafka.common.KafkaFuture;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -60,11 +64,16 @@ public class TopicCommandTest {
     AdminClient admin;
 
     @Mock
+    CreateTopicsResult createTopicsResult;
+
+    @Mock
+    KafkaFuture<Void> kafkaFuture;
+
+    @Mock
     Strategy strategy;
 
     @Spy
-    TopicOperationMapper mapper =
-        Mappers.getMapper(TopicOperationMapper.class);
+    TopicOperationMapper mapper = Mappers.getMapper(TopicOperationMapper.class);
 
     @InjectMocks
     @Spy
@@ -73,40 +82,50 @@ public class TopicCommandTest {
     @Captor
     ArgumentCaptor<TopicOperation> topicOperationCaptor;
 
+    private void mockitoWhen() throws Exception {
+
+        when(kafka.adminFor(any()))
+            .thenReturn(admin);
+
+        when(admin.createTopics(anyCollection()))
+            .thenReturn(createTopicsResult);
+
+        when(createTopicsResult.all())
+            .thenReturn(kafkaFuture);
+
+        when(kafkaFuture.get())
+            .thenReturn((Void)null);
+
+    }
+
     @Test
     public void should_exit_code_2_when_directory_not_exists() {
 
-        String[] args = {
-            "--config-file=./src/test/java/resources/.kattlo.yaml",
-            "--kafka-cfg=./src/test/java/resources/kafka.properties",
-            "topic",
-            "--directory=./_not_exists"
-        };
+        String[] args = { "--config-file=./src/test/java/resources/.kattlo.yaml",
+                "--kafka-cfg=./src/test/java/resources/kafka.properties", "topic", "--directory=./_not_exists" };
 
-        int actual =
-            new CommandLine(topic).execute(args);
+        int actual = new CommandLine(topic).execute(args);
 
         assertEquals(2, actual);
     }
 
     @Test
-    public void should_execute_create_strategy() {
+    public void should_execute_create_strategy() throws Exception {
 
         // setup
         final String topic = "01_try_to_create_topic";
         final File directory = new File("./src/test/resources/topics/01_try_to_create_topic/");
 
-        //when(parent.getConfiguration())
-        //    .thenReturn(new Properties());
+        // when(parent.getConfiguration())
+        // .thenReturn(new Properties());
 
         when(backend.latest(any(), anyString()))
             .thenReturn(Optional.empty());
 
-        when(kafka.adminFor(any()))
-            .thenReturn(admin);
+        mockitoWhen();
 
-        //when(command.strategyOf(to))
-        //    .thenReturn(strategy);
+        // when(command.strategyOf(to))
+        // .thenReturn(strategy);
 
         command.setDirectory(directory);
 
@@ -123,25 +142,23 @@ public class TopicCommandTest {
 
     }
 
-
     @Test
-    public void should_execute_create_and_patch_strategies() {
+    public void should_execute_create_and_patch_strategies() throws Exception {
 
         // setup
         final String topic = "02_try_to_create_topic_patch_partitions";
         final File directory = new File("./src/test/resources/topics/02_try_to_create_topic_patch_partitions/");
 
-        //when(parent.getConfiguration())
-        //    .thenReturn(new Properties());
+        // when(parent.getConfiguration())
+        // .thenReturn(new Properties());
 
         when(backend.latest(any(), anyString()))
             .thenReturn(Optional.empty());
 
-        when(kafka.adminFor(any()))
-            .thenReturn(admin);
+        mockitoWhen();
 
-        //when(command.strategyOf(to))
-        //    .thenReturn(strategy);
+        // when(command.strategyOf(to))
+        // .thenReturn(strategy);
 
         command.setDirectory(directory);
 
@@ -167,17 +184,15 @@ public class TopicCommandTest {
     }
 
     @Test
-    public void should_create_with_default_and_patch_replication_factor_strategies() {
+    public void should_create_with_default_and_patch_replication_factor_strategies() throws Exception {
 
         // setup
         final String topic = "03_try_to_create_topic_patch_replication_factor";
         final File directory = new File("./src/test/resources/topics/03_try_to_create_topic_patch_replication_factor/");
 
-        when(backend.latest(any(), anyString()))
-            .thenReturn(Optional.empty());
+        when(backend.latest(any(), anyString())).thenReturn(Optional.empty());
 
-        when(kafka.adminFor(any()))
-            .thenReturn(admin);
+        mockitoWhen();
 
         command.setDirectory(directory);
 
@@ -202,7 +217,8 @@ public class TopicCommandTest {
     }
 
     @Test
-    public void should_create_patch_and_remove_strategies() {
+    public void should_create_patch_and_remove_strategies()
+        throws Exception {
 
         // setup
         final String topic = "08_try_to_create_patch_remove";
@@ -211,8 +227,7 @@ public class TopicCommandTest {
         when(backend.latest(any(), anyString()))
             .thenReturn(Optional.empty());
 
-        when(kafka.adminFor(any()))
-            .thenReturn(admin);
+        mockitoWhen();
 
         command.setDirectory(directory);
 
@@ -245,7 +260,7 @@ public class TopicCommandTest {
     }
 
     @Test
-    public void should_execute_just_the_newest_migration_strategy() {
+    public void should_execute_just_the_newest_migration_strategy() throws Exception {
 
         // setup
         final String topic = "08_try_to_create_patch_remove";
