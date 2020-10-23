@@ -2,6 +2,7 @@ package com.github.kattlo.topic.migration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.verify;
@@ -224,7 +225,34 @@ public class CreateStrategyTest {
     }
 
     @Test
-    public void should_throw_when_fail_to_create() {
+    public void should_throw_when_fail_to_create() throws Exception {
+
+        // setup
+        var operation = TopicOperation.builder()
+            .file(Path.of("first"))
+            .version("v0001")
+            .operation("create")
+            .notes("notes")
+            .topic("topic")
+            .partitions(3)
+            .replicationFactor(3)
+            .config(null)
+            .build();
+
+        var create = Strategy.of(operation);
+
+        when(admin.createTopics(anyCollection()))
+            .thenReturn(result);
+
+        when(result.all())
+            .thenReturn(future);
+
+        when(future.get())
+            .thenThrow(new TopicCreateException());
+
+        // assert
+        assertThrows(TopicCreateException.class, () ->
+            create.execute(admin));
 
     }
 }
