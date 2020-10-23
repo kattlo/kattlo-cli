@@ -247,7 +247,7 @@ public class CreateStrategyTest {
             .thenReturn(future);
 
         when(future.get())
-            .thenThrow(new TopicCreateException());
+            .thenThrow(new InterruptedException("message"));
 
         // assert
         assertThrows(TopicCreateException.class, () ->
