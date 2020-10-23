@@ -1,8 +1,11 @@
 package com.github.kattlo.topic.migration;
 
+import static java.util.AbstractMap.SimpleEntry;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import com.github.kattlo.topic.yaml.TopicOperation;
 
@@ -34,6 +37,11 @@ public class CreateStrategy implements Strategy {
             Optional.ofNullable(operation.getPartitions()),
             Optional.ofNullable(operation.getReplicationFactor())
                 .map(i -> i.shortValue()));
+
+        newTopic.configs(operation.getConfig().entrySet()
+            .stream()
+            .map(e -> new SimpleEntry<>(e.getKey(), e.getValue().toString()))
+            .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 
         log.debug("NewTopic {}", newTopic);
 
