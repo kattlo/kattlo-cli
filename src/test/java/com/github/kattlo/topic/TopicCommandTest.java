@@ -13,7 +13,6 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 
 import com.github.kattlo.EntryCommand;
 import com.github.kattlo.core.backend.Backend;
