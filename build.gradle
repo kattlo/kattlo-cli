@@ -17,8 +17,11 @@ dependencies {
     implementation 'org.apache.kafka:kafka-clients:2.6.0'
     implementation 'org.apache.commons:commons-lang3:3.11'
 
+    testImplementation "org.testcontainers:kafka:1.14.3"
     testImplementation 'io.quarkus:quarkus-junit5'
     testImplementation 'org.hamcrest:hamcrest-library:2.2'
+    testImplementation 'io.quarkus:quarkus-junit5-mockito'
+    testImplementation 'org.mockito:mockito-junit-jupiter:2.23.0'
 
     annotationProcessor enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
     annotationProcessor 'info.picocli:picocli-codegen'
@@ -49,4 +52,5 @@ java {
 
 test {
     systemProperty "java.util.logging.manager", "org.jboss.logmanager.LogManager"
+    useJUnitPlatform()
 }
