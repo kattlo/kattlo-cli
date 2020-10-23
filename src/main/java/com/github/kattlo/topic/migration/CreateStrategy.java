@@ -29,7 +29,6 @@ public class CreateStrategy implements Strategy {
     @Override
     public void execute(AdminClient admin) {
         log.debug("AdminClient {}", admin);
-
         log.debug("TopicOperation to perform {}", operation);
 
         var newTopic = new NewTopic(
@@ -43,7 +42,7 @@ public class CreateStrategy implements Strategy {
             .map(e -> new SimpleEntry<>(e.getKey(), e.getValue().toString()))
             .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 
-        log.debug("NewTopic {}", newTopic);
+        log.debug("NewTopic to create {}", newTopic);
 
         var result = admin.createTopics(Collections.singletonList(newTopic));
 
