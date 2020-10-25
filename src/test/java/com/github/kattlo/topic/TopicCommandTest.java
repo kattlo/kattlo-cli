@@ -6,7 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyObject;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -24,6 +27,7 @@ import com.github.kattlo.topic.yaml.TopicOperation;
 import com.github.kattlo.topic.yaml.TopicOperationMapper;
 
 import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.CreatePartitionsResult;
 import org.apache.kafka.clients.admin.CreateTopicsResult;
 import org.apache.kafka.common.KafkaFuture;
 import org.junit.jupiter.api.Test;
@@ -64,6 +68,9 @@ public class TopicCommandTest {
 
     @Mock
     CreateTopicsResult createTopicsResult;
+
+    @Mock
+    CreatePartitionsResult partitionsResult;
 
     @Mock
     KafkaFuture<Void> kafkaFuture;
@@ -156,8 +163,14 @@ public class TopicCommandTest {
 
         mockitoWhen();
 
-        // when(command.strategyOf(to))
-        // .thenReturn(strategy);
+        //when(command.strategyOf(any(TopicOperation.class)))
+        //   .thenReturn(strategy);
+
+        when(admin.createPartitions(anyMap()))
+            .thenReturn(partitionsResult);
+
+        when(partitionsResult.all())
+            .thenReturn(kafkaFuture);
 
         command.setDirectory(directory);
 
