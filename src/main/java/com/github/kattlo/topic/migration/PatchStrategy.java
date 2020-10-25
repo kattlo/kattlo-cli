@@ -30,6 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PatchStrategy implements Strategy {
 
+    private static final String DEFAULT_KEYWORD = "$default";
+
     @NonNull
     private final TopicOperation operation;
 
@@ -59,6 +61,15 @@ public class PatchStrategy implements Strategy {
         // TODO probally zook
     }
 
+    private AlterConfigOp opFor(final ConfigEntry entry){
+
+        if(DEFAULT_KEYWORD.equals(entry.value())){
+            return new AlterConfigOp(entry, OpType.DELETE);
+        }
+
+        return new AlterConfigOp(entry, OpType.SET);
+    }
+
     void patchConfig(AdminClient admin){
 
         var resource = new ConfigResource(Type.TOPIC, operation.getTopic());
@@ -66,7 +77,7 @@ public class PatchStrategy implements Strategy {
         final Collection<AlterConfigOp> configs =
         operation.getConfig().entrySet().stream()
             .map(e -> new ConfigEntry(e.getKey(), e.getValue().toString()))
-            .map(c -> new AlterConfigOp(c, OpType.SET))
+            .map(this::opFor)
             .collect(Collectors.toCollection(ArrayList::new));
 
         log.debug("Configurations to change: {}", configs);
