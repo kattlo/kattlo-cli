@@ -7,14 +7,19 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Map;
 
 import com.github.kattlo.topic.yaml.TopicOperation;
 
 import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.AlterConfigOp;
+import org.apache.kafka.clients.admin.AlterConfigsResult;
 import org.apache.kafka.clients.admin.CreatePartitionsResult;
 import org.apache.kafka.clients.admin.NewPartitions;
 import org.apache.kafka.common.KafkaFuture;
+import org.apache.kafka.common.config.ConfigResource;
+import org.apache.kafka.common.config.ConfigResource.Type;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -35,10 +40,19 @@ public class PatchStategyTest {
     CreatePartitionsResult partitionsResult;
 
     @Mock
-    KafkaFuture<Void> future;
+    AlterConfigsResult configsResult;
+
+    @Mock
+    KafkaFuture<Void> partitionsResultFuture;
+
+    @Mock
+    KafkaFuture<Void> configsResultFuture;
 
     @Captor
     ArgumentCaptor<Map<String, NewPartitions>> newPartitionsCaptor;
+
+    @Captor
+    ArgumentCaptor<Map<ConfigResource, Collection<AlterConfigOp>>> newConfigCaptor;
 
     private void partitionsMockitoWhen() throws Exception {
 
@@ -46,15 +60,27 @@ public class PatchStategyTest {
             .thenReturn(partitionsResult);
 
         when(partitionsResult.all())
-            .thenReturn(future);
+            .thenReturn(partitionsResultFuture);
 
-        when(future.get())
+        when(partitionsResultFuture.get())
             .thenReturn((Void)null);
 
     }
 
+    private void configMockitoWhen() throws Exception {
+
+        when(admin.incrementalAlterConfigs(anyMap()))
+            .thenReturn(configsResult);
+
+        when(configsResult.all())
+            .thenReturn(configsResultFuture);
+
+        when(configsResultFuture.get())
+            .thenReturn((Void)null);
+    }
+
     @Test
-    public void should_patch_patitions() throws Exception {
+    public void should_patch_partitions() throws Exception {
 
         // setup
         var operation = TopicOperation.builder()
@@ -85,12 +111,43 @@ public class PatchStategyTest {
 
     @Test
     public void should_patch_replication_factor() {
-
+        //TODO
     }
 
     @Test
-    public void should_patch_config() {
+    public void should_patch_config() throws Exception {
 
+        // setup
+        var config = Map.of("compression.type", (Object)"snappy");
+
+        var operation = TopicOperation.builder()
+            .file(Path.of("first"))
+            .version("v0002")
+            .operation("patch")
+            .notes("notes")
+            .topic("topic")
+            .config(config)
+            .build();
+
+        var patch = Strategy.of(operation);
+
+        configMockitoWhen();
+
+        // act
+        patch.execute(admin);
+
+        verify(admin).incrementalAlterConfigs(newConfigCaptor.capture());
+        var captured = newConfigCaptor.getValue();
+
+        var resource = new ConfigResource(Type.TOPIC, operation.getTopic());
+        var actual = captured.get(resource);
+
+        //assert
+        assertNotNull(actual);
+        assertEquals(1, actual.size());
+        assertEquals(
+            config.get("compression.type"),
+            actual.iterator().next().configEntry().value());
     }
 
     @Test
