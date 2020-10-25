@@ -17,6 +17,7 @@ import org.apache.kafka.clients.admin.AlterConfigOp;
 import org.apache.kafka.clients.admin.AlterConfigsResult;
 import org.apache.kafka.clients.admin.CreatePartitionsResult;
 import org.apache.kafka.clients.admin.NewPartitions;
+import org.apache.kafka.clients.admin.AlterConfigOp.OpType;
 import org.apache.kafka.common.KafkaFuture;
 import org.apache.kafka.common.config.ConfigResource;
 import org.apache.kafka.common.config.ConfigResource.Type;
@@ -151,8 +152,39 @@ public class PatchStategyTest {
     }
 
     @Test
-    public void should_patch_config_to_cluster_default() {
+    public void should_patch_config_to_cluster_default() throws Exception {
 
+        // setup
+        var config = Map.of("compression.type", (Object)"$default");
+
+        var operation = TopicOperation.builder()
+            .file(Path.of("first"))
+            .version("v0002")
+            .operation("patch")
+            .notes("notes")
+            .topic("topic")
+            .config(config)
+            .build();
+
+        var patch = Strategy.of(operation);
+
+        configMockitoWhen();
+
+        // act
+        patch.execute(admin);
+
+        verify(admin).incrementalAlterConfigs(newConfigCaptor.capture());
+        var captured = newConfigCaptor.getValue();
+
+        var resource = new ConfigResource(Type.TOPIC, operation.getTopic());
+        var actual = captured.get(resource);
+
+        //assert
+        assertNotNull(actual);
+        assertEquals(1, actual.size());
+        var op = actual.iterator().next();
+        assertEquals(OpType.DELETE, op.opType());
+        assertEquals("compression.type", op.configEntry().name());
     }
 
     @Test
