@@ -6,15 +6,15 @@ package com.github.kattlo.topic.migration;
 public class TopicCreateException extends RuntimeException {
     private static final long serialVersionUID = 5224421179483658498L;
 
-    public TopicCreateException(){
+    TopicCreateException(){
 
     }
 
-    public TopicCreateException(String message){
+    TopicCreateException(String message){
         super(message);
     }
 
-    public TopicCreateException(String message, Throwable cause){
+    TopicCreateException(String message, Throwable cause){
         super(message, cause);
     }
 
