@@ -12,6 +12,7 @@ import com.github.kattlo.topic.yaml.TopicOperation;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
 
+import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * @author fabiojose
  */
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.MODULE)
 @Slf4j
 public class CreateStrategy implements Strategy {
 
