@@ -115,7 +115,7 @@ public class PatchStategyTest {
     }
 
     @Test
-    public void should_patch_config() throws Exception {
+    public void should_patch_and_set_new_config() throws Exception {
 
         // setup
         var config = Map.of("compression.type", (Object)"snappy");
