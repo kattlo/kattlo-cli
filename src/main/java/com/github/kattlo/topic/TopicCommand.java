@@ -21,6 +21,7 @@ import com.github.kattlo.topic.yaml.TopicOperationMapper;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -37,6 +38,7 @@ import picocli.CommandLine.Model.CommandSpec;
 )
 @AllArgsConstructor
 @NoArgsConstructor
+@Slf4j
 public class TopicCommand implements Runnable {
 
     private static final String NO_VERSION = "v0000";
@@ -96,8 +98,10 @@ public class TopicCommand implements Runnable {
 
             for(int i = 0; i < migrationFiles.size(); i++){
                 var migrationFile = migrationFiles.get(i);
+                log.debug("Migration file {}", migrationFile);
 
                 //TODO Validate yaml against schema??
+
                 final var migrationModel =
                     Loader.load(migrationFile);
 
