@@ -52,7 +52,7 @@ public class PatchStrategy implements Strategy {
 
         }catch(InterruptedException | ExecutionException e){
             log.error(e.getMessage(), e);
-
+            throw new TopicPatchException(e.getMessage(), e);
         }
     }
 
@@ -92,6 +92,7 @@ public class PatchStrategy implements Strategy {
                 operation.getTopic(), configs);
         }catch(InterruptedException | ExecutionException e){
             log.error(e.getMessage(), e);
+            throw new TopicPatchException(e.getMessage(), e);
         }
     }
 
