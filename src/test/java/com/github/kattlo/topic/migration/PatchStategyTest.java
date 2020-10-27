@@ -2,6 +2,7 @@ package com.github.kattlo.topic.migration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -188,7 +189,63 @@ public class PatchStategyTest {
     }
 
     @Test
-    public void should_fail_when_exception_to_patch() {
+    public void should_fail_when_exception_to_patch_partitions() throws Exception {
 
+        // setup
+        var operation = TopicOperation.builder()
+            .file(Path.of("first"))
+            .version("v0002")
+            .operation("patch")
+            .notes("notes")
+            .topic("topic")
+            .partitions(3)
+            .build();
+
+        var patch = Strategy.of(operation);
+
+        when(admin.createPartitions(anyMap()))
+            .thenReturn(partitionsResult);
+
+        when(partitionsResult.all())
+            .thenReturn(partitionsResultFuture);
+
+        when(partitionsResultFuture.get())
+            .thenThrow(new InterruptedException("failure"));
+
+        // assert
+        assertThrows(TopicPatchException.class, () ->
+            patch.execute(admin));
+
+    }
+
+    @Test
+    public void should_fail_when_exception_to_patch_config() throws Exception {
+
+        // setup
+        var config = Map.of("compression.type", (Object)"snappy");
+
+        var operation = TopicOperation.builder()
+            .file(Path.of("first"))
+            .version("v0002")
+            .operation("patch")
+            .notes("notes")
+            .topic("topic")
+            .config(config)
+            .build();
+
+        var patch = Strategy.of(operation);
+
+        when(admin.incrementalAlterConfigs(anyMap()))
+            .thenReturn(configsResult);
+
+        when(configsResult.all())
+            .thenReturn(configsResultFuture);
+
+        when(configsResultFuture.get())
+            .thenThrow(new InterruptedException("failure"));
+
+        //assert.
+        assertThrows(TopicPatchException.class, () ->
+            patch.execute(admin));
     }
 }
