@@ -5,9 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyCollection;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,9 +24,6 @@ import com.github.kattlo.topic.yaml.TopicOperation;
 import com.github.kattlo.topic.yaml.TopicOperationMapper;
 
 import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.CreatePartitionsResult;
-import org.apache.kafka.clients.admin.CreateTopicsResult;
-import org.apache.kafka.common.KafkaFuture;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -50,55 +46,41 @@ public class TopicCommandTest {
     private TopicCommand topic = new TopicCommand();
 
     @Mock
-    EntryCommand parent;
+    private EntryCommand parent;
 
     @Mock
-    CommandSpec spec;
+    private CommandSpec spec;
 
     @Mock
-    Backend backend;
+    private Backend backend;
 
     @Mock
-    Kafka kafka;
+    private Kafka kafka;
 
     @Mock
-    AdminClient admin;
+    private AdminClient admin;
 
     @Mock
-    CreateTopicsResult createTopicsResult;
-
-    @Mock
-    CreatePartitionsResult partitionsResult;
-
-    @Mock
-    KafkaFuture<Void> kafkaFuture;
-
-    @Mock
-    Strategy strategy;
+    private Strategy strategy;
 
     @Spy
-    TopicOperationMapper mapper = Mappers.getMapper(TopicOperationMapper.class);
+    private TopicOperationMapper mapper =
+        Mappers.getMapper(TopicOperationMapper.class);
 
     @InjectMocks
     @Spy
-    TopicCommand command;
+    private TopicCommand command;
 
     @Captor
-    ArgumentCaptor<TopicOperation> topicOperationCaptor;
+    private ArgumentCaptor<TopicOperation> topicOperationCaptor;
 
     private void mockitoWhen() throws Exception {
 
+        when(backend.latest(any(), anyString()))
+            .thenReturn(Optional.empty());
+
         when(kafka.adminFor(any()))
             .thenReturn(admin);
-
-        when(admin.createTopics(anyCollection()))
-            .thenReturn(createTopicsResult);
-
-        when(createTopicsResult.all())
-            .thenReturn(kafkaFuture);
-
-        when(kafkaFuture.get())
-            .thenReturn((Void)null);
 
     }
 
@@ -120,30 +102,25 @@ public class TopicCommandTest {
         final String topic = "01_try_to_create_topic";
         final File directory = new File("./src/test/resources/topics/01_try_to_create_topic/");
 
-        // when(parent.getConfiguration())
-        // .thenReturn(new Properties());
-
-        when(backend.latest(any(), anyString()))
-            .thenReturn(Optional.empty());
-
         mockitoWhen();
-
-        // when(command.strategyOf(to))
-        // .thenReturn(strategy);
 
         command.setDirectory(directory);
 
-        // act
-        command.run();
+        try(var mocked = mockStatic(Strategy.class)){
+            mocked.when(() -> Strategy.of(any()))
+                .thenReturn(strategy);
 
-        verify(command).strategyOf(topicOperationCaptor.capture());
-        var actual = topicOperationCaptor.getValue();
+            // act
+            command.run();
 
-        // assert
-        assertEquals(topic, actual.getTopic());
-        assertEquals(1, actual.getPartitions());
-        assertEquals(1, actual.getReplicationFactor());
+            verify(command).strategyOf(topicOperationCaptor.capture());
+            var actual = topicOperationCaptor.getValue();
 
+            // assert
+            assertEquals(topic, actual.getTopic());
+            assertEquals(1, actual.getPartitions());
+            assertEquals(1, actual.getReplicationFactor());
+        }
     }
 
     @Test
@@ -153,44 +130,33 @@ public class TopicCommandTest {
         final String topic = "02_try_to_create_topic_patch_partitions";
         final File directory = new File("./src/test/resources/topics/02_try_to_create_topic_patch_partitions/");
 
-        // when(parent.getConfiguration())
-        // .thenReturn(new Properties());
-
-        when(backend.latest(any(), anyString()))
-            .thenReturn(Optional.empty());
-
         mockitoWhen();
-
-        //when(command.strategyOf(any(TopicOperation.class)))
-        //   .thenReturn(strategy);
-
-        when(admin.createPartitions(anyMap()))
-            .thenReturn(partitionsResult);
-
-        when(partitionsResult.all())
-            .thenReturn(kafkaFuture);
 
         command.setDirectory(directory);
 
-        // act
-        command.run();
+        try(var mocked = mockStatic(Strategy.class)){
+            mocked.when(() -> Strategy.of(any()))
+                .thenReturn(strategy);
 
-        verify(command, times(2)).strategyOf(topicOperationCaptor.capture());
-        var actual = topicOperationCaptor.getAllValues();
+            // act
+            command.run();
 
-        // assert
-        assertEquals(2, actual.size());
+            verify(command, times(2)).strategyOf(topicOperationCaptor.capture());
+            var actual = topicOperationCaptor.getAllValues();
 
-        var create = actual.get(0);
-        assertEquals(topic, create.getTopic());
-        assertEquals(2, create.getPartitions());
-        assertEquals(1, create.getReplicationFactor());
+            // assert
+            assertEquals(2, actual.size());
 
-        var patch = actual.get(1);
-        assertEquals(topic, patch.getTopic());
-        assertEquals(3, patch.getPartitions());
-        assertNull(patch.getReplicationFactor());
+            var create = actual.get(0);
+            assertEquals(topic, create.getTopic());
+            assertEquals(2, create.getPartitions());
+            assertEquals(1, create.getReplicationFactor());
 
+            var patch = actual.get(1);
+            assertEquals(topic, patch.getTopic());
+            assertEquals(3, patch.getPartitions());
+            assertNull(patch.getReplicationFactor());
+        }
     }
 
     @Test
@@ -200,30 +166,33 @@ public class TopicCommandTest {
         final String topic = "03_try_to_create_topic_patch_replication_factor";
         final File directory = new File("./src/test/resources/topics/03_try_to_create_topic_patch_replication_factor/");
 
-        when(backend.latest(any(), anyString())).thenReturn(Optional.empty());
-
         mockitoWhen();
 
         command.setDirectory(directory);
 
-        // act
-        command.run();
+        try(var mocked = mockStatic(Strategy.class)){
+            mocked.when(() -> Strategy.of(any()))
+                .thenReturn(strategy);
 
-        verify(command, times(2)).strategyOf(topicOperationCaptor.capture());
-        var actual = topicOperationCaptor.getAllValues();
+            // act
+            command.run();
 
-        // assert
-        assertEquals(2, actual.size());
+            verify(command, times(2)).strategyOf(topicOperationCaptor.capture());
+            var actual = topicOperationCaptor.getAllValues();
 
-        var create = actual.get(0);
-        assertEquals(topic, create.getTopic());
-        assertNull(create.getPartitions());
-        assertNull(create.getReplicationFactor());
+            // assert
+            assertEquals(2, actual.size());
 
-        var patch = actual.get(1);
-        assertEquals(topic, patch.getTopic());
-        assertNull(patch.getPartitions());
-        assertEquals(2, patch.getReplicationFactor());
+            var create = actual.get(0);
+            assertEquals(topic, create.getTopic());
+            assertNull(create.getPartitions());
+            assertNull(create.getReplicationFactor());
+
+            var patch = actual.get(1);
+            assertEquals(topic, patch.getTopic());
+            assertNull(patch.getPartitions());
+            assertEquals(2, patch.getReplicationFactor());
+        }
     }
 
     @Test
@@ -234,39 +203,41 @@ public class TopicCommandTest {
         final String topic = "08_try_to_create_patch_remove";
         final File directory = new File("./src/test/resources/topics/08_try_to_create_patch_remove/");
 
-        when(backend.latest(any(), anyString()))
-            .thenReturn(Optional.empty());
-
         mockitoWhen();
 
         command.setDirectory(directory);
 
-        // act
-        command.run();
+        try(var mocked = mockStatic(Strategy.class)){
+            mocked.when(() -> Strategy.of(any()))
+                .thenReturn(strategy);
 
-        verify(command, times(3)).strategyOf(topicOperationCaptor.capture());
-        var actual = topicOperationCaptor.getAllValues();
+            // act
+            command.run();
 
-        // assert
-        assertEquals(3, actual.size());
+            verify(command, times(3)).strategyOf(topicOperationCaptor.capture());
+            var actual = topicOperationCaptor.getAllValues();
 
-        var create = actual.get(0);
-        assertEquals("create", create.getOperation());
-        assertEquals(topic, create.getTopic());
-        assertNull(create.getPartitions());
-        assertNull(create.getReplicationFactor());
+            // assert
+            assertEquals(3, actual.size());
 
-        var patch = actual.get(1);
-        assertEquals("patch", patch.getOperation());
-        assertEquals(topic, patch.getTopic());
-        assertNull(patch.getPartitions());
-        assertNull(patch.getReplicationFactor());
-        assertNotNull(patch.getConfig());
-        assertTrue(patch.getConfig().containsKey("compression.type"));
+            var create = actual.get(0);
+            assertEquals("create", create.getOperation());
+            assertEquals(topic, create.getTopic());
+            assertNull(create.getPartitions());
+            assertNull(create.getReplicationFactor());
 
-        var remove = actual.get(2);
-        assertEquals("remove", remove.getOperation());
-        assertEquals(topic, remove.getTopic());
+            var patch = actual.get(1);
+            assertEquals("patch", patch.getOperation());
+            assertEquals(topic, patch.getTopic());
+            assertNull(patch.getPartitions());
+            assertNull(patch.getReplicationFactor());
+            assertNotNull(patch.getConfig());
+            assertTrue(patch.getConfig().containsKey("compression.type"));
+
+            var remove = actual.get(2);
+            assertEquals("remove", remove.getOperation());
+            assertEquals(topic, remove.getTopic());
+        }
     }
 
     @Test
@@ -289,17 +260,23 @@ public class TopicCommandTest {
 
         command.setDirectory(directory);
 
-        // act
-        command.run();
+        try(var mocked = mockStatic(Strategy.class)){
+            mocked.when(() -> Strategy.of(any()))
+                .thenReturn(strategy);
 
-        verify(command).strategyOf(topicOperationCaptor.capture());
-        var actual = topicOperationCaptor.getAllValues();
+            // act
+            command.run();
 
-        // assert
-        assertEquals(1, actual.size());
+            verify(command).strategyOf(topicOperationCaptor.capture());
+            var actual = topicOperationCaptor.getAllValues();
 
-        var remove = actual.get(0);
-        assertEquals("remove", remove.getOperation());
-        assertEquals(topic, remove.getTopic());
+            // assert
+            assertEquals(1, actual.size());
+
+            var remove = actual.get(0);
+            assertEquals("remove", remove.getOperation());
+            assertEquals(topic, remove.getTopic());
+        }
+
     }
 }
