@@ -111,10 +111,6 @@ public class PatchStategyTest {
         assertEquals(operation.getPartitions(), actual.totalCount());
     }
 
-    @Test
-    public void should_patch_replication_factor() {
-        //TODO
-    }
 
     @Test
     public void should_patch_and_set_new_config() throws Exception {
@@ -247,5 +243,15 @@ public class PatchStategyTest {
         //assert.
         assertThrows(TopicPatchException.class, () ->
             patch.execute(admin));
+    }
+
+    @Test
+    public void should_patch_replication_factor() {
+        //TODO
+    }
+
+    @Test
+    public void should_fail_when_exception_to_patch_replication_factor() {
+        // TODO
     }
 }
