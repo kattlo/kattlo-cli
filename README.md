@@ -20,18 +20,14 @@ configurations with:
 
 ### Common Options
 
-- `--config-file`: Path to bakon :bacon: configuration file for migrations
+- `--config-file`: Path to Kattlo configuration file for migrations
 - `--kafka-cfg`: Path to properties file to be used for Kafka Admin Client
 
-In the bakon configuration file you must define your environments types,
-see below:
-
-__Example__: `.bakon.yaml` 
+In the `.kattlo.yaml` configuration file you may define the following
+properties:
 
 ```yaml
-- dev: Development environment 
-- uat: User acceptance environment
-- prd: Production environment
+TODO
 ```
 
 In the Kafka Admin client file you may put the properties described at [official documentation](https://kafka.apache.org/documentation/#adminclientconfigs).
@@ -69,7 +65,7 @@ In order to manage the migrations, we use four special topics:
 
 - `__kattlo_topic_migrations`:
 - `__kattlo_schema_migrations`:
-- `__kattlo_acl_migrations`: 
+- `__kattlo_acl_migrations`:
 - `__kattlo_cluster_migrations`:
 
 ### `__kattlo_topic_migrations`
@@ -88,6 +84,14 @@ This topic has the following configurations:
 ## Build and Run
 
 TODO
+
+### Native
+
+```bash
+./gradlew build \
+  -Dquarkus.package.type=native \
+  -Dquarkus.native.container-build=true
+```
 
 ### Running the application in dev mode
 
