@@ -21,7 +21,8 @@ dependencies {
     testImplementation 'io.quarkus:quarkus-junit5'
     testImplementation 'org.hamcrest:hamcrest-library:2.2'
     testImplementation 'io.quarkus:quarkus-junit5-mockito'
-    testImplementation 'org.mockito:mockito-junit-jupiter:2.23.0'
+    testImplementation 'org.mockito:mockito-inline:3.6.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:3.6.0'
 
     annotationProcessor enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
     annotationProcessor 'info.picocli:picocli-codegen'
@@ -33,8 +34,8 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.10'
 }
 
-group 'org.acme'
-version '1.0-SNAPSHOT'
+group 'com.github.kattlo'
+version '0.1.0-SNAPSHOT'
 
 compileJava {
     options.encoding = 'UTF-8'
