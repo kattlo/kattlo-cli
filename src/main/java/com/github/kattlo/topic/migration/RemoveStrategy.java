@@ -4,13 +4,14 @@ import com.github.kattlo.topic.yaml.TopicOperation;
 
 import org.apache.kafka.clients.admin.AdminClient;
 
+import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
  * @author fabiojose
  */
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.MODULE)
 public class RemoveStrategy implements Strategy {
 
     @NonNull
