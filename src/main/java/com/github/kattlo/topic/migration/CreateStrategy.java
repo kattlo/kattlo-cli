@@ -52,7 +52,6 @@ public class CreateStrategy implements Strategy {
             log.debug("Topic created: {}", operation.getTopic());
 
         }catch(InterruptedException | ExecutionException e){
-            log.error(e.getMessage(), e);
             throw new TopicCreateException(e.getMessage(), e);
         }
     }
