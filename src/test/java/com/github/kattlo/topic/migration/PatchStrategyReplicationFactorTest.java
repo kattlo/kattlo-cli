@@ -183,7 +183,7 @@ public class PatchStrategyReplicationFactorTest {
     }
 
     @Test
-    public void should_patch_replication_factor() throws Exception {
+    public void should_patch_to_increase_the_replication_factor() throws Exception {
         // setup
         var operation = TopicOperation.builder()
             .file(Path.of("first"))
@@ -242,12 +242,12 @@ public class PatchStrategyReplicationFactorTest {
     }
 
     @Test
-    public void should_patch_to_decrease_replication_factor() {
-
+    public void should_patch_to_decrease_the_replication_factor() {
+        //TODO
     }
 
     @Test
     public void should_throw_when_replication_factor_already_set() {
-
+        //TODO
     }
 }
