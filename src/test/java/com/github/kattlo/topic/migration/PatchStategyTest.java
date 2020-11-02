@@ -245,13 +245,4 @@ public class PatchStategyTest {
             patch.execute(admin));
     }
 
-    @Test
-    public void should_patch_replication_factor() {
-        //TODO
-    }
-
-    @Test
-    public void should_fail_when_exception_to_patch_replication_factor() {
-        // TODO
-    }
 }
