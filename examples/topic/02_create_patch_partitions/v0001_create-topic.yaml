@@ -1,5 +1,5 @@
 operation: create
 notes: 'Create the topic with default config'
-topic: create_topic_patch_partitions
+topic: 02_create_patch_partitions
 partitions: 2
 replicationFactor: 1

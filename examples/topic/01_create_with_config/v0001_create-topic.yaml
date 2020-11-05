@@ -1,0 +1,8 @@
+operation: create
+notes: |
+  Create the topic with some custom configurations and default
+  particions and replication factor.
+topic: 01_create_with_config
+config:
+  compression.type: gzip
+  cleanup.policy  : compact

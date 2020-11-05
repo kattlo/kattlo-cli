@@ -1,4 +1,4 @@
 operation: patch
 notes: 'Patch partitions to 3'
-topic: create_topic_patch_partitions
+topic: 02_create_patch_partitions
 partitions: 3
