@@ -1,0 +1,6 @@
+operation: patch
+notes: |
+  Path the replication factor to 2
+  Never patch the partitions immediately after replication factor patch
+topic: 03_create_patch_replication_factor
+replicationFactor: 2

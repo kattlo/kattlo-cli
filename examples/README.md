@@ -1,6 +1,8 @@
 # Kattlo Examples
 
-Install Kattlo and run the examples.
+1. Install Kattlo
+2. Create the `kafka.properties` file
+3. Run the examples
 
 ## Topics
 
@@ -22,4 +24,14 @@ kattlo \
   --kafka-cfg='kafka.properties' \
   topic \
   --directory='topic/02_create_patch_partitions'
+```
+
+- Create a topics and patch to increase the replication factor
+
+```bash
+kattlo \
+  --config-file='.kattlo.yaml' \
+  --kafka-cfg='kafka.properties' \
+  topic \
+  --directory='topic/03_create_patch_replication_factor'
 ```
