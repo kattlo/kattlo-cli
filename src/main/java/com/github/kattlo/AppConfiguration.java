@@ -5,6 +5,7 @@ import javax.enterprise.inject.Produces;
 
 import com.github.kattlo.core.backend.Backend;
 import com.github.kattlo.core.backend.memory.InMemoryMigrationBackend;
+import com.github.kattlo.core.kafka.Kafka;
 
 /**
  * @author fabiojose
@@ -18,4 +19,9 @@ public class AppConfiguration {
         return new InMemoryMigrationBackend();
     }
 
+    @Produces
+    @ApplicationScoped
+    Kafka kafka(){
+        return new Kafka();
+    }
 }
