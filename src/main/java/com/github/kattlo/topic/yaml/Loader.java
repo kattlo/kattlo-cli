@@ -17,6 +17,7 @@ import org.mapstruct.factory.Mappers;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Data;
 
 /**
@@ -143,6 +144,7 @@ public class Loader {
     }
 
     @Data
+    @RegisterForReflection
     public static class Model {
         private String operation;
         private String notes;
