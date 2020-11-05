@@ -65,7 +65,7 @@ public class TopicCommand implements Runnable {
             "-d",
             "--directory"
         },
-        description = "Diretory with topic migrations",
+        description = "Directory with topic migrations",
         required = true
     )
     public void setDirectory(File directory){
