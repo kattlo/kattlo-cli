@@ -4,14 +4,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
 import com.github.kattlo.schema.SchemaCommand;
 import com.github.kattlo.topic.TopicCommand;
-
-import org.yaml.snakeyaml.Yaml;
 
 import io.quarkus.picocli.runtime.annotations.TopCommand;
 import picocli.CommandLine;
@@ -25,8 +22,8 @@ import picocli.CommandLine.Model.CommandSpec;
  */
 @TopCommand
 @Command(
-    name = "ot",
-    version = "0.1",    
+    name = "kattlo",
+    version = "0.1",
     mixinStandardHelpOptions = true,
     subcommands = {
         TopicCommand.class,
@@ -41,9 +38,9 @@ public class EntryCommand {
     private boolean verbose;
 
     private File kafkaConfiguration;
-    private Map<String, Object> kafkaConfigurationValues;
-    
-    @Spec 
+    private Properties kafkaConfigurationValues;
+
+    @Spec
     private CommandSpec spec;
 
     @Option(
@@ -95,14 +92,13 @@ public class EntryCommand {
         this.kafkaConfiguration = Objects.requireNonNull(kafkaConfiguration);
     }
 
-    public Map<String, Object> getKafkaConfiguration() {
+    public Properties getKafkaConfiguration() {
         if(null== kafkaConfigurationValues){
-            final Yaml yaml = new Yaml();
+            kafkaConfigurationValues = new Properties();
 
             try{
-                kafkaConfigurationValues = 
-                    yaml.load(new FileReader(kafkaConfiguration));
-
+                kafkaConfigurationValues
+                    .load(new FileReader(kafkaConfiguration));
             }catch(IOException e){
                 throw new CommandLine
                     .ParameterException(spec.commandLine(),
@@ -112,7 +108,7 @@ public class EntryCommand {
         return kafkaConfigurationValues;
     }
 
-    public void validate() {
+    public void validateOptions() {
         if(!configuration.exists()){
             throw new CommandLine.
                 ParameterException(spec.commandLine(),
