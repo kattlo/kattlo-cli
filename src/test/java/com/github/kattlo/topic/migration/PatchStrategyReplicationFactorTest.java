@@ -242,12 +242,74 @@ public class PatchStrategyReplicationFactorTest {
     }
 
     @Test
-    public void should_patch_to_decrease_the_replication_factor() {
-        //TODO
+    public void should_patch_to_decrease_the_replication_factor() throws Exception {
+        // setup
+        var operation = TopicOperation.builder()
+            .file(Path.of("first"))
+            .version("v0002")
+            .operation("patch")
+            .notes("notes")
+            .topic("topic")
+            .replicationFactor(2)
+            .build();
+
+        var patch = Strategy.of(operation);
+
+        var nodes = new ArrayList<Node>();
+        nodes.add(new Node(9, "nodeA", 9092));
+        nodes.add(new Node(5, "nodeB", 9092));
+        nodes.add(new Node(7, "nodeC", 9092));
+        nodes.add(new Node(6, "nodeZ", 9092));
+
+        when(admin.describeCluster())
+            .thenReturn(describeClusterResult);
+
+        when(describeClusterResult.nodes())
+            .thenReturn(describeClusterResultFuture);
+
+        when(describeClusterResultFuture.get())
+            .thenReturn(nodes);
+
+        when(admin.describeTopics(anyCollection()))
+            .thenReturn(describeTopicsResult);
+
+        when(describeTopicsResult.all())
+            .thenReturn(describeTopicsResultFuture);
+
+        var tp0 = new TopicPartitionInfo(0, nodes.get(0), nodes.subList(0, 3), nodes.subList(0, 3));
+        var tp1 = new TopicPartitionInfo(1, nodes.get(1), nodes.subList(0, 3), nodes.subList(0, 3));
+        var tp2 = new TopicPartitionInfo(2, nodes.get(2), nodes.subList(0, 3), nodes.subList(0, 3));
+
+        var description = new TopicDescription("topic", false,
+            List.of(tp0, tp1, tp2));
+
+        when(describeTopicsResultFuture.get())
+            .thenReturn(Map.of("topic", description));
+
+        // act
+        patch.execute(admin);
+
+        verify(admin).alterPartitionReassignments(captor.capture());
+        var actual = captor.getValue();
+
+        // assert
+        assertEquals(3, actual.size()); //partitions
+
+        var tp0Assignments = actual.get(new TopicPartition("topic", 0));
+        assertEquals(2, tp0Assignments.get().targetReplicas().size());
+
+        var tp1Assignments = actual.get(new TopicPartition("topic", 1));
+        assertEquals(2, tp1Assignments.get().targetReplicas().size());
     }
 
     @Test
     public void should_throw_when_replication_factor_already_set() {
         //TODO
     }
+
+    @Test
+    public void should_fail_when_topic_does_not_exists() {
+        //TODO
+    }
+
 }

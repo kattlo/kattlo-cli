@@ -245,4 +245,9 @@ public class PatchStategyTest {
             patch.execute(admin));
     }
 
+    @Test
+    public void should_fail_topic_does_not_exists() {
+
+    }
+
 }

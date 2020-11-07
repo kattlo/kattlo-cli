@@ -64,6 +64,21 @@ public class PatchStrategy implements Strategy {
         }
     }
 
+    private ArrayList<Node> decreaseReplicationFactor(List<Node> currentReplicas, int toDecrease) {
+        log.debug("Replication factor to decrease {}", toDecrease);
+
+        var newReplicas = new ArrayList<>(currentReplicas);
+        for(int index = currentReplicas.size() - 1, decrease = 0;
+                index >= 0 && decrease < Math.abs(toDecrease);
+                index--, decrease++){
+
+            var removed = newReplicas.remove(index);
+            log.debug("Removed replica {}", removed);
+        }
+
+        return newReplicas;
+    }
+
     void patchReplicationFactor(AdminClient admin) {
 
         // Fetch brokers list
@@ -99,8 +114,9 @@ public class PatchStrategy implements Strategy {
 
                     final var newReplicas =
                       description.partitions().stream()
+                        .filter(info -> info.replicas().size() < toIncrease)
                         .peek(info ->
-                            log.debug("Info of {}: {}",
+                            log.debug("Info of topic {}: {}",
                                 operation.getTopic(), info))
                         .filter(info -> !info.replicas().containsAll(nodes))
                         .map(info -> {
@@ -125,6 +141,10 @@ public class PatchStrategy implements Strategy {
                         .map(kv -> {
                             var newValue = new ArrayList<>(kv.getValue());
                             newValue.addAll(newReplicas);
+
+                            if(toIncrease < 0){
+                                newValue = decreaseReplicationFactor(newValue, toIncrease);
+                            }
 
                             return Map.entry(kv.getKey(), newValue);
                         })
