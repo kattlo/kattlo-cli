@@ -100,10 +100,20 @@ public class PatchStrategy implements Strategy {
                 try {
                     final var details = result.all().get();
                     final var description = details.get(operation.getTopic());
+                    final var actualReplicationFactor =
+                        description.partitions()
+                            .get(FIRST_POSITION)
+                            .replicas().size();
+                    log.debug("Actual replication factor: {}", actualReplicationFactor);
 
                     final var toIncrease =
                         operation.getReplicationFactor()
-                        - description.partitions().size();
+                        - actualReplicationFactor;
+
+                    if(toIncrease == ZERO){
+                        throw new TopicPatchException("Replication factor already set: "
+                            + actualReplicationFactor);
+                    }
 
                     log.debug("Replication factor to increase: {}", toIncrease);
 
