@@ -300,6 +300,9 @@ public class PatchStrategyReplicationFactorTest {
 
         var tp1Assignments = actual.get(new TopicPartition("topic", 1));
         assertEquals(2, tp1Assignments.get().targetReplicas().size());
+
+        var tp2Assignments = actual.get(new TopicPartition("topic", 2));
+        assertEquals(2, tp2Assignments.get().targetReplicas().size());
     }
 
     @Test
