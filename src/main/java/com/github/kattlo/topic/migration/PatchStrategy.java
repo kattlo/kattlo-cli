@@ -40,6 +40,7 @@ public class PatchStrategy implements Strategy {
 
     private static final String DEFAULT_KEYWORD = "$default";
     private static final int FIRST_POSITION = 0;
+    private static final int ZERO = 0;
 
     @NonNull
     private final TopicOperation operation;
@@ -68,8 +69,8 @@ public class PatchStrategy implements Strategy {
         log.debug("Replication factor to decrease {}", toDecrease);
 
         var newReplicas = new ArrayList<>(currentReplicas);
-        for(int index = currentReplicas.size() - 1, decrease = 0;
-                index >= 0 && decrease < Math.abs(toDecrease);
+        for(int index = currentReplicas.size() - 1, decrease = ZERO;
+                index >= ZERO && decrease < Math.abs(toDecrease);
                 index--, decrease++){
 
             var removed = newReplicas.remove(index);
@@ -114,10 +115,10 @@ public class PatchStrategy implements Strategy {
 
                     final var newReplicas =
                       description.partitions().stream()
-                        .filter(info -> info.replicas().size() < toIncrease)
                         .peek(info ->
                             log.debug("Info of topic {}: {}",
                                 operation.getTopic(), info))
+                        .filter(info -> toIncrease > ZERO)
                         .filter(info -> !info.replicas().containsAll(nodes))
                         .map(info -> {
                             var candidate = new ArrayList<>(nodes);
@@ -142,7 +143,7 @@ public class PatchStrategy implements Strategy {
                             var newValue = new ArrayList<>(kv.getValue());
                             newValue.addAll(newReplicas);
 
-                            if(toIncrease < 0){
+                            if(toIncrease < ZERO){
                                 newValue = decreaseReplicationFactor(newValue, toIncrease);
                             }
 
