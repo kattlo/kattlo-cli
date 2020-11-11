@@ -10,7 +10,6 @@ repositories {
 
 dependencies {
     implementation 'io.quarkus:quarkus-picocli'
-    implementation 'io.quarkus:quarkus-resteasy-jsonb'
     implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
     implementation 'info.picocli:picocli-codegen'
     implementation 'org.yaml:snakeyaml:1.27'
