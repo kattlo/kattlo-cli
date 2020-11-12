@@ -1,7 +1,6 @@
 package com.github.kattlo.topic.migration;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
@@ -9,7 +8,6 @@ import com.github.kattlo.topic.yaml.TopicOperation;
 
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.TopicDescription;
-import org.apache.kafka.common.errors.InterruptException;
 
 import lombok.AccessLevel;
 import lombok.NonNull;
