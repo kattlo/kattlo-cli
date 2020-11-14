@@ -3,12 +3,16 @@ package com.github.kattlo.topic.migration;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import com.github.kattlo.topic.yaml.TopicOperation;
@@ -17,9 +21,13 @@ import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AlterConfigOp;
 import org.apache.kafka.clients.admin.AlterConfigsResult;
 import org.apache.kafka.clients.admin.CreatePartitionsResult;
+import org.apache.kafka.clients.admin.DescribeTopicsResult;
 import org.apache.kafka.clients.admin.NewPartitions;
+import org.apache.kafka.clients.admin.TopicDescription;
 import org.apache.kafka.clients.admin.AlterConfigOp.OpType;
 import org.apache.kafka.common.KafkaFuture;
+import org.apache.kafka.common.Node;
+import org.apache.kafka.common.TopicPartitionInfo;
 import org.apache.kafka.common.config.ConfigResource;
 import org.apache.kafka.common.config.ConfigResource.Type;
 import org.junit.jupiter.api.Test;
@@ -50,11 +58,40 @@ public class PatchStategyTest {
     @Mock
     KafkaFuture<Void> configsResultFuture;
 
+    @Mock
+    DescribeTopicsResult describeTopicsResult;
+
+    @Mock
+    KafkaFuture<Map<String, TopicDescription>> describeTopicsResultFuture;
+
     @Captor
     ArgumentCaptor<Map<String, NewPartitions>> newPartitionsCaptor;
 
     @Captor
     ArgumentCaptor<Map<ConfigResource, Collection<AlterConfigOp>>> newConfigCaptor;
+
+    private void describePartitionsMockitoWhen() throws Exception {
+
+        var nodes = new ArrayList<Node>();
+        nodes.add(new Node(9, "nodeA", 9092));
+        nodes.add(new Node(5, "nodeB", 9092));
+        nodes.add(new Node(7, "nodeC", 9092));
+
+        var tp0 = new TopicPartitionInfo(0, nodes.get(0), nodes.subList(0, 2), nodes.subList(0, 2));
+        var tp1 = new TopicPartitionInfo(1, nodes.get(1), nodes.subList(0, 2), nodes.subList(0, 2));
+
+        var description = new TopicDescription("topic", false,
+            List.of(tp0, tp1));
+
+        when(admin.describeTopics(anyCollection()))
+            .thenReturn(describeTopicsResult);
+
+        when(describeTopicsResult.all())
+            .thenReturn(describeTopicsResultFuture);
+
+        when(describeTopicsResultFuture.get())
+            .thenReturn(Map.of("topic", description));
+    }
 
     private void partitionsMockitoWhen() throws Exception {
 
@@ -67,6 +104,7 @@ public class PatchStategyTest {
         when(partitionsResultFuture.get())
             .thenReturn((Void)null);
 
+        describePartitionsMockitoWhen();
     }
 
     private void configMockitoWhen() throws Exception {
@@ -79,6 +117,8 @@ public class PatchStategyTest {
 
         when(configsResultFuture.get())
             .thenReturn((Void)null);
+
+        describePartitionsMockitoWhen();
     }
 
     @Test
@@ -199,11 +239,7 @@ public class PatchStategyTest {
 
         var patch = Strategy.of(operation);
 
-        when(admin.createPartitions(anyMap()))
-            .thenReturn(partitionsResult);
-
-        when(partitionsResult.all())
-            .thenReturn(partitionsResultFuture);
+        partitionsMockitoWhen();
 
         when(partitionsResultFuture.get())
             .thenThrow(new InterruptedException("failure"));
@@ -231,6 +267,8 @@ public class PatchStategyTest {
 
         var patch = Strategy.of(operation);
 
+        describePartitionsMockitoWhen();
+
         when(admin.incrementalAlterConfigs(anyMap()))
             .thenReturn(configsResult);
 
@@ -246,8 +284,33 @@ public class PatchStategyTest {
     }
 
     @Test
-    public void should_fail_topic_does_not_exists() {
+    public void should_fail_when_topic_does_not_exists() throws Exception {
+        // setup
+        var operation = TopicOperation.builder()
+            .file(Path.of("first"))
+            .version("v0002")
+            .operation("patch")
+            .notes("notes")
+            .topic("-no-exists-")
+            .partitions(4)
+            .build();
 
+        var patch = Strategy.of(operation);
+
+        when(admin.describeTopics(anyCollection()))
+            .thenReturn(describeTopicsResult);
+
+        when(describeTopicsResult.all())
+            .thenReturn(describeTopicsResultFuture);
+
+        when(describeTopicsResultFuture.get())
+            .thenReturn(Map.of());
+
+        // act & assert
+        var actual =
+        assertThrows(TopicPatchException.class, () ->
+            patch.execute(admin));
+
+        assertTrue(actual.getMessage().contains("topic does not exists"));
     }
-
 }

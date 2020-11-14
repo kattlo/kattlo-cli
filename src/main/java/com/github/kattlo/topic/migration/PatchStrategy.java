@@ -4,7 +4,6 @@ import static org.apache.kafka.clients.admin.NewPartitions.increaseTo;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -13,12 +12,14 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+import com.github.kattlo.topic.TopicUtils;
 import com.github.kattlo.topic.yaml.TopicOperation;
 
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AlterConfigOp;
 import org.apache.kafka.clients.admin.ConfigEntry;
 import org.apache.kafka.clients.admin.NewPartitionReassignment;
+import org.apache.kafka.clients.admin.TopicDescription;
 import org.apache.kafka.clients.admin.AlterConfigOp.OpType;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.TopicPartition;
@@ -80,7 +81,7 @@ public class PatchStrategy implements Strategy {
         return newReplicas;
     }
 
-    void patchReplicationFactor(AdminClient admin) {
+    void patchReplicationFactor(AdminClient admin, TopicDescription description) {
 
         // Fetch brokers list
         var cluster = admin.describeCluster();
@@ -92,94 +93,82 @@ public class PatchStrategy implements Strategy {
             // is new size of replication factor less or equal of
             if(operation.getReplicationFactor() <= nodes.size()){
 
-                // describe topic
-                var result =
-                    admin.describeTopics(Collections
-                        .singletonList(operation.getTopic()));
+                final var actualReplicationFactor =
+                    description.partitions()
+                        .get(FIRST_POSITION)
+                        .replicas().size();
+                log.debug("Actual replication factor: {}", actualReplicationFactor);
 
-                try {
-                    final var details = result.all().get();
-                    final var description = details.get(operation.getTopic());
-                    final var actualReplicationFactor =
-                        description.partitions()
-                            .get(FIRST_POSITION)
-                            .replicas().size();
-                    log.debug("Actual replication factor: {}", actualReplicationFactor);
+                final var toIncrease =
+                    operation.getReplicationFactor()
+                    - actualReplicationFactor;
 
-                    final var toIncrease =
-                        operation.getReplicationFactor()
-                        - actualReplicationFactor;
-
-                    if(toIncrease == ZERO){
-                        throw new TopicPatchException("Replication factor already set: "
-                            + actualReplicationFactor);
-                    }
-
-                    log.debug("Replication factor to increase: {}", toIncrease);
-
-                    var currentReplicas =
-                      description.partitions().stream()
-                        .collect(Collectors.toMap(
-                            TopicPartitionInfo::partition,
-                            TopicPartitionInfo::replicas));
-
-                    final var newReplicas =
-                      description.partitions().stream()
-                        .peek(info ->
-                            log.debug("Info of topic {}: {}",
-                                operation.getTopic(), info))
-                        .filter(info -> toIncrease > ZERO)
-                        .filter(info -> !info.replicas().containsAll(nodes))
-                        .map(info -> {
-                            var candidate = new ArrayList<>(nodes);
-                            candidate.removeAll(info.replicas());
-
-                            return candidate;
-                        })
-                        .peek(candidate ->
-                            log.debug("Candidate replicas {}", candidate))
-                        .map(candidate ->
-                            candidate.subList(FIRST_POSITION, toIncrease))
-                        .flatMap(List::stream)
-                        .distinct()
-                        .peek(newOnes -> log.debug("New replicas {}", newOnes))
-                        .collect(Collectors.toList());
-
-                    // For each topic-partition
-                    var newAssignments =
-                      currentReplicas.entrySet().stream()
-                        .peek(kv -> log.debug("Current Replicas {}", kv.getValue()))
-                        .map(kv -> {
-                            var newValue = new ArrayList<>(kv.getValue());
-                            newValue.addAll(newReplicas);
-
-                            if(toIncrease < ZERO){
-                                newValue = decreaseReplicationFactor(newValue, toIncrease);
-                            }
-
-                            return Map.entry(kv.getKey(), newValue);
-                        })
-                        .peek(kv -> log.debug("New Replicas {}", kv.getValue()))
-                        .map(kv -> {
-                            var assigment = new NewPartitionReassignment(
-                                kv.getValue().stream()
-                                    .map(Node::id)
-                                    .collect(Collectors.toList()));
-
-                            return Map.entry(
-                                new TopicPartition(operation.getTopic(), kv.getKey()),
-                                    Optional.of(assigment));
-                        })
-                        .peek(kv -> log.debug("New Assignments: {}",
-                                kv.getValue().get().targetReplicas()))
-                        .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
-
-                    admin.alterPartitionReassignments(newAssignments);
-                    log.debug("New assignments applied: {}", newAssignments);
-
-                }catch(InterruptedException | ExecutionException e){
-                    throw new TopicPatchException(e.getMessage(), e);
+                if(toIncrease == ZERO){
+                    throw new TopicPatchException("Replication factor already set: "
+                        + actualReplicationFactor);
                 }
+
+                log.debug("Replication factor to increase: {}", toIncrease);
+
+                var currentReplicas =
+                    description.partitions().stream()
+                    .collect(Collectors.toMap(
+                        TopicPartitionInfo::partition,
+                        TopicPartitionInfo::replicas));
+
+                final var newReplicas =
+                    description.partitions().stream()
+                    .peek(info ->
+                        log.debug("Info of topic {}: {}",
+                            operation.getTopic(), info))
+                    .filter(info -> toIncrease > ZERO)
+                    .filter(info -> !info.replicas().containsAll(nodes))
+                    .map(info -> {
+                        var candidate = new ArrayList<>(nodes);
+                        candidate.removeAll(info.replicas());
+
+                        return candidate;
+                    })
+                    .peek(candidate ->
+                        log.debug("Candidate replicas {}", candidate))
+                    .map(candidate ->
+                        candidate.subList(FIRST_POSITION, toIncrease))
+                    .flatMap(List::stream)
+                    .distinct()
+                    .peek(newOnes -> log.debug("New replicas {}", newOnes))
+                    .collect(Collectors.toList());
+
+                // For each topic-partition
+                var newAssignments =
+                    currentReplicas.entrySet().stream()
+                    .peek(kv -> log.debug("Current Replicas {}", kv.getValue()))
+                    .map(kv -> {
+                        var newValue = new ArrayList<>(kv.getValue());
+                        newValue.addAll(newReplicas);
+
+                        if(toIncrease < ZERO){
+                            newValue = decreaseReplicationFactor(newValue, toIncrease);
+                        }
+
+                        return Map.entry(kv.getKey(), newValue);
+                    })
+                    .peek(kv -> log.debug("New Replicas {}", kv.getValue()))
+                    .map(kv -> {
+                        var assigment = new NewPartitionReassignment(
+                            kv.getValue().stream()
+                                .map(Node::id)
+                                .collect(Collectors.toList()));
+
+                        return Map.entry(
+                            new TopicPartition(operation.getTopic(), kv.getKey()),
+                                Optional.of(assigment));
+                    })
+                    .peek(kv -> log.debug("New Assignments: {}",
+                            kv.getValue().get().targetReplicas()))
+                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+
+                admin.alterPartitionReassignments(newAssignments);
+                log.debug("New assignments applied: {}", newAssignments);
 
             } else {
                 throw new TopicPatchException("replication factor is greater than nodes: " + nodes.size());
@@ -229,18 +218,26 @@ public class PatchStrategy implements Strategy {
         log.debug("AdminClient {}", admin);
         log.debug("TopicOperation to perform {}", operation);
 
-        if(!Objects.isNull(operation.getPartitions())){
-            patchPartitions(admin);
-        }
+        try {
+            var description = TopicUtils.describe(operation.getTopic(), admin)
+                .orElseThrow(() ->
+                    new TopicPatchException("topic does not exists: "
+                            + operation.getTopic()));
 
-        if(!Objects.isNull(operation.getReplicationFactor())){
-            patchReplicationFactor(admin);
-        }
+            if(!Objects.isNull(operation.getPartitions())){
+                patchPartitions(admin);
+            }
 
-        if(!operation.getConfig().isEmpty()){
-            patchConfig(admin);
-        }
+            if(!Objects.isNull(operation.getReplicationFactor())){
+                patchReplicationFactor(admin, description);
+            }
 
+            if(!operation.getConfig().isEmpty()){
+                patchConfig(admin);
+            }
+        }catch(ExecutionException | InterruptedException e){
+            throw new TopicPatchException(e.getMessage(), e);
+        }
     }
 
 }

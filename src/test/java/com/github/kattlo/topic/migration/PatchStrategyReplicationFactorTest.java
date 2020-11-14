@@ -67,6 +67,31 @@ public class PatchStrategyReplicationFactorTest {
     @Mock
     private Node broker;
 
+    private void describeTopicsMockitoWhen() throws Exception {
+
+        when(admin.describeTopics(anyCollection()))
+            .thenReturn(describeTopicsResult);
+
+        when(describeTopicsResult.all())
+            .thenReturn(describeTopicsResultFuture);
+
+        var nodes = new ArrayList<Node>();
+        nodes.add(new Node(9, "nodeA", 9092));
+        nodes.add(new Node(5, "nodeB", 9092));
+        nodes.add(new Node(7, "nodeC", 9092));
+        nodes.add(new Node(6, "nodeZ", 9092));
+
+        var tp0 = new TopicPartitionInfo(0, nodes.get(0), nodes.subList(0, 3), nodes.subList(0, 3));
+        var tp1 = new TopicPartitionInfo(1, nodes.get(1), nodes.subList(0, 3), nodes.subList(0, 3));
+        var tp2 = new TopicPartitionInfo(2, nodes.get(2), nodes.subList(0, 3), nodes.subList(0, 3));
+
+        var description = new TopicDescription("topic", false,
+            List.of(tp0, tp1, tp2));
+
+        when(describeTopicsResultFuture.get())
+            .thenReturn(Map.of("topic", description));
+    }
+
     @Test
     public void should_throws_when_replication_is_greater_than_number_of_brokers()
             throws Exception {
@@ -95,6 +120,8 @@ public class PatchStrategyReplicationFactorTest {
 
         when(describeClusterResultFuture.get())
             .thenReturn(nodes);
+
+        describeTopicsMockitoWhen();
 
         // act
         var actual =
@@ -132,6 +159,8 @@ public class PatchStrategyReplicationFactorTest {
         when(describeClusterResultFuture.get())
             .thenThrow(new InterruptedException("interrupted"));
 
+        describeTopicsMockitoWhen();
+
         // act
         var actual =
             assertThrows(TopicPatchException.class, () -> patch.execute(admin));
@@ -153,20 +182,6 @@ public class PatchStrategyReplicationFactorTest {
             .build();
 
         var patch = Strategy.of(operation);
-
-        var nodes = new ArrayList<Node>();
-        nodes.add(new Node(9, "nodeA", 9092));
-        nodes.add(new Node(5, "nodeB", 9092));
-        nodes.add(new Node(7, "nodeC", 9092));
-
-        when(admin.describeCluster())
-            .thenReturn(describeClusterResult);
-
-        when(describeClusterResult.nodes())
-            .thenReturn(describeClusterResultFuture);
-
-        when(describeClusterResultFuture.get())
-            .thenReturn(nodes);
 
         when(admin.describeTopics(anyCollection()))
             .thenReturn(describeTopicsResult);
@@ -356,11 +371,6 @@ public class PatchStrategyReplicationFactorTest {
             patch.execute(admin));
 
         assertTrue(actual.getMessage().contains("already set"));
-    }
-
-    @Test
-    public void should_fail_when_topic_does_not_exists() {
-        //TODO
     }
 
 }
