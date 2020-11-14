@@ -1,6 +1,5 @@
 operation: create
 notes: >-
-  Create a topic with Cluster default for patitions,
-  replication factor and config
+  Create a topic with Cluster default for patitions and config
 topic: 04_create_patch_reduce_replication_factor
 replicationFactor: 3
