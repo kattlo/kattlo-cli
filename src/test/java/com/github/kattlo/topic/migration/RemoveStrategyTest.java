@@ -108,7 +108,7 @@ public class RemoveStrategyTest {
     }
 
     @Test
-    public void should_fail_topic_does_not_exists() throws Exception {
+    public void should_fail_when_topic_does_not_exists() throws Exception {
 
         // setup
         var operation = TopicOperation.builder()

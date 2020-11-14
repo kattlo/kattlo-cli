@@ -1,13 +1,12 @@
 package com.github.kattlo.topic.migration;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
+import com.github.kattlo.topic.TopicUtils;
 import com.github.kattlo.topic.yaml.TopicOperation;
 
 import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.TopicDescription;
 
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -24,23 +23,11 @@ public class RemoveStrategy implements Strategy {
     @NonNull
     private final TopicOperation operation;
 
-    private Optional<TopicDescription> describe(String topic, AdminClient admin)
-            throws ExecutionException, InterruptedException {
-
-        log.debug("Try to describe the {}", topic);
-        var topicsResult = admin.describeTopics(List.of(topic));
-
-        var descriptions = topicsResult.all().get();
-        log.debug("Description of {}: {}", topic, descriptions);
-
-        return Optional.ofNullable(descriptions.get(topic));
-    }
-
     @Override
     public void execute(AdminClient admin) {
 
         try {
-            var description = describe(operation.getTopic(), admin)
+            var description = TopicUtils.describe(operation.getTopic(), admin)
                 .orElseThrow(() ->
                     new TopicRemoveException("topic does not exists: "
                         + operation.getTopic()));
