@@ -1,0 +1,5 @@
+operation: create
+notes: >-
+  Create a topic with Cluster default for patitions,
+  replication factor and config
+topic: 05_create_and_remove
