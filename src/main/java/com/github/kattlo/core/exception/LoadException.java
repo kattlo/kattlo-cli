@@ -1,4 +1,4 @@
-package com.github.kattlo.topic.yaml;
+package com.github.kattlo.core.exception;
 
 /**
  * @author fabiojose

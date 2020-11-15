@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import com.github.kattlo.core.exception.LoadException;
 import com.github.kattlo.topic.yaml.Loader.Model;
 
 import org.junit.jupiter.api.Test;
