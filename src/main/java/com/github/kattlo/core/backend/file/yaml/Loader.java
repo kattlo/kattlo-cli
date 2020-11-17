@@ -1,7 +1,8 @@
 package com.github.kattlo.core.backend.file.yaml;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 import com.github.kattlo.core.backend.file.yaml.model.State;
@@ -24,8 +25,9 @@ public final class Loader {
     public static State load(Path file) {
 
         try {
-            return YAML.load(new FileReader(file.toFile()));
-        }catch(FileNotFoundException e){
+            return YAML.load(new FileReader(file.toFile(),
+                Charset.forName("UTF-8")));
+        }catch(IOException e){
             throw new LoadException(e);
         }
 
