@@ -7,6 +7,8 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.Data;
 
 /**
+ * The current and acumulative state of an Topic.
+ *
  * @author fabiojose
  */
 @Data
