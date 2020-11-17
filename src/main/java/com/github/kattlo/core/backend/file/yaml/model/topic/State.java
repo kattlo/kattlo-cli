@@ -1,4 +1,4 @@
-package com.github.kattlo.core.backend.file.yaml.model;
+package com.github.kattlo.core.backend.file.yaml.model.topic;
 
 import java.util.List;
 

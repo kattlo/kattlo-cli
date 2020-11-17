@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 
-import com.github.kattlo.core.backend.file.yaml.model.State;
+import com.github.kattlo.core.backend.file.yaml.model.topic.State;
 import com.github.kattlo.core.exception.LoadException;
 
 import org.yaml.snakeyaml.Yaml;

@@ -9,10 +9,10 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-import com.github.kattlo.core.backend.file.yaml.model.Current;
-import com.github.kattlo.core.backend.file.yaml.model.History;
-import com.github.kattlo.core.backend.file.yaml.model.Original;
-import com.github.kattlo.core.backend.file.yaml.model.State;
+import com.github.kattlo.core.backend.file.yaml.model.topic.Current;
+import com.github.kattlo.core.backend.file.yaml.model.topic.History;
+import com.github.kattlo.core.backend.file.yaml.model.topic.Original;
+import com.github.kattlo.core.backend.file.yaml.model.topic.State;
 import com.github.kattlo.core.exception.WriteException;
 
 import org.junit.jupiter.api.Test;
