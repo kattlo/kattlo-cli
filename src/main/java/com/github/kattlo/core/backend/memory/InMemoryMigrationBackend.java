@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import com.github.kattlo.core.backend.Backend;
 import com.github.kattlo.core.backend.Migration;
-import com.github.kattlo.core.backend.MigrationStatus;
+import com.github.kattlo.core.backend.ResourceStatus;
 import com.github.kattlo.core.backend.MigrationToApply;
 import com.github.kattlo.core.backend.ResourceType;
 
@@ -33,7 +33,7 @@ public class InMemoryMigrationBackend implements
         final Migration migration = new Migration();
         migration.setApplied(applied);
         migration.setTimestamp(LocalDateTime.now());
-        migration.setStatus(MigrationStatus.AVAILABLE);
+        migration.setStatus(ResourceStatus.AVAILABLE);
 
         MIGRATIONS.put(keyOf(applied), migration);
 

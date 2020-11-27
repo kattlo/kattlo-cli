@@ -17,6 +17,6 @@ public class Migration {
 
     @NonNull private MigrationToApply applied;
     @NonNull private LocalDateTime timestamp;
-    @NonNull private MigrationStatus status;
+    @NonNull private ResourceStatus status;
 
 }

@@ -14,13 +14,19 @@ import lombok.NonNull;
 public class MigrationToApply {
 
     @NonNull private String version;
-    @NonNull private String source;
-
     @NonNull private OperationType operation;
-    private String notes;
-
     @NonNull private ResourceType resourceType;
-
     @NonNull private String resourceName;
 
+    /**
+     * MIME type of content
+     */
+    @NonNull private String contentType;
+
+    /**
+     * Migration content
+     */
+    @NonNull private byte[] content;
+
+    private String notes;
 }

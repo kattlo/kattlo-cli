@@ -7,8 +7,19 @@ import java.util.Optional;
  */
 public interface Backend {
 
+    /**
+     * Fetches the current state of resource
+     */
+    //Optional<CurrentState> current(ResourceType type, String name);
+
+    /**
+     * Fetches the latest applied migration
+     */
     Optional<Migration> latest(ResourceType type, String name);
 
+    /**
+     * Confirms an applied migration
+     */
     Migration commit(MigrationToApply migration);
 
 }
