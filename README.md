@@ -36,7 +36,7 @@ __Example__: `kafka.properties`
 
 ```properties
 bootstrap.servers=localhost:19092,localhost:29092
-client.id=bakon
+client.id=kattlo-cli
 ```
 
 __Command__:
@@ -115,7 +115,13 @@ If you want to build an _über-jar_, just add the `--uber-jar` option to the com
 
 ### Creating a native executable
 
-You can create a native executable using: `./gradlew build -Dquarkus.package.type=native`.
+You can create a native executable using:
+
+```bash
+./gradlew build -Dquarkus.package.type=native \
+ -Dquarkus.native.container-build=true \
+ -Dquarkus.native.additional-build-args=--report-unsupported-elements-at-runtime,--allow-incomplete-classpath
+```
 
 Or, if you don't have GraalVM installed, you can run the native executable build in a container using: `./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true`.
 
