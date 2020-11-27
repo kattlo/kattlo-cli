@@ -1,6 +1,9 @@
 package com.github.kattlo.core.backend;
 
-public enum MigrationStatus {
+/**
+ * @author fabiojose
+ */
+public enum ResourceStatus {
 
     AVAILABLE,
     DELETED;
