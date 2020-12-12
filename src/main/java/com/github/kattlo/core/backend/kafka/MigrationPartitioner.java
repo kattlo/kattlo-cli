@@ -25,7 +25,7 @@ public class MigrationPartitioner implements Partitioner {
     private static final int PARTITIONS = 50;
 
     private static final Map<ResourceType, String> TOPIC = Map.of(
-        ResourceType.TOPIC, "__kattlo-topics-state"
+        ResourceType.TOPIC, KafkaBackend.TOPIC_T
     );
 
     @Override
