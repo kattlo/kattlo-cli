@@ -9,7 +9,8 @@ import org.apache.kafka.clients.admin.AdminClient;
  */
 public class Kafka {
 
-    public AdminClient adminFor(Properties config) {
-        return AdminClient.create(config);
+    public AdminClient adminFor(Properties configs) {
+        return AdminClient.create(configs);
     }
+
 }
