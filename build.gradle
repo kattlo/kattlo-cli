@@ -13,7 +13,11 @@ dependencies {
     implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
     implementation 'info.picocli:picocli-codegen'
     implementation 'org.yaml:snakeyaml:1.27'
-    implementation 'org.apache.kafka:kafka-clients:2.6.0'
+    //implementation 'org.apache.kafka:kafka-clients:2.6.0'
+    implementation "io.quarkus:quarkus-kafka-client:${quarkusPlatformVersion}"
+    implementation('org.eclipse:yasson:2.0.1'){
+        exclude group: 'org.glassfish'
+    }
     implementation 'org.apache.commons:commons-lang3:3.11'
 
     testImplementation "org.testcontainers:kafka:1.14.3"
