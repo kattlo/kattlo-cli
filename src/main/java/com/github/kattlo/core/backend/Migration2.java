@@ -52,4 +52,11 @@ public class Migration2 {
         );
     }
 
+    public String key() {
+        return keyFor(getResourceType(), getResourceName());
+    }
+
+    public static String keyFor(ResourceType type, String name) {
+        return type + "_" + name;
+    }
 }
