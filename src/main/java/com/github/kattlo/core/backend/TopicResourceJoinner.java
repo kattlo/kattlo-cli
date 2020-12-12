@@ -1,5 +1,6 @@
 package com.github.kattlo.core.backend;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,18 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class TopicResourceJoinner {
+
+    @SuppressWarnings("unchecked")
+    static List<Object> historyOf(Map<String, Object> map) {
+        var history = ((List<Object>)map.get("history"));
+
+        if(null== history){
+            history = new ArrayList<>();
+            map.put("history", history);
+        }
+
+        return history;
+    }
 
     @SuppressWarnings("unchecked")
     public Map<String, Object> join(Map<String, Object> left, Migration2 right) {
@@ -32,7 +45,7 @@ public class TopicResourceJoinner {
         var rightCopy = new HashMap<String, Object>();
         rightCopy.putAll(right.asMigrationMap());
 
-        ((List<Object>)leftCopy.get("history"))
+        historyOf(leftCopy)
             .add(new HashMap<String, Object>(rightCopy));
 
         rightCopy.remove("attributes");
