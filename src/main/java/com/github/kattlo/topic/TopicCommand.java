@@ -10,8 +10,7 @@ import javax.inject.Inject;
 
 import com.github.kattlo.EntryCommand;
 import com.github.kattlo.core.backend.Backend;
-import com.github.kattlo.core.backend.Migration;
-import com.github.kattlo.core.backend.MigrationToApply;
+import com.github.kattlo.core.backend.Resource;
 import com.github.kattlo.core.backend.ResourceType;
 import com.github.kattlo.core.kafka.Kafka;
 import com.github.kattlo.topic.migration.Strategy;
@@ -110,14 +109,13 @@ public class TopicCommand implements Runnable {
 
                 // fetch the 'topic' latest migration
                 final var latestMigration =
-                    backend.latest(
+                    backend.current(
                         ResourceType.TOPIC,
                         operation.getTopic());
 
                 final var currentVersion =
                     latestMigration
-                        .map(Migration::getApplied)
-                        .map(MigrationToApply::getVersion)
+                        .map(Resource::getVersion)
                         .orElse(NO_VERSION);
 
                 // Remove all migrations related to migrationModel.getTopic()

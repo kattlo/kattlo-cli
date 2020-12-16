@@ -1,6 +1,7 @@
 package com.github.kattlo.core.backend;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * @author fabiojose
@@ -8,18 +9,17 @@ import java.util.Optional;
 public interface Backend {
 
     /**
-     * Fetches the current state of resource
-     */
-    //Optional<CurrentState> current(ResourceType type, String name);
-
-    /**
-     * Fetches the latest applied migration
-     */
-    Optional<Migration> latest(ResourceType type, String name);
-
-    /**
      * Confirms an applied migration
      */
-    Migration commit(MigrationToApply migration);
+    Resource commit(Migration applied);
 
+    /**
+     * Fetches the current state of resource
+     */
+    Optional<Resource> current(ResourceType type, String name);
+
+    /**
+     * Fetches the resource migration history
+     */
+    Stream<Migration> history(ResourceType type, String name);
 }

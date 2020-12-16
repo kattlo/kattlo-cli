@@ -27,7 +27,7 @@ public class TopicResourceJoinner {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<String, Object> join(Map<String, Object> left, Migration2 right) {
+    public Map<String, Object> join(Map<String, Object> left, Migration right) {
 
         var attributesLeft = new HashMap<String, Object>();
         attributesLeft.putAll(Optional

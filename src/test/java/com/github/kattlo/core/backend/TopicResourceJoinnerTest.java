@@ -52,7 +52,7 @@ public class TopicResourceJoinnerTest {
 
         var config = Map.of("retention.bytes", "1024");
 
-        var right = new Migration2();
+        var right = new Migration();
         right.setAttributes(Map.of(
             "partitions", "7",
             "config", config
@@ -111,7 +111,7 @@ public class TopicResourceJoinnerTest {
 
         var config = Map.of("retention.bytes", "1024");
 
-        var right = new Migration2();
+        var right = new Migration();
         right.setAttributes(Map.of(
             "partitions", "7",
             "config", config
@@ -163,7 +163,7 @@ public class TopicResourceJoinnerTest {
 
         var config = Map.of();
 
-        var right = new Migration2();
+        var right = new Migration();
         right.setAttributes(Map.of(
             "partitions", "7",
             "config", config
@@ -216,7 +216,7 @@ public class TopicResourceJoinnerTest {
 
         var config = Map.of("retention.bytes", "1024");
 
-        var right = new Migration2();
+        var right = new Migration();
         right.setAttributes(Map.of(
             "partitions", "7",
             "config", config
@@ -285,7 +285,7 @@ public class TopicResourceJoinnerTest {
 
         var config = Map.of("retention.bytes", "1024");
 
-        var right = new Migration2();
+        var right = new Migration();
         right.setAttributes(Map.of(
             "partitions", "7",
             "config", config
@@ -352,7 +352,7 @@ public class TopicResourceJoinnerTest {
 
         var config = Map.of("retention.bytes", "1024");
 
-        var right = new Migration2();
+        var right = new Migration();
         right.setAttributes(Map.of(
             "partitions", "7",
             "config", config

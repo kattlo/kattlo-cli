@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.github.kattlo.core.backend.Migration2;
+import com.github.kattlo.core.backend.Migration;
 import com.github.kattlo.core.backend.OperationType;
 import com.github.kattlo.core.backend.ResourceType;
 
@@ -42,7 +42,7 @@ public class ResourceCommit {
      * Creates a copy of migration with empty {@link ResourceCommit#attributes}
      * and {@link ResourceCommit#history}
      */
-    public static ResourceCommit from(Migration2 migration){
+    public static ResourceCommit from(Migration migration){
 
         var commit = new ResourceCommit();
         commit.setVersion(migration.getVersion());

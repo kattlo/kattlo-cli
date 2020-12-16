@@ -3,8 +3,13 @@ package com.github.kattlo.core.backend.memory;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.github.kattlo.core.backend.Migration;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+
+import com.github.kattlo.core.backend.OperationType;
 import com.github.kattlo.core.backend.ResourceType;
+import com.github.kattlo.core.backend.kafka.ResourceCommit;
 
 import org.junit.jupiter.api.Test;
 
@@ -24,10 +29,20 @@ public class InMemoryMigrationBackendTest {
     @Test
     public void should_commit_the_applied_migration() {
 
-        InMemoryMigrationBackend
-            .MIGRATIONS.put("{TOPIC}applied", new Migration());
+        var commit = new ResourceCommit();
+        commit.setVersion("v0001");
+        commit.setOperation(OperationType.CREATE);
+        commit.setNotes("Some notes");
+        commit.setResourceType(ResourceType.TOPIC);
+        commit.setResourceName("topic-1");
+        commit.setTimestamp(LocalDateTime.now());
+        commit.setAttributes(Map.of());
+        commit.setHistory(List.of());
 
-        var actual = backend.latest(ResourceType.TOPIC, "applied");
+        InMemoryMigrationBackend
+            .MIGRATIONS.put("{TOPIC}applied", commit);
+
+        var actual = backend.current(ResourceType.TOPIC, "applied");
 
         assertTrue(actual.isPresent());
     }
@@ -35,7 +50,7 @@ public class InMemoryMigrationBackendTest {
     @Test
     public void should_result_empty_when_no_migrations() {
 
-        var actual = backend.latest(ResourceType.TOPIC, "name");
+        var actual = backend.current(ResourceType.TOPIC, "name");
 
         assertTrue(actual.isEmpty());
     }

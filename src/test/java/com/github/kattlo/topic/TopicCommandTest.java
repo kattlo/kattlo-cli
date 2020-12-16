@@ -16,8 +16,7 @@ import java.util.Optional;
 
 import com.github.kattlo.EntryCommand;
 import com.github.kattlo.core.backend.Backend;
-import com.github.kattlo.core.backend.Migration;
-import com.github.kattlo.core.backend.MigrationToApply;
+import com.github.kattlo.core.backend.Resource;
 import com.github.kattlo.core.kafka.Kafka;
 import com.github.kattlo.topic.migration.Strategy;
 import com.github.kattlo.topic.yaml.TopicOperation;
@@ -76,7 +75,7 @@ public class TopicCommandTest {
 
     private void mockitoWhen() throws Exception {
 
-        when(backend.latest(any(), anyString()))
+        when(backend.current(any(), anyString()))
             .thenReturn(Optional.empty());
 
         when(kafka.adminFor(any()))
@@ -247,13 +246,11 @@ public class TopicCommandTest {
         final String topic = "08_try_to_create_patch_remove";
         final File directory = new File("./src/test/resources/topics/08_try_to_create_patch_remove/");
 
-        final var applied = new MigrationToApply();
+        final var applied = new Resource();
         applied.setVersion("v0002");
-        final var latest = new Migration();
-        latest.setApplied(applied);
 
-        when(backend.latest(any(), anyString()))
-            .thenReturn(Optional.of(latest));
+        when(backend.current(any(), anyString()))
+            .thenReturn(Optional.of(applied));
 
         when(kafka.adminFor(any()))
             .thenReturn(admin);

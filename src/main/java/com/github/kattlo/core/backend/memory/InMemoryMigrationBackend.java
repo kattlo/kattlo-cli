@@ -1,48 +1,49 @@
 package com.github.kattlo.core.backend.memory;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import com.github.kattlo.core.backend.Backend;
 import com.github.kattlo.core.backend.Migration;
-import com.github.kattlo.core.backend.ResourceStatus;
-import com.github.kattlo.core.backend.MigrationToApply;
+import com.github.kattlo.core.backend.Resource;
 import com.github.kattlo.core.backend.ResourceType;
+import com.github.kattlo.core.backend.kafka.ResourceCommit;
 
 /**
  * @author fabiojose
  */
-public class InMemoryMigrationBackend implements
-        Backend {
+public class InMemoryMigrationBackend implements Backend {
 
-    static final Map<String, Migration> MIGRATIONS =
-            new HashMap<>();
+    static final Map<String, ResourceCommit> MIGRATIONS = new HashMap<>();
 
     static final String keyOf(ResourceType type, String name) {
         return "{" + type + "}" + name;
     }
-    static final String keyOf(MigrationToApply applied) {
+
+    static final String keyOf(Migration applied) {
         return keyOf(applied.getResourceType(), applied.getResourceName());
     }
 
     @Override
-    public Migration commit(MigrationToApply applied) {
+    public Resource commit(Migration applied) {
 
-        final Migration migration = new Migration();
-        migration.setApplied(applied);
-        migration.setTimestamp(LocalDateTime.now());
-        migration.setStatus(ResourceStatus.AVAILABLE);
+        var commit = ResourceCommit.from(applied);
+        MIGRATIONS.put(keyOf(applied), commit);
 
-        MIGRATIONS.put(keyOf(applied), migration);
-
-        return migration;
+        return Resource.from(commit);
     }
 
     @Override
-    public Optional<Migration> latest(ResourceType type, String name) {
-        return Optional.ofNullable(MIGRATIONS.get(keyOf(type, name)));
+    public Optional<Resource> current(ResourceType type, String name) {
+        return Optional.ofNullable(MIGRATIONS.get(keyOf(type, name)))
+                .map(Resource::from);
+    }
+
+    @Override
+    public Stream<Migration> history(ResourceType type, String name) {
+        return Stream.empty();
     }
 
 }

@@ -16,7 +16,7 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import com.github.kattlo.core.backend.BackendException;
-import com.github.kattlo.core.backend.Migration2;
+import com.github.kattlo.core.backend.Migration;
 import com.github.kattlo.core.backend.OperationType;
 import com.github.kattlo.core.backend.Resource;
 import com.github.kattlo.core.backend.ResourceStatus;
@@ -104,7 +104,7 @@ public class KafkaBackendTest {
 
         var config = Map.of("compression.type", "snappy");
 
-        var applied = new Migration2();
+        var applied = new Migration();
         applied.setAttributes(Map.of(
             "partitions", "2",
             "replicationFactor", "1",
@@ -153,7 +153,7 @@ public class KafkaBackendTest {
 
         var config = Map.of("compression.type", "snappy");
 
-        var applied = new Migration2();
+        var applied = new Migration();
         applied.setAttributes(Map.of(
             "partitions", "2",
             "replicationFactor", "1",
@@ -201,7 +201,7 @@ public class KafkaBackendTest {
 
         var config = Map.of("compression.type", "snappy");
 
-        var applied = new Migration2();
+        var applied = new Migration();
         applied.setAttributes(Map.of(
             "partitions", "2",
             "replicationFactor", "1",
@@ -272,7 +272,7 @@ public class KafkaBackendTest {
 
         var config = Map.of("compression.type", "snappy");
 
-        var applied = new Migration2();
+        var applied = new Migration();
         applied.setAttributes(Map.of(
             "partitions", "2",
             "replicationFactor", "1",
@@ -319,7 +319,7 @@ public class KafkaBackendTest {
 
         var config = Map.of("compression.type", "snappy");
 
-        var applied = new Migration2();
+        var applied = new Migration();
         applied.setAttributes(Map.of(
             "partitions", "2",
             "replicationFactor", "1",
@@ -371,7 +371,7 @@ public class KafkaBackendTest {
 
         var config = Map.of("compression.type", "snappy");
 
-        var applied = new Migration2();
+        var applied = new Migration();
         applied.setAttributes(Map.of(
             "partitions", "2",
             "replicationFactor", "1",
@@ -449,7 +449,7 @@ public class KafkaBackendTest {
 
         var v0001Config = Map.of("compression.type", "snappy");
 
-        var v0001 = new Migration2();
+        var v0001 = new Migration();
         v0001.setAttributes(Map.of(
             "partitions", "2",
             "replicationFactor", "1",
@@ -480,7 +480,7 @@ public class KafkaBackendTest {
 
         var config = Map.of("retention.ms", "-1");
 
-        var applied = new Migration2();
+        var applied = new Migration();
         applied.setAttributes(Map.of(
             "partitions", "4",
             "replicationFactor", "2",
@@ -543,7 +543,7 @@ public class KafkaBackendTest {
 
         var config = Map.of("compression.type", "snappy");
 
-        var applied = new Migration2();
+        var applied = new Migration();
         applied.setAttributes(Map.of(
             "partitions", "2",
             "replicationFactor", "1",

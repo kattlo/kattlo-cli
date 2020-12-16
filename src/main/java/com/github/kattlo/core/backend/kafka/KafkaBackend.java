@@ -11,9 +11,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import com.github.kattlo.core.backend.Backend2;
+import com.github.kattlo.core.backend.Backend;
 import com.github.kattlo.core.backend.BackendException;
-import com.github.kattlo.core.backend.Migration2;
+import com.github.kattlo.core.backend.Migration;
 import com.github.kattlo.core.backend.OperationType;
 import com.github.kattlo.core.backend.Resource;
 import com.github.kattlo.core.backend.ResourceStatus;
@@ -38,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author fabiojose
  */
 @Slf4j
-public class KafkaBackend implements Backend2 {
+public class KafkaBackend implements Backend {
 
     static final String TOPIC_T = "__kattlo-topics-state";
 
@@ -100,7 +100,7 @@ public class KafkaBackend implements Backend2 {
         return new KafkaConsumer<>(consumerConfigs);
     }
 
-    private ResourceStatus statusFor(Migration2 applied){
+    private ResourceStatus statusFor(Migration applied){
         if(OperationType.CREATE.equals(applied.getOperation())
             || OperationType.PATCH.equals(applied.getOperation())){
 
@@ -116,7 +116,7 @@ public class KafkaBackend implements Backend2 {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Resource commit(Migration2 applied) {
+    public Resource commit(Migration applied) {
         Objects.requireNonNull(applied);
 
         var current = current(applied.getResourceType(),
@@ -184,7 +184,7 @@ public class KafkaBackend implements Backend2 {
 
             consumer.seekToBeginning(tp);
 
-            final var key = Migration2.keyFor(type, name);
+            final var key = Migration.keyFor(type, name);
 
             int attempsForEmpty = 0;
             while(!result.isPresent()){
@@ -229,13 +229,13 @@ public class KafkaBackend implements Backend2 {
     }
 
     @Override
-    public Stream<Migration2> history(ResourceType type, String name) {
+    public Stream<Migration> history(ResourceType type, String name) {
 
         return commitOf(type, name)
             .map(ResourceCommit::getHistory)
             .orElse(List.of())
             .stream()
-            .map(Migration2::from);
+            .map(Migration::from);
 
     }
 
