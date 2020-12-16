@@ -26,4 +26,14 @@ public class Original {
         );
     }
 
+    public static Original from(Map<String, Object> map) {
+
+        var result = new Original();
+
+        result.setPath((String)map.get("path"));
+        result.setContentType((String)map.get("contentType"));
+        result.setContent((String)map.get("content"));
+
+        return result;
+    }
 }
