@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Properties;
 
-import com.github.kattlo.schema.SchemaCommand;
 import com.github.kattlo.topic.TopicCommand;
 
 import io.quarkus.picocli.runtime.annotations.TopCommand;
@@ -27,7 +26,6 @@ import picocli.CommandLine.Model.CommandSpec;
     mixinStandardHelpOptions = true,
     subcommands = {
         TopicCommand.class,
-        SchemaCommand.class
     }
 )
 public class EntryCommand {
