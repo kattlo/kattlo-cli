@@ -59,4 +59,30 @@ public class Migration2 {
     public static String keyFor(ResourceType type, String name) {
         return type + "_" + name;
     }
+
+    private static String asString(Object o) {
+        if(null== o){
+            return null;
+        }
+
+        return o.toString();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static Migration2 from(Map<String, Object> map) {
+
+        var result = new Migration2();
+
+        result.setVersion(asString(map.get("version")));
+        result.setOperation(OperationType.valueOf((String)map.get("operation")));
+        result.setNotes(asString(map.get("notes")));
+        result.setResourceName(asString(map.get("resourceName")));
+        result.setResourceType(ResourceType.valueOf((String)map.get("resourceType")));
+        result.setTimestamp(LocalDateTime.parse((String)map.get("timestamp"),
+            DateTimeFormatter.ISO_DATE_TIME));
+        result.setAttributes(Map.copyOf((Map<String, Object>)map.get("attributes")));
+        result.setOriginal(Original.from((Map<String, Object>)map.get("original")));
+
+        return result;
+    }
 }
