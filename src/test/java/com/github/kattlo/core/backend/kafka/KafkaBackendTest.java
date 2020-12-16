@@ -13,10 +13,12 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import com.github.kattlo.core.backend.BackendException;
 import com.github.kattlo.core.backend.Migration2;
 import com.github.kattlo.core.backend.OperationType;
+import com.github.kattlo.core.backend.Resource;
 import com.github.kattlo.core.backend.ResourceStatus;
 import com.github.kattlo.core.backend.ResourceType;
 import com.github.kattlo.core.backend.file.yaml.model.topic.Original;
@@ -54,7 +56,6 @@ public class KafkaBackendTest {
 
     @Spy
     private KafkaBackend backend = new KafkaBackend(new Properties());
-
 
     MigrationPartitioner partitioner = new MigrationPartitioner();
 
@@ -387,7 +388,7 @@ public class KafkaBackendTest {
         var commit = ResourceCommit.from(applied);
         commit.setAttributes(Map.copyOf(applied.getAttributes()));
 
-        ConsumerRecord<String, ResourceCommit> record =
+        var record =
             new ConsumerRecord<>(KafkaBackend.TOPIC_T,
                 partitioner.partition(applied.getResourceType(), applied.getResourceName()),
                 0, applied.key(), commit);
@@ -418,25 +419,189 @@ public class KafkaBackendTest {
     @Test
     public void should_return_the_new_joined_topic_resource_state() {
 
-    }
+        // setup
+        var topic = "topic-name-5";
 
-    @Test
-    public void should_throw_when_fail_to_fetch_the_current_resource_state() {
+        var expectedConfig = Map.of(
+            "compression.type", "snappy",
+            "retention.ms", "-1"
+        );
 
+        var expectedAttributes =
+            Map.of(
+                "partitions", "4",
+                "replicationFactor", "2",
+                "config", expectedConfig
+            );
+
+        var expected = new Resource();
+        expected.setVersion("v0002");
+        expected.setStatus(ResourceStatus.AVAILABLE);
+        expected.setResourceType(ResourceType.TOPIC);
+        expected.setResourceName(topic);
+        expected.setTimestamp(LocalDateTime.now());
+        expected.setAttributes(expectedAttributes);
+
+        var v0001Original = new Original();
+        v0001Original.setContentType("text/yaml");
+        v0001Original.setContent("tYmFzZTY0RmlsZUNvbnRlbnQ=");//base64FileContent
+        v0001Original.setPath("/path/to/original.yaml");
+
+        var v0001Config = Map.of("compression.type", "snappy");
+
+        var v0001 = new Migration2();
+        v0001.setAttributes(Map.of(
+            "partitions", "2",
+            "replicationFactor", "1",
+            "config", v0001Config
+        ));
+        v0001.setNotes("some notes");
+        v0001.setOperation(OperationType.CREATE);
+        v0001.setOriginal(v0001Original);
+        v0001.setResourceName(topic);
+        v0001.setResourceType(ResourceType.TOPIC);
+        v0001.setTimestamp(LocalDateTime.now());
+        v0001.setVersion("v0001");
+
+        var v0001Commit = ResourceCommit.from(v0001);
+        v0001Commit.setAttributes(Map.copyOf(v0001.getAttributes()));
+
+        var v0001Record =
+            new ConsumerRecord<>(KafkaBackend.TOPIC_T,
+                partitioner.partition(v0001.getResourceType(), v0001.getResourceName()),
+                0, v0001.key(), v0001Commit);
+
+        setupConsumer(v0001Record);
+
+        var original = new Original();
+        original.setContentType("text/yaml");
+        original.setContent("tYmFzZTY0RmlsZUNvbnRlbnQ=");//base64FileContent
+        original.setPath("/path/to/original.yaml");
+
+        var config = Map.of("retention.ms", "-1");
+
+        var applied = new Migration2();
+        applied.setAttributes(Map.of(
+            "partitions", "4",
+            "replicationFactor", "2",
+            "config", config
+        ));
+        applied.setNotes("some notes");
+        applied.setOperation(OperationType.CREATE);
+        applied.setOriginal(original);
+        applied.setResourceName(topic);
+        applied.setResourceType(ResourceType.TOPIC);
+        applied.setTimestamp(LocalDateTime.now());
+        applied.setVersion("v0002");
+
+        try(var mocked = mockStatic(KafkaBackend.class)){
+            mocked.when(() -> KafkaBackend.producer(any()))
+                .thenReturn(producer);
+
+            mocked.when(() -> KafkaBackend.consumer(any()))
+                .thenReturn(consumer);
+
+            // act
+            var actual = backend.commit(applied);
+
+            // assert
+            assertEquals(expected.getVersion(), actual.getVersion());
+            assertEquals(expected.getStatus(), actual.getStatus());
+            assertEquals(expected.getResourceType(), actual.getResourceType());
+            assertEquals(expected.getResourceName(), actual.getResourceName());
+            assertEquals(expected.getAttributes(), actual.getAttributes());
+        }
     }
 
     @Test
     public void should_return_empty_when_current_topic_state_not_found() {
 
+        var topic = "not-found";
+        try(var mocked = mockStatic(KafkaBackend.class)){
+            mocked.when(() -> KafkaBackend.consumer(any()))
+                .thenReturn(consumer);
+
+            setupConsumer(ResourceType.TOPIC, topic);
+
+            // act
+            var actual = backend.current(ResourceType.TOPIC, topic);
+
+            // assert
+            assertTrue(actual.isEmpty());
+        }
     }
 
     @Test
     public void should_return_the_history_of_topic_migrations() {
 
+        var topic = "topic-name-1";
+
+        var original = new Original();
+        original.setContentType("text/yaml");
+        original.setContent("tYmFzZTY0RmlsZUNvbnRlbnQ=");//base64FileContent
+        original.setPath("/path/to/original.yaml");
+
+        var config = Map.of("compression.type", "snappy");
+
+        var applied = new Migration2();
+        applied.setAttributes(Map.of(
+            "partitions", "2",
+            "replicationFactor", "1",
+            "config", config
+        ));
+        applied.setNotes("some notes");
+        applied.setOperation(OperationType.CREATE);
+        applied.setOriginal(original);
+        applied.setResourceName(topic);
+        applied.setResourceType(ResourceType.TOPIC);
+        applied.setTimestamp(LocalDateTime.now());
+        applied.setVersion("v0001");
+
+        var commit = ResourceCommit.from(applied);
+        commit.setAttributes(Map.copyOf(applied.getAttributes()));
+        commit.getHistory().add(applied.asMigrationMap());
+
+        var record =
+            new ConsumerRecord<>(KafkaBackend.TOPIC_T,
+                partitioner.partition(applied.getResourceType(), applied.getResourceName()),
+                0, applied.key(), commit);
+
+        setupConsumer(record);
+
+        try(var mocked = mockStatic(KafkaBackend.class)){
+            mocked.when(() -> KafkaBackend.consumer(any()))
+                .thenReturn(consumer);
+
+            // act
+            var actualStream = backend.history(ResourceType.TOPIC, topic);
+            var actualList = actualStream.collect(Collectors.toList());
+
+            // assert
+            assertEquals(1, actualList.size());
+            var actual = actualList.iterator().next();
+
+            assertEquals(applied, actual);
+        }
     }
 
     @Test
     public void should_return_empty_when_does_not_have_topic_history() {
 
+        var topic = "not-found";
+
+        try(var mocked = mockStatic(KafkaBackend.class)){
+            mocked.when(() -> KafkaBackend.consumer(any()))
+                .thenReturn(consumer);
+
+            setupConsumer(ResourceType.TOPIC, topic);
+
+            // act
+            var actualStream = backend.history(ResourceType.TOPIC, topic);
+            var actualList = actualStream.collect(Collectors.toList());
+
+            // assert
+            assertEquals(0, actualList.size());
+
+        }
     }
 }

@@ -164,12 +164,11 @@ public class KafkaBackend implements Backend2 {
         }
     }
 
-    @Override
-    public Optional<Resource> current(ResourceType type, String name) {
+    private Optional<ResourceCommit> commitOf(ResourceType type, String name) {
         Objects.requireNonNull(type);
         Objects.requireNonNull(name);
 
-        Optional<Resource> result = Optional.empty();
+        Optional<ResourceCommit> result = Optional.empty();
         log.debug("Searching the state for {}, named as {}", type, name);
 
         var partition = PARTITIONER.partition(type, name);
@@ -190,7 +189,7 @@ public class KafkaBackend implements Backend2 {
             int attempsForEmpty = 0;
             while(!result.isPresent()){
 
-                var records = consumer.poll(Duration.ofMillis(300));
+                var records = consumer.poll(Duration.ofMillis(3000));
                 if(!records.isEmpty()){
 
                     result = StreamSupport.stream(records.spliterator(), false)
@@ -198,8 +197,7 @@ public class KafkaBackend implements Backend2 {
                         .peek(r -> log.debug("Found record {}", r))
                         .map(ConsumerRecord::value)
                         .filter(Objects::nonNull)
-                        .map(Resource::from)
-                        .peek(r -> log.debug("Resulting resource corrent state " + r))
+                        .peek(r -> log.debug("Current resource commit {}", r))
                         .findFirst();
 
                     log.trace("Try do commit the higher offsets ...");
@@ -223,8 +221,22 @@ public class KafkaBackend implements Backend2 {
     }
 
     @Override
+    public Optional<Resource> current(ResourceType type, String name) {
+
+        return commitOf(type, name)
+                    .map(Resource::from);
+
+    }
+
+    @Override
     public Stream<Migration2> history(ResourceType type, String name) {
-        return null;
+
+        return commitOf(type, name)
+            .map(ResourceCommit::getHistory)
+            .orElse(List.of())
+            .stream()
+            .map(Migration2::from);
+
     }
 
 }
