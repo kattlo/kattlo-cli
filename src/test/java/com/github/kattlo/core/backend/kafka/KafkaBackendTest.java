@@ -21,7 +21,7 @@ import com.github.kattlo.core.backend.OperationType;
 import com.github.kattlo.core.backend.Resource;
 import com.github.kattlo.core.backend.ResourceStatus;
 import com.github.kattlo.core.backend.ResourceType;
-import com.github.kattlo.core.backend.file.yaml.model.topic.Original;
+import com.github.kattlo.core.backend.Original;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.MockConsumer;

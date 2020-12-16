@@ -10,8 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.github.kattlo.core.backend.file.yaml.model.topic.Original;
-
 import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("unchecked")

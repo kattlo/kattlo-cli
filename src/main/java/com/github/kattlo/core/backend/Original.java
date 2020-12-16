@@ -1,4 +1,4 @@
-package com.github.kattlo.core.backend.file.yaml.model.topic;
+package com.github.kattlo.core.backend;
 
 import java.util.Map;
 
