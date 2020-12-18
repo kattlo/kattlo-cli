@@ -1,10 +1,12 @@
 package com.github.kattlo.core.backend.kafka;
 
 import io.quarkus.kafka.client.serialization.JsonbDeserializer;
+import io.quarkus.runtime.annotations.RegisterForReflection;
 
 /**
  * @author fabiojose
  */
+@RegisterForReflection
 public class ResourceCommitDeserializer
     extends JsonbDeserializer<ResourceCommit> {
 
