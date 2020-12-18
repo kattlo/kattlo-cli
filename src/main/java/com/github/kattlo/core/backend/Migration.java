@@ -8,16 +8,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Represents a migration version performed over a resource
  *
  * @author fabiojose
  */
+@Slf4j
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Migration {
+
+    private static final String WITHOUT_NOTES = "";
 
     @NonNull private String version;
 
@@ -38,10 +42,12 @@ public class Migration {
     @NonNull private Original original;
 
     public Map<String, Object> asMigrationMap() {
+
+        log.debug("Create map of migration {}", this);
         return Map.of(
             "version"     , version,
             "operation"   , operation.name(),
-            "notes"       , notes,
+            "notes"       , (null== notes ? WITHOUT_NOTES : notes),
             "resourceName", resourceName,
             "resourceType", resourceType.name(),
             "timestamp"   , timestamp.format(DateTimeFormatter.ISO_DATE_TIME),
