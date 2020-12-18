@@ -3,6 +3,7 @@ package com.github.kattlo.core.backend.memory;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.stream.Stream;
 
 import com.github.kattlo.core.backend.Backend;
@@ -37,13 +38,16 @@ public class InMemoryMigrationBackend implements Backend {
 
     @Override
     public Optional<Resource> current(ResourceType type, String name) {
-        return Optional.ofNullable(MIGRATIONS.get(keyOf(type, name)))
-                .map(Resource::from);
+        return Optional.ofNullable(MIGRATIONS.get(keyOf(type, name))).map(Resource::from);
     }
 
     @Override
     public Stream<Migration> history(ResourceType type, String name) {
         return Stream.empty();
+    }
+
+    @Override
+    public void init(Properties properties) {
     }
 
 }
