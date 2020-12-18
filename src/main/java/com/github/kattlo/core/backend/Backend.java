@@ -1,12 +1,18 @@
 package com.github.kattlo.core.backend;
 
 import java.util.Optional;
+import java.util.Properties;
 import java.util.stream.Stream;
 
 /**
  * @author fabiojose
  */
 public interface Backend {
+
+    /**
+     * To perform initializations before backend usage
+     */
+    void init(Properties properties);
 
     /**
      * Confirms an applied migration
