@@ -1,13 +1,21 @@
 package com.github.kattlo.topic.yaml;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.github.kattlo.core.backend.Migration;
 import com.github.kattlo.core.backend.OperationType;
+import com.github.kattlo.core.backend.Original;
+import com.github.kattlo.core.backend.ResourceType;
+import com.github.kattlo.topic.TopicCommandException;
 import com.github.kattlo.util.StringUtil;
 
 import lombok.Builder;
@@ -22,6 +30,8 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 public class TopicOperation {
+
+    private static final String DEFAULT_CONTENT_TYPE = "text/yaml";
 
     private String version;
     private String operation;
@@ -68,5 +78,39 @@ public class TopicOperation {
         this.config = Objects.requireNonNullElse(config, new HashMap<>());
 
         this.file = Objects.requireNonNull(file);
+    }
+
+    public Migration toMigration() {
+        var result = new Migration();
+
+        result.setVersion(getVersion());
+        result.setOperation(OperationType.valueOf(getOperation().toUpperCase()));
+        result.setResourceType(ResourceType.TOPIC);
+        result.setResourceName(getTopic());
+        result.setTimestamp(LocalDateTime.now());
+
+        var attributes = Map.of(
+            "partitions", String.valueOf(getPartitions()),
+            "replicationFactor", String.valueOf(getReplicationFactor()),
+            "config", Map.copyOf(getConfig())
+        );
+        result.setAttributes(attributes);
+
+        var original = new Original();
+        original.setPath(getFile().toString());
+        original.setContentType(DEFAULT_CONTENT_TYPE);
+
+        try {
+            var contentBytes = Files.readAllBytes(getFile());
+            var contentBase64 = Base64.getEncoder().encodeToString(contentBytes);
+            original.setContent(contentBase64);
+
+            result.setOriginal(original);
+
+        }catch(IOException e) {
+            throw new TopicCommandException(e.getMessage(), e);
+        }
+
+        return result;
     }
 }
