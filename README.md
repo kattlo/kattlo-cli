@@ -58,17 +58,17 @@ build/ottla-1.0-SNAPSHOT-runner \
 
 ## Internals
 
-Kattlo needs to have all permissions to manage topics, ACLs, schemas and clusters
+Kattlo needs to have all permissions to manage topics, ACLs and Schemas
 configurations, outherwise you will be not able to perform the migrations.
 
 In order to manage the migrations, we use four special topics:
 
-- `__kattlo_topic_migrations`:
+- `__kattlo-topics-state`:
 - `__kattlo_schema_migrations`:
 - `__kattlo_acl_migrations`:
 - `__kattlo_cluster_migrations`:
 
-### `__kattlo_topic_migrations`
+### `__kattlo-topics-state`
 
 > To persist migrations per topic.
 
@@ -78,7 +78,32 @@ This topic has the following configurations:
 - replication-factor: `2`
 
 ```properties
+cleanup.policy=compact
+retention.ms=-1
+segment.ms=3000
+segment.bytes=104857600
+compression.type=producer
+message.timestamp.type=CreateTime
+delete.retention.ms=0
+min.cleanable.dirty.ratio=0.1
+```
 
+Kafka CLI command:
+
+```bash
+kafka-topics.sh --create \
+  --bootstrap-server 'localhost:9092' \
+  --replication-factor 1 \
+  --partitions 50 \
+  --topic '__kattlo-topics-state' \
+  --config 'cleanup.policy=compact' \
+  --config 'retention.ms=-1' \
+  --config 'segment.ms=3000' \
+  --config 'segment.bytes=104857600' \
+  --config 'compression.type=producer' \
+  --config 'message.timestamp.type=CreateTime' \
+  --config 'delete.retention.ms=0' \
+  --config 'min.cleanable.dirty.ratio=0.1'
 ```
 
 ## Build and Run
@@ -88,10 +113,14 @@ TODO
 ### Native
 
 ```bash
-./gradlew build \
-  -Dquarkus.package.type=native \
-  -Dquarkus.native.container-build=true
+./gradlew build -Dquarkus.package.type=native \
+ -Dquarkus.native.container-build=true \
+ -Dquarkus.native.additional-build-args=--report-unsupported-elements-at-runtime,--allow-incomplete-classpathe
 ```
+
+You can then execute your native executable with: `./build/ottla-1.0-SNAPSHOT-runner`
+
+If you want to learn more about building native executables, please consult https://quarkus.io/guides/gradle-tooling#building-a-native-executable.
 
 ### Running the application in dev mode
 
@@ -112,22 +141,6 @@ If you want to build an _über-jar_, just add the `--uber-jar` option to the com
 ```
 ./gradlew quarkusBuild --uber-jar
 ```
-
-### Creating a native executable
-
-You can create a native executable using:
-
-```bash
-./gradlew build -Dquarkus.package.type=native \
- -Dquarkus.native.container-build=true \
- -Dquarkus.native.additional-build-args=--report-unsupported-elements-at-runtime,--allow-incomplete-classpath
-```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using: `./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true`.
-
-You can then execute your native executable with: `./build/ottla-1.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/gradle-tooling#building-a-native-executable.
 
 ## Made with :purple_heart: by
 
