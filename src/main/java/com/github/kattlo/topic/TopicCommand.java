@@ -95,6 +95,8 @@ public class TopicCommand implements Runnable {
                 Loader.list(directory)
                     .collect(Collectors.toList());
 
+            backend.init(parent.getKafkaConfiguration());
+
             for(int i = 0; i < migrationFiles.size(); i++){
                 var migrationFile = migrationFiles.get(i);
                 log.debug("Migration file {}", migrationFile);
@@ -141,11 +143,14 @@ public class TopicCommand implements Runnable {
                     // apply the strategy
                     strategy.execute(admin);
 
-                    //TODO Commit the applied migration
+                    var applied = to.toMigration();
+                    log.debug("Migration to commit {}", applied);
 
+                    // commit the applied migration
+                    var current = backend.commit(applied);
+
+                    log.debug("New Topic's state {}", current);
                 });
-
-
             }
         }catch(IOException e) {
             throw new CommandLine.ExecutionException(spec.commandLine(),
