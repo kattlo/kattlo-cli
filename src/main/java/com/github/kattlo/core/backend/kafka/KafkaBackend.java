@@ -44,7 +44,8 @@ public class KafkaBackend implements Backend {
 
     private static final String CLIENT_ID = "kattlo";
 
-    private static final int MAX_ATTEMP_FOR_EMPTY = 10;
+    private static final int MAX_ATTEMP_FOR_EMPTY = 3;
+    private static final int MAX_POLL_TIME_MS = 800;
 
     private static final MigrationPartitioner PARTITIONER =
         new MigrationPartitioner();
@@ -52,14 +53,22 @@ public class KafkaBackend implements Backend {
     private final TopicResourceJoinner topicJoinner =
         new TopicResourceJoinner();
 
-    private final Properties configs;
+    private boolean initialized = false;
+    private Properties configs;
+
+    public KafkaBackend() {
+        configs = new Properties();
+    }
+
     public KafkaBackend(final Properties configs){
         this.configs = Objects.requireNonNull(configs);
+        this.initialized = true;
     }
 
     static Producer<String, ResourceCommit> producer(Properties configs) {
 
-        var producerConfigs = new Properties(configs);
+        var producerConfigs = new Properties();
+        producerConfigs.putAll(configs);
         producerConfigs.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
             StringSerializer.class.getName());
 
@@ -74,12 +83,15 @@ public class KafkaBackend implements Backend {
 
         producerConfigs.setProperty(ProducerConfig.CLIENT_ID_CONFIG, CLIENT_ID);
 
-        return new KafkaProducer<>(configs);
+        return new KafkaProducer<>(producerConfigs);
     }
 
     static Consumer<String, ResourceCommit> consumer(Properties configs) {
 
-        var consumerConfigs = new Properties(configs);
+        log.debug("Will create Kafka Consumer with base configs {}", configs);
+
+        var consumerConfigs = new Properties();
+        consumerConfigs.putAll(configs);
         consumerConfigs.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
             StringDeserializer.class.getName());
 
@@ -92,10 +104,12 @@ public class KafkaBackend implements Backend {
         consumerConfigs.setProperty(ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG,
             Boolean.FALSE.toString());
 
-        consumerConfigs.setProperty(ConsumerConfig.DEFAULT_ISOLATION_LEVEL,
+        consumerConfigs.setProperty(ConsumerConfig.ISOLATION_LEVEL_CONFIG,
             "read_committed");
 
         consumerConfigs.setProperty(ConsumerConfig.CLIENT_ID_CONFIG, CLIENT_ID);
+
+        log.debug("Actual Kafka Consumer configs {}", consumerConfigs);
 
         return new KafkaConsumer<>(consumerConfigs);
     }
@@ -113,10 +127,16 @@ public class KafkaBackend implements Backend {
         throw new IllegalArgumentException(applied.getOperation().name());
     }
 
+    private void check() {
+        if(!initialized){
+            throw new IllegalStateException("Backend does not initialized");
+        }
+    }
 
     @Override
     @SuppressWarnings("unchecked")
     public Resource commit(Migration applied) {
+        check();
         Objects.requireNonNull(applied);
 
         var current = current(applied.getResourceType(),
@@ -165,6 +185,7 @@ public class KafkaBackend implements Backend {
     }
 
     private Optional<ResourceCommit> commitOf(ResourceType type, String name) {
+        check();
         Objects.requireNonNull(type);
         Objects.requireNonNull(name);
 
@@ -189,7 +210,7 @@ public class KafkaBackend implements Backend {
             int attempsForEmpty = 0;
             while(!result.isPresent()){
 
-                var records = consumer.poll(Duration.ofMillis(3000));
+                var records = consumer.poll(Duration.ofMillis(MAX_POLL_TIME_MS));
                 if(!records.isEmpty()){
 
                     result = StreamSupport.stream(records.spliterator(), false)
@@ -239,4 +260,11 @@ public class KafkaBackend implements Backend {
 
     }
 
+    @Override
+    public void init(Properties properties) {
+        Objects.requireNonNull(properties);
+        this.configs.putAll(properties);
+        this.initialized = true;
+        log.debug("Backend initialized with configs {}", this.configs);
+    }
 }
