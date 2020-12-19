@@ -12,6 +12,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Optional;
 
 import com.github.kattlo.EntryCommand;
@@ -23,6 +25,7 @@ import com.github.kattlo.topic.yaml.TopicOperation;
 import com.github.kattlo.topic.yaml.TopicOperationMapper;
 
 import org.apache.kafka.clients.admin.AdminClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
@@ -42,7 +45,10 @@ import picocli.CommandLine.Model.CommandSpec;
 @ExtendWith(MockitoExtension.class)
 public class TopicCommandTest {
 
-    private TopicCommand topic = new TopicCommand();
+    private EntryCommand entry = new EntryCommand();
+    private StringWriter out;
+    private StringWriter err;
+    private CommandLine cli;
 
     @Mock
     private EntryCommand parent;
@@ -83,15 +89,30 @@ public class TopicCommandTest {
 
     }
 
+    @BeforeEach
+    public void beforeEach() {
+        out = new StringWriter();
+        err = new StringWriter();
+
+        cli = new CommandLine(entry);
+        cli.setOut(new PrintWriter(out));
+        cli.setErr(new PrintWriter(err));
+    }
+
     @Test
     public void should_exit_code_2_when_directory_not_exists() {
 
-        String[] args = { "--config-file=./src/test/java/resources/.kattlo.yaml",
-                "--kafka-cfg=./src/test/java/resources/kafka.properties", "topic", "--directory=./_not_exists" };
+        String[] args = {
+            "--config-file=./src/test/resources/.kattlo.yaml",
+            "--kafka-cfg=./src/test/resources/kafka.properties",
+            "topic",
+            "--directory=./_not_exists"
+        };
 
-        int actual = new CommandLine(topic).execute(args);
+        int actual = cli.execute(args);
 
         assertEquals(2, actual);
+        assertTrue(err.toString().contains("./_not_exists not found or"));
     }
 
     @Test
