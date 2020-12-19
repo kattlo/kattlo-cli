@@ -19,13 +19,13 @@ public class EntryCommandTest {
     public void should_exit_code_2_when_config_file_does_not_exists(){
 
         String[] args = {
-            "--config-file=./src/test/java/resources/_not_found.yaml",
-            "--kafka-cfg=./src/test/java/resources/kafka.properties",
+            "--config-file=./src/test/resources/_not_found.yaml",
+            "--kafka-cfg=./src/test/resources/kafka.properties",
             "topic",
             "--directory=."
         };
 
-        int actual = 
+        int actual =
             new CommandLine(entry).execute(args);
 
         assertEquals(2, actual);
@@ -35,13 +35,13 @@ public class EntryCommandTest {
     public void should_exit_code_2_when_kafka_cfg_files_does_not_exists() {
 
         String[] args = {
-            "--config-file=./src/test/java/resources/.bakon.yaml",
-            "--kafka-cfg=./src/test/java/resources/__not_found_kafka.properties",
+            "--config-file=./src/test/resources/.kattlo.yaml",
+            "--kafka-cfg=./src/test/resources/__not_found_kafka.properties",
             "topic",
             "--directory=."
         };
 
-        int actual = 
+        int actual =
             new CommandLine(entry).execute(args);
 
         assertEquals(2, actual);
