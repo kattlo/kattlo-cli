@@ -20,7 +20,7 @@ public class EntryCommandTest {
 
         String[] args = {
             "--config-file=./src/test/resources/_not_found.yaml",
-            "--kafka-cfg=./src/test/resources/kafka.properties",
+            "--kafka-config-file=./src/test/resources/kafka.properties",
             "topic",
             "--directory=."
         };
@@ -36,7 +36,7 @@ public class EntryCommandTest {
 
         String[] args = {
             "--config-file=./src/test/resources/.kattlo.yaml",
-            "--kafka-cfg=./src/test/resources/__not_found_kafka.properties",
+            "--kafka-config-file=./src/test/resources/__not_found_kafka.properties",
             "topic",
             "--directory=."
         };

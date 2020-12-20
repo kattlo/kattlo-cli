@@ -16,7 +16,7 @@ kattlo \
   --directory='topic/01_create_with_config'
 ```
 
-- Create a topic and patch the partitions
+- Create a topic and patch the number of partitions
 
 ```bash
 kattlo \

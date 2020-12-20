@@ -68,7 +68,7 @@ public class EntryCommand {
     }
 
     @Option(
-        names = "-v",
+        names = "--debug",
         description = "Verbose mode"
     )
     public void setVerbose(boolean[] verbose) {
@@ -81,7 +81,7 @@ public class EntryCommand {
 
     @Option(
         names = {
-            "--kafka-cfg"
+            "--kafka-config-file"
         },
         description = "Properties file for Apache Kafka® Admin Client",
         required = true

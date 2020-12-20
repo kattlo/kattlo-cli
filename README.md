@@ -1,7 +1,7 @@
 # Apache Kafka® Configuration Made Easy
 
 Use an approach like Database Migrations to manage your evolutionary
-configurations with:
+configurations for:
 
 - Topics
 - Schemas
@@ -9,19 +9,24 @@ configurations with:
 - Clusters
 - and more soon . . .
 
+## Installation
+
+TODO
+
 ## Released Features
 
 - [x] Topic migrations
 - [ ] Schema migrations
 - [ ] ACL migrations
 - [ ] Cluster migrations
+- [ ] ksqlDB migrations
 
 ## Usage
 
 ### Common Options
 
 - `--config-file`: Path to Kattlo configuration file for migrations
-- `--kafka-cfg`: Path to properties file to be used for Kafka Admin Client
+- `--kafka-config-file`: Path to properties file to be used for Kafka Admin Client
 
 In the `.kattlo.yaml` configuration file you may define the following
 properties:
@@ -43,7 +48,7 @@ __Command__:
 
 ```bash
 kattlo --config-file='.kattlo.yaml' \
-      --kafka-cfg='kafka.properties'
+       --kafka-config-file='kafka.properties'
 ```
 
 ## Examples
@@ -51,7 +56,7 @@ kattlo --config-file='.kattlo.yaml' \
 ```bash
 build/ottla-1.0-SNAPSHOT-runner \
   --config-file=src/test/resources/.kattlo.yaml \
-  --kafka-cfg=src/test/resources/kafka.properties \
+  --kafka-config-file=src/test/resources/kafka.properties \
   topic \
   --directory=src/test/resources/topics/
 ```

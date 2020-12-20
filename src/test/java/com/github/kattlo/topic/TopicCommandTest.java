@@ -104,7 +104,7 @@ public class TopicCommandTest {
 
         String[] args = {
             "--config-file=./src/test/resources/.kattlo.yaml",
-            "--kafka-cfg=./src/test/resources/kafka.properties",
+            "--kafka-config-file=./src/test/resources/kafka.properties",
             "topic",
             "--directory=./_not_exists"
         };
