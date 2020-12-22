@@ -6,13 +6,15 @@ configurations for:
 - Topics
 - Schemas
 - ACLs
-- Clusters
+- ksqlDB
+- Connect
+- Cluster
 - and more soon . . .
 
 ## Kattlo helps with
 
 - maintain the configuration and avoid drifts
-- helps to known way a topic was removed
+- helps to known when a topic was removed
 - access the history of migrations
 - and more . . .
 
@@ -67,7 +69,7 @@ kattlo --config-file='.kattlo.yaml' \
 
 ## Examples
 
-Set the directory with migrations:
+Set the directory with migrations using the `--directory` option:
 ```bash
 kattlo \
   --config-file='examples/.kattlo.yaml' \
@@ -89,11 +91,33 @@ kattlo \
 
 TODO
 
+### File Naming
+
+All migrations are defined using physical files, and they must follow
+this naming pattern:
+
+- `v[0-9]{4}_[\\w\\-]{0,246}\\.ya?ml`
+
+Simplifing to will be:
+
+- `v0000_the-name-of-my-migration.yaml`
+- where `v0000` will be the version of resource migration, from `1` to `n`
+- when a new migration is created, increase the version
+
+### File Content
+
+Every migration file must have exatcly one resource migration.
+
+Never mix `create`, `patch` or `remove` in the same file, or mix
+same operations for distinct resources.
+
 ## Migrations
 
-Kattlo provide a way to declare what we want, using yaml notation. Based
+Kattlo provide a way to declare what we want using yaml notation. Based
 on that files, Kattlo runs the necessary Admin commands to create, patch or
 remove resources.
+
+> See [examples](./examples) to see the variations of usage.
 
 Resources can be:
 
@@ -122,7 +146,8 @@ config: #config is optional
 ```
 
 Notes about `create`:
-- if you want all cluster default values, just suppress them
+- if you want all cluster default values for `partitions`, `replicationFactor`
+and `config`, just suppress them
 
 To __patch__ a topic:
 
@@ -141,10 +166,10 @@ config: #config is optional
 ```
 
 Notes about `patch`:
-- `partitions` can note be reduced
-- at least on of `partitions`, `replicationFactor` or `config` must be present
-in the migration declare
-- use the keyword `$default` to patch configs to cluster default value
+- `partitions` can not be reduced
+- at least one of `partitions`, `replicationFactor` or `config` must be present
+in the migration file
+- use the keyword `$default` to patch config to cluster default value
 
 To __remove__ a topic:
 
@@ -156,7 +181,7 @@ topic: 05_create_and_remove # Topic to remove
 
 Notes about `remove`:
 - remove will delete the entire topic data
-- all history about the topic will be maintained
+- all migrations history about the topic will be maintained
 
 ## Internals
 
