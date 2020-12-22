@@ -9,17 +9,29 @@ configurations for:
 - Clusters
 - and more soon . . .
 
-## Installation
+## Kattlo helps with
 
-TODO
+- maintain the configuration and avoid drifts
+- helps to known way a topic was removed
+- access the history of migrations
+- and more . . .
+
+## Install
+
+```bash
+curl ...
+
+sudo chmod +x kattlo
+sudo mv kattlo /usr/sbin/kattlo
+```
 
 ## Released Features
 
 - [x] Topic migrations
-- [ ] Schema migrations
 - [ ] ACL migrations
-- [ ] Cluster migrations
+- [ ] Schema migrations
 - [ ] ksqlDB migrations
+- [ ] Cluster migrations
 
 ## Usage
 
@@ -48,18 +60,103 @@ __Command__:
 
 ```bash
 kattlo --config-file='.kattlo.yaml' \
-       --kafka-config-file='kafka.properties'
+       --kafka-config-file='kafka.properties' \
+       <command>
+       [command arguments]
 ```
 
 ## Examples
 
+Set the directory with migrations:
 ```bash
-build/ottla-1.0-SNAPSHOT-runner \
-  --config-file=src/test/resources/.kattlo.yaml \
-  --kafka-config-file=src/test/resources/kafka.properties \
+kattlo \
+  --config-file='examples/.kattlo.yaml' \
+  --kafka-config-file='examples/kafka.properties' \
   topic \
-  --directory=src/test/resources/topics/
+  --directory='examples/topics/01_create_with_config'
 ```
+
+Directory with migrations will be default to current, when `--directory` is
+suppressed:
+```bash
+kattlo \
+  --config-file='examples/.kattlo.yaml' \
+  --kafka-config-file='examples/kafka.properties' \
+  topic
+```
+
+## Main Concepts
+
+TODO
+
+## Migrations
+
+Kattlo provide a way to declare what we want, using yaml notation. Based
+on that files, Kattlo runs the necessary Admin commands to create, patch or
+remove resources.
+
+Resources can be:
+
+- topics
+- schemas
+- ACLs
+
+### Topics
+
+This is the way to manage topics resources within Apache Kafka® cluster.
+
+To __create__ a topic:
+```yaml
+operation: create # The operation over the resource
+notes: |
+  Write down whatever you want to describe this.
+  This can be a multiline text . . .
+topic: topic_name
+partitions: 1 #partitions is optional
+replicationFactor: 1 #replicationFactor is optional
+config: #config is optional
+  compression.type: gzip
+  cleanup.policy  : compact
+  # Any configuration available here:
+  #   https://kafka.apache.org/documentation/#topicconfigs
+```
+
+Notes about `create`:
+- if you want all cluster default values, just suppress them
+
+To __patch__ a topic:
+
+```yaml
+operation: patch # The operation over the resource
+notes: Patch partitions to 3 # Describe your patch . . .
+topic: 02_create_patch_partitions # Topic that was created before
+partitions: 3 #partitions is optional
+replicationFactor: 2 #replicationFactor is optional
+config: #config is optional
+  retention.ms: -1
+  # Any configuration available here:
+  #   https://kafka.apache.org/documentation/#topicconfigs
+
+  compresstion.type: $default # Patch to cluster default value
+```
+
+Notes about `patch`:
+- `partitions` can note be reduced
+- at least on of `partitions`, `replicationFactor` or `config` must be present
+in the migration declare
+- use the keyword `$default` to patch configs to cluster default value
+
+To __remove__ a topic:
+
+```yaml
+operation: remove
+notes: Descrive your motivation to remove this topic
+topic: 05_create_and_remove # Topic to remove
+```
+
+Notes about `remove`:
+- remove will delete the entire topic data
+- all history about the topic will be maintained
 
 ## Internals
 
@@ -68,10 +165,7 @@ configurations, outherwise you will be not able to perform the migrations.
 
 In order to manage the migrations, we use four special topics:
 
-- `__kattlo-topics-state`:
-- `__kattlo_schema_migrations`:
-- `__kattlo_acl_migrations`:
-- `__kattlo_cluster_migrations`:
+- `__kattlo-topics-state`: the topics' migrations state
 
 ### `__kattlo-topics-state`
 
@@ -119,13 +213,11 @@ TODO
 
 ```bash
 ./gradlew build -Dquarkus.package.type=native \
- -Dquarkus.native.container-build=true \
- -Dquarkus.native.additional-build-args=--report-unsupported-elements-at-runtime,--allow-incomplete-classpathe
+  -Dquarkus.native.container-build=true \
+  -Dquarkus.native.additional-build-args=--report-unsupported-elements-at-runtime,--allow-incomplete-classpathe
 ```
 
-You can then execute your native executable with: `./build/ottla-1.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/gradle-tooling#building-a-native-executable.
+You can then execute your native executable with: `./build/kattlo-1.0-SNAPSHOT-runner`
 
 ### Running the application in dev mode
 
@@ -137,12 +229,13 @@ You can run your application in dev mode that enables live coding using:
 ### Packaging and running the application
 
 The application can be packaged using `./gradlew quarkusBuild`.
-It produces the `ottla-1.0-SNAPSHOT-runner.jar` file in the `build` directory.
+It produces the `kattlo-1.0-SNAPSHOT-runner.jar` file in the `build` directory.
 Be aware that it’s not an _über-jar_ as the dependencies are copied into the `build/lib` directory.
 
-The application is now runnable using `java -jar build/ottla-1.0-SNAPSHOT-runner.jar`.
+The application is now runnable using `java -jar build/kattlo-1.0-SNAPSHOT-runner.jar`.
 
 If you want to build an _über-jar_, just add the `--uber-jar` option to the command line:
+
 ```
 ./gradlew quarkusBuild --uber-jar
 ```
