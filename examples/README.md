@@ -55,3 +55,13 @@ kattlo \
   topic \
   --directory='topic/05_create_and_remove'
 ```
+
+- Create a topic and patch config to cluster default
+
+```bash
+kattlo \
+  --config-file='.kattlo.yaml' \
+  --kafka-cfg='kafka.properties' \
+  topic \
+  --directory='topic/06_create_patch_config_to_default'
+```

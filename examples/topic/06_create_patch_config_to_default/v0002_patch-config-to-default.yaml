@@ -1,0 +1,5 @@
+operation: patch
+notes: Patch compression.type to cluster default value
+topic: 06_create_patch_config_to_default
+config:
+  compression.type: $default
