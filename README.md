@@ -11,6 +11,8 @@ configurations for:
 - Cluster
 - and more soon . . .
 
+:bulb: Check the [examples directory](./examples) :bulb:
+
 ## Kattlo helps with
 
 - maintain the configuration and avoid drifts
@@ -201,18 +203,7 @@ This topic has the following configurations:
 - partitions: `50`
 - replication-factor: `2`
 
-```properties
-cleanup.policy=compact
-retention.ms=-1
-segment.ms=3000
-segment.bytes=104857600
-compression.type=producer
-message.timestamp.type=CreateTime
-delete.retention.ms=0
-min.cleanable.dirty.ratio=0.1
-```
-
-Kafka CLI command:
+Kafka CLI to create the state topic:
 
 ```bash
 kafka-topics.sh --create \
