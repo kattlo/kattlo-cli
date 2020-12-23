@@ -9,8 +9,6 @@ import java.util.Properties;
 
 import com.github.kattlo.topic.TopicCommand;
 
-import org.jboss.logging.Logger;
-
 import io.quarkus.picocli.runtime.annotations.TopCommand;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
