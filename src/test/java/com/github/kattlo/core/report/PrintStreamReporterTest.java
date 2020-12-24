@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 public class PrintStreamReporterTest {
 
     /*
-    + create a TOPIC
+    + create TOPIC
       v0001
         original -> /path/to/migration.yaml
         resource -> topic-name
@@ -43,7 +43,7 @@ public class PrintStreamReporterTest {
     @Test
     public void should_report_a_create_migration() {
 
-        var expected = "+ create";
+        var expected = "+ create TOPIC";
 
         var create = new Migration();
         create.setVersion("v0001");
@@ -188,7 +188,7 @@ public class PrintStreamReporterTest {
     @Test
     public void should_report_a_patch_migration() {
 
-        var expected = "~ patch";
+        var expected = "~ patch TOPIC";
 
         var create = new Migration();
         create.setVersion("v0001");
@@ -215,7 +215,7 @@ public class PrintStreamReporterTest {
     @Test
     public void should_report_a_remove_migration() {
 
-        var expected = "! remove";
+        var expected = "! remove TOPIC";
 
         var create = new Migration();
         create.setVersion("v0001");

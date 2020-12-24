@@ -19,6 +19,9 @@ public class PrintStreamReporter implements Reporter {
         att1 -> vlu2
     */
 
+
+    private static final String EMPTY = "";
+
     private final PrintStream out;
     public PrintStreamReporter(PrintStream out) {
         this.out = Objects.requireNonNull(out);
@@ -29,19 +32,23 @@ public class PrintStreamReporter implements Reporter {
         Objects.requireNonNull(migration,
             "Provide a non-null migration instance");
 
+        out.println(EMPTY);
+
         switch(migration.getOperation()){
             case CREATE:
-                out.println("+ create");
+                out.print("+ create");
                 break;
             case PATCH:
-                out.println("~ patch");
+                out.print("~ patch");
                 break;
             case REMOVE:
-                out.println("! remove");
+                out.print("! remove");
                 break;
             default:
                 throw new IllegalArgumentException(migration.getResourceType().name());
         }
+        out.print(" ");
+        out.println(migration.getResourceType());
 
         out.print("  ");
         out.println(migration.getVersion());
