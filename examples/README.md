@@ -11,7 +11,7 @@
 ```bash
 kattlo \
   --config-file='.kattlo.yaml' \
-  --kafka-cfg='kafka.properties' \
+  --kafka-config-file='kafka.properties' \
   topic \
   --directory='topic/01_create_with_config'
 ```
@@ -21,7 +21,7 @@ kattlo \
 ```bash
 kattlo \
   --config-file='.kattlo.yaml' \
-  --kafka-cfg='kafka.properties' \
+  --kafka-config-file='kafka.properties' \
   topic \
   --directory='topic/02_create_patch_partitions'
 ```
@@ -31,7 +31,7 @@ kattlo \
 ```bash
 kattlo \
   --config-file='.kattlo.yaml' \
-  --kafka-cfg='kafka.properties' \
+  --kafka-config-file='kafka.properties' \
   topic \
   --directory='topic/03_create_patch_replication_factor'
 ```
@@ -41,7 +41,7 @@ kattlo \
 ```bash
 kattlo \
   --config-file='.kattlo.yaml' \
-  --kafka-cfg='kafka.properties' \
+  --kafka-config-file='kafka.properties' \
   topic \
   --directory='topic/04_create_patch_reduce_replication_factor'
 ```
@@ -51,7 +51,7 @@ kattlo \
 ```bash
 kattlo \
   --config-file='.kattlo.yaml' \
-  --kafka-cfg='kafka.properties' \
+  --kafka-config-file='kafka.properties' \
   topic \
   --directory='topic/05_create_and_remove'
 ```
@@ -61,7 +61,7 @@ kattlo \
 ```bash
 kattlo \
   --config-file='.kattlo.yaml' \
-  --kafka-cfg='kafka.properties' \
+  --kafka-config-file='kafka.properties' \
   topic \
   --directory='topic/06_create_patch_config_to_default'
 ```
