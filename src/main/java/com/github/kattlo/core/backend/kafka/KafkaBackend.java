@@ -42,7 +42,8 @@ public class KafkaBackend implements Backend {
 
     static final String TOPIC_T = "__kattlo-topics-state";
 
-    private static final String CLIENT_ID = "kattlo";
+    private static final String CLIENT_ID = "kattlo-cli";
+    private static final String GROUP_ID = "kattlo-cli";
 
     private static final int MAX_ATTEMP_FOR_EMPTY = 3;
     private static final int MAX_POLL_TIME_MS = 800;
@@ -108,6 +109,7 @@ public class KafkaBackend implements Backend {
             "read_committed");
 
         consumerConfigs.setProperty(ConsumerConfig.CLIENT_ID_CONFIG, CLIENT_ID);
+        consumerConfigs.setProperty(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID);
 
         log.debug("Actual Kafka Consumer configs {}", consumerConfigs);
 
