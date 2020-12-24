@@ -28,6 +28,8 @@ kattlo \
 
 - Create a topic and patch to increase the replication factor
 
+> you need a cluster with two or more brokers to run the following example
+
 ```bash
 kattlo \
   --config-file='.kattlo.yaml' \
@@ -37,6 +39,8 @@ kattlo \
 ```
 
 - Create a topic and patch to reduce the replication factor
+
+> you need a cluster with two or more brokers to run the following example
 
 ```bash
 kattlo \
