@@ -13,6 +13,8 @@ import com.github.kattlo.core.backend.Backend;
 import com.github.kattlo.core.backend.Resource;
 import com.github.kattlo.core.backend.ResourceType;
 import com.github.kattlo.core.kafka.Kafka;
+import com.github.kattlo.core.report.PrintStreamReporter;
+import com.github.kattlo.core.report.Reporter;
 import com.github.kattlo.topic.migration.Strategy;
 import com.github.kattlo.topic.yaml.Loader;
 import com.github.kattlo.topic.yaml.TopicOperation;
@@ -56,6 +58,8 @@ public class TopicCommand implements Runnable {
 
     @Inject
     Kafka kafka;
+
+    private final Reporter reporter = new PrintStreamReporter(System.out);
 
     private File directory;
 
@@ -141,14 +145,16 @@ public class TopicCommand implements Runnable {
                     // create, patch or remove?
                     final var strategy = strategyOf(to);
 
+                    var migration = to.toMigration();
+                    reporter.report(migration);
+
                     // apply the strategy
                     strategy.execute(admin);
 
-                    var applied = to.toMigration();
-                    log.debug("Migration to commit {}", applied);
+                    log.debug("Migration to commit {}", migration);
 
                     // commit the applied migration
-                    var current = backend.commit(applied);
+                    var current = backend.commit(migration);
 
                     log.debug("New Topic's state {}", current);
                 });
