@@ -119,10 +119,10 @@ public class KafkaBackendTest {
         applied.setVersion("v0001");
 
         try(var mocked = mockStatic(KafkaBackend.class)){
-            mocked.when(() -> KafkaBackend.producer(any()))
+            mocked.when(() -> KafkaBackend.producer(any(), any()))
                 .thenReturn(producer);
 
-            mocked.when(() -> KafkaBackend.consumer(any()))
+            mocked.when(() -> KafkaBackend.consumer(any(), any()))
                 .thenReturn(consumer);
 
             setupConsumer(ResourceType.TOPIC, topic);
@@ -168,10 +168,10 @@ public class KafkaBackendTest {
         applied.setVersion("v0001");
 
         try(var mocked = mockStatic(KafkaBackend.class)){
-            mocked.when(() -> KafkaBackend.producer(any()))
+            mocked.when(() -> KafkaBackend.producer(any(), any()))
                 .thenReturn(producer);
 
-            mocked.when(() -> KafkaBackend.consumer(any()))
+            mocked.when(() -> KafkaBackend.consumer(any(), any()))
                 .thenReturn(consumer);
 
             setupConsumer(ResourceType.TOPIC, topic);
@@ -216,10 +216,10 @@ public class KafkaBackendTest {
         applied.setVersion("v0001");
 
         try(var mocked = mockStatic(KafkaBackend.class)){
-            mocked.when(() -> KafkaBackend.producer(any()))
+            mocked.when(() -> KafkaBackend.producer(any(), any()))
                 .thenReturn(producer);
 
-            mocked.when(() -> KafkaBackend.consumer(any()))
+            mocked.when(() -> KafkaBackend.consumer(any(), any()))
                 .thenReturn(consumer);
 
             setupConsumer(ResourceType.TOPIC, topic);
@@ -287,10 +287,10 @@ public class KafkaBackendTest {
         applied.setVersion("v0001");
 
         try(var mocked = mockStatic(KafkaBackend.class)){
-            mocked.when(() -> KafkaBackend.producer(any()))
+            mocked.when(() -> KafkaBackend.producer(any(), any()))
                 .thenReturn(producer);
 
-            mocked.when(() -> KafkaBackend.consumer(any()))
+            mocked.when(() -> KafkaBackend.consumer(any(), any()))
                 .thenReturn(consumer);
 
             setupConsumer(ResourceType.TOPIC, topic);
@@ -334,10 +334,10 @@ public class KafkaBackendTest {
         applied.setVersion("v0001");
 
         try(var mocked = mockStatic(KafkaBackend.class)){
-            mocked.when(() -> KafkaBackend.producer(any()))
+            mocked.when(() -> KafkaBackend.producer(any(), any()))
                 .thenReturn(producer);
 
-            mocked.when(() -> KafkaBackend.consumer(any()))
+            mocked.when(() -> KafkaBackend.consumer(any(), any()))
                 .thenReturn(consumer);
 
             setupConsumer(ResourceType.TOPIC, topic);
@@ -396,7 +396,7 @@ public class KafkaBackendTest {
         setupConsumer(record);
 
         try(var mocked = mockStatic(KafkaBackend.class)){
-            mocked.when(() -> KafkaBackend.consumer(any()))
+            mocked.when(() -> KafkaBackend.consumer(any(), any()))
                 .thenReturn(consumer);
 
             // act
@@ -495,10 +495,10 @@ public class KafkaBackendTest {
         applied.setVersion("v0002");
 
         try(var mocked = mockStatic(KafkaBackend.class)){
-            mocked.when(() -> KafkaBackend.producer(any()))
+            mocked.when(() -> KafkaBackend.producer(any(), any()))
                 .thenReturn(producer);
 
-            mocked.when(() -> KafkaBackend.consumer(any()))
+            mocked.when(() -> KafkaBackend.consumer(any(), any()))
                 .thenReturn(consumer);
 
             // act
@@ -518,7 +518,7 @@ public class KafkaBackendTest {
 
         var topic = "not-found";
         try(var mocked = mockStatic(KafkaBackend.class)){
-            mocked.when(() -> KafkaBackend.consumer(any()))
+            mocked.when(() -> KafkaBackend.consumer(any(), any()))
                 .thenReturn(consumer);
 
             setupConsumer(ResourceType.TOPIC, topic);
@@ -569,7 +569,7 @@ public class KafkaBackendTest {
         setupConsumer(record);
 
         try(var mocked = mockStatic(KafkaBackend.class)){
-            mocked.when(() -> KafkaBackend.consumer(any()))
+            mocked.when(() -> KafkaBackend.consumer(any(), any()))
                 .thenReturn(consumer);
 
             // act
@@ -590,7 +590,7 @@ public class KafkaBackendTest {
         var topic = "not-found";
 
         try(var mocked = mockStatic(KafkaBackend.class)){
-            mocked.when(() -> KafkaBackend.consumer(any()))
+            mocked.when(() -> KafkaBackend.consumer(any(), any()))
                 .thenReturn(consumer);
 
             setupConsumer(ResourceType.TOPIC, topic);

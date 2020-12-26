@@ -32,6 +32,8 @@ import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 
+import io.quarkus.kafka.client.serialization.JsonbDeserializer;
+import io.quarkus.kafka.client.serialization.JsonbSerializer;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -41,6 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 public class KafkaBackend implements Backend {
 
     static final String TOPIC_T = "__kattlo-topics-state";
+    static final String TOPIC_T_HISTORY = "__kattlo-topics-history";
 
     private static final String CLIENT_ID = "kattlo-cli";
     private static final String GROUP_ID = "kattlo-cli";
@@ -66,7 +69,8 @@ public class KafkaBackend implements Backend {
         this.initialized = true;
     }
 
-    static Producer<String, ResourceCommit> producer(Properties configs) {
+    static <T, S extends JsonbSerializer<T>> Producer<String, T>
+        producer(Properties configs, Class<S> valueSerializer) {
 
         var producerConfigs = new Properties();
         producerConfigs.putAll(configs);
@@ -74,12 +78,13 @@ public class KafkaBackend implements Backend {
             StringSerializer.class.getName());
 
         producerConfigs.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-            ResourceCommitSerializer.class.getName());
+            valueSerializer.getName());
 
         producerConfigs.setProperty(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG,
             Boolean.TRUE.toString());
         producerConfigs.setProperty(ProducerConfig.ACKS_CONFIG, "all");
-        producerConfigs.setProperty(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "1");
+        producerConfigs.setProperty(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION,
+            "1");
         producerConfigs.setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG, "gzip");
 
         producerConfigs.setProperty(ProducerConfig.CLIENT_ID_CONFIG, CLIENT_ID);
@@ -87,7 +92,8 @@ public class KafkaBackend implements Backend {
         return new KafkaProducer<>(producerConfigs);
     }
 
-    static Consumer<String, ResourceCommit> consumer(Properties configs) {
+    static <T, D extends JsonbDeserializer<T>> Consumer<String, T>
+        consumer(Properties configs, Class<D> valueDeserializer) {
 
         log.debug("Will create Kafka Consumer with base configs {}", configs);
 
@@ -97,7 +103,7 @@ public class KafkaBackend implements Backend {
             StringDeserializer.class.getName());
 
         consumerConfigs.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-            ResourceCommitDeserializer.class.getName());
+            valueDeserializer.getName());
 
         consumerConfigs.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG,
             Boolean.FALSE.toString());
@@ -131,7 +137,7 @@ public class KafkaBackend implements Backend {
 
     private void check() {
         if(!initialized){
-            throw new IllegalStateException("Backend does not initialized");
+            throw new IllegalStateException("Backend did not initialized");
         }
     }
 
@@ -164,7 +170,7 @@ public class KafkaBackend implements Backend {
 
         var record = new ProducerRecord<>(TOPIC_T, applied.key(), commit);
 
-        var producer = producer(configs);
+        var producer = producer(configs, ResourceCommitSerializer.class);
         var future = producer.send(record);
 
         try {
@@ -198,7 +204,7 @@ public class KafkaBackend implements Backend {
         log.debug("Partition to seek for the current state of {}-{}: {}",
             type, name, partition);
 
-        try(var consumer = consumer(configs)){
+        try(var consumer = consumer(configs, ResourceCommitDeserializer.class)){
             var tp = Collections.singletonList(
                 new TopicPartition(TOPIC_T, partition));
 
