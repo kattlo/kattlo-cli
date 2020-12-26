@@ -261,6 +261,54 @@ public class KafkaBackendTest {
     }
 
     @Test
+    public void should_commit_with_right_topic_history_topic_name() {
+
+        // setup
+        var topic = "topic-name-1";
+        var original = new Original();
+        original.setContentType("text/yaml");
+        original.setContent("tYmFzZTY0RmlsZUNvbnRlbnQ=");//base64FileContent
+        original.setPath("/path/to/original.yaml");
+
+        var config = Map.of("compression.type", "snappy");
+
+        var applied = new Migration();
+        applied.setAttributes(Map.of(
+            "partitions", "2",
+            "replicationFactor", "1",
+            "config", config
+        ));
+        applied.setNotes("some notes");
+        applied.setOperation(OperationType.CREATE);
+        applied.setOriginal(original);
+        applied.setResourceName(topic);
+        applied.setResourceType(ResourceType.TOPIC);
+        applied.setTimestamp(LocalDateTime.now());
+        applied.setVersion("v0001");
+
+        try(var mocked = mockStatic(KafkaBackend.class)){
+            mocked.when(() -> KafkaBackend.producer(any(), any()))
+                .thenReturn(producer);
+
+            mocked.when(() -> KafkaBackend.consumer(any(), any()))
+                .thenReturn(consumer);
+
+            setupConsumer(ResourceType.TOPIC, topic);
+
+            // act
+            backend.commit(applied);
+
+            // assert
+            var records = producer.history();
+            assertEquals(2, records.size());
+
+            var actual = records.get(1);
+
+            assertEquals(KafkaBackend.TOPIC_T_HISTORY, actual.topic());
+        }
+
+    }
+    @Test
     public void should_commit_the_new_entry_to_the_topic_history() {
 
         // setup
