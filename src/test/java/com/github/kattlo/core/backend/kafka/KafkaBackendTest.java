@@ -51,6 +51,10 @@ public class KafkaBackendTest {
     private MockConsumer<String, ResourceCommit> consumer =
         new MockConsumer<>(OffsetResetStrategy.EARLIEST);
 
+    @Spy
+    private MockConsumer<String, Migration> migrationConsumer =
+        new MockConsumer<>(OffsetResetStrategy.EARLIEST);
+
     @Mock
     private Future<RecordMetadata> future;
 
@@ -77,6 +81,19 @@ public class KafkaBackendTest {
 
     }
 
+    private void setupConsumer(ConsumerRecord<String, Migration> record, String topic){
+
+        migrationConsumer.schedulePollTask(() -> {
+            var tp = new TopicPartition(topic,
+                partitioner.partition(record.value().getResourceType(),
+                    record.value().getResourceName()));
+
+            migrationConsumer.updateBeginningOffsets(Map.of(tp, Long.valueOf(0)));
+            migrationConsumer.addRecord(record);
+        });
+
+    }
+
     private void setupConsumer(ResourceType type, String name) {
 
         var tp = new TopicPartition(KafkaBackend.TOPIC_T,
@@ -90,6 +107,12 @@ public class KafkaBackendTest {
             //consumer.seek(tp, 0);
         });
 
+        var tpHistory = new TopicPartition(KafkaBackend.TOPIC_T_HISTORY,
+            partitioner.partition(type, name));
+
+        migrationConsumer.schedulePollTask(() -> {
+            migrationConsumer.updateBeginningOffsets(Map.of(tpHistory, Long.valueOf(0)));
+        });
     }
 
     @Test
@@ -676,15 +699,15 @@ public class KafkaBackendTest {
         commit.getHistory().add(applied.asMigrationMap());
 
         var record =
-            new ConsumerRecord<>(KafkaBackend.TOPIC_T,
+            new ConsumerRecord<>(KafkaBackend.TOPIC_T_HISTORY,
                 partitioner.partition(applied.getResourceType(), applied.getResourceName()),
-                0, applied.key(), commit);
+                0, applied.key(), applied);
 
-        setupConsumer(record);
+        setupConsumer(record, KafkaBackend.TOPIC_T_HISTORY);
 
         try(var mocked = mockStatic(KafkaBackend.class)){
             mocked.when(() -> KafkaBackend.consumer(any(), any()))
-                .thenReturn(consumer);
+                .thenReturn(migrationConsumer);
 
             // act
             var actualStream = backend.history(ResourceType.TOPIC, topic);
@@ -705,7 +728,7 @@ public class KafkaBackendTest {
 
         try(var mocked = mockStatic(KafkaBackend.class)){
             mocked.when(() -> KafkaBackend.consumer(any(), any()))
-                .thenReturn(consumer);
+                .thenReturn(migrationConsumer);
 
             setupConsumer(ResourceType.TOPIC, topic);
 

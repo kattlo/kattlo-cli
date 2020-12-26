@@ -1,6 +1,7 @@
 package com.github.kattlo.core.backend.kafka;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -265,12 +267,65 @@ public class KafkaBackend implements Backend {
 
     @Override
     public Stream<Migration> history(ResourceType type, String name) {
+        check();
+        Objects.requireNonNull(type);
+        Objects.requireNonNull(name);
 
-        return commitOf(type, name)
-            .map(ResourceCommit::getHistory)
-            .orElse(List.of())
-            .stream()
-            .map(Migration::from);
+        List<Migration> result = new ArrayList<>();
+        log.debug("Searching the state for {}, named as {}", type, name);
+
+        var partition = PARTITIONER.partition(type, name);
+        log.debug("Partition to seek for the history of {}-{}: {}",
+            type, name, partition);
+
+        try(var consumer = consumer(configs, MigrationDeserializer.class)){
+            var tp = Collections.singletonList(
+                new TopicPartition(TOPIC_T_HISTORY, partition));
+
+            consumer.assign(tp);
+            log.debug("Consumer assigned to {}", consumer.assignment());
+
+            consumer.seekToBeginning(tp);
+
+            final var key = Migration.keyFor(type, name);
+
+            int attempsForEmpty = 0;
+            while(Boolean.TRUE){
+
+                var records = consumer.poll(Duration.ofMillis(MAX_POLL_TIME_MS));
+                if(!records.isEmpty()){
+
+                    result.addAll(
+                      StreamSupport.stream(records.spliterator(), false)
+                        .filter(r -> key.equals(r.key()))
+                        .peek(r -> log.debug("Found history record {}", r))
+                        .map(ConsumerRecord::value)
+                        .filter(Objects::nonNull)
+                        .peek(r -> log.debug("History entry {}", r))
+                        .collect(Collectors.toList())
+                    );
+
+                    log.trace("Try do commit the higher processed offsets ...");
+                    consumer.commitSync(Duration.ofSeconds(10));
+                    log.trace("Offsets committed.");
+
+                } else {
+                    if(attempsForEmpty < MAX_ATTEMP_FOR_EMPTY){
+                        attempsForEmpty++;
+                        log.debug("Attemp for empty # {}", attempsForEmpty);
+                    } else {
+
+                        if(result.isEmpty()){
+                            log.debug("History does not exists for {}-{}", type, name);
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        return result.stream();
 
     }
 
