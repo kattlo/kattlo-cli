@@ -44,7 +44,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class KafkaBackendTest {
 
     @Spy
-    private MockProducer<String, ResourceCommit> producer =
+    private MockProducer<String, Object> producer =
         new MockProducer<>(true, null, null);
 
     @Spy
@@ -132,7 +132,7 @@ public class KafkaBackendTest {
 
             // assert
             var records = producer.history();
-            assertEquals(1, records.size());
+            assertEquals(2, records.size());
 
             var actual = records.iterator().next();
 
@@ -181,7 +181,7 @@ public class KafkaBackendTest {
 
             // assert
             var records = producer.history();
-            assertEquals(1, records.size());
+            assertEquals(2, records.size());
 
             var actual = records.iterator().next();
 
@@ -229,10 +229,10 @@ public class KafkaBackendTest {
 
             // assert
             var records = producer.history();
-            assertEquals(1, records.size());
+            assertEquals(2, records.size());
 
             var record = records.iterator().next();
-            var actual = record.value();
+            var actual = (ResourceCommit)record.value();
 
             assertEquals("topic-name-1", actual.getResourceName());
             assertEquals(ResourceType.TOPIC, actual.getResourceType());
@@ -257,6 +257,72 @@ public class KafkaBackendTest {
 
             var actualHistory = actualHistories.iterator().next();
             assertEquals(applied.asMigrationMap(), actualHistory);
+        }
+    }
+
+    @Test
+    public void should_commit_the_new_entry_to_the_topic_history() {
+
+        // setup
+        var topic = "topic-name-1";
+        var original = new Original();
+        original.setContentType("text/yaml");
+        original.setContent("tYmFzZTY0RmlsZUNvbnRlbnQ=");//base64FileContent
+        original.setPath("/path/to/original.yaml");
+
+        var config = Map.of("compression.type", "snappy");
+
+        var applied = new Migration();
+        applied.setAttributes(Map.of(
+            "partitions", "2",
+            "replicationFactor", "1",
+            "config", config
+        ));
+        applied.setNotes("some notes");
+        applied.setOperation(OperationType.CREATE);
+        applied.setOriginal(original);
+        applied.setResourceName(topic);
+        applied.setResourceType(ResourceType.TOPIC);
+        applied.setTimestamp(LocalDateTime.now());
+        applied.setVersion("v0001");
+
+        try(var mocked = mockStatic(KafkaBackend.class)){
+            mocked.when(() -> KafkaBackend.producer(any(), any()))
+                .thenReturn(producer);
+
+            mocked.when(() -> KafkaBackend.consumer(any(), any()))
+                .thenReturn(consumer);
+
+            setupConsumer(ResourceType.TOPIC, topic);
+
+            // act
+            backend.commit(applied);
+
+            // assert
+            var records = producer.history();
+            assertEquals(2, records.size());
+
+            var record = records.get(1);
+            var actual = (Migration)record.value();
+
+            assertEquals("topic-name-1", actual.getResourceName());
+            assertEquals(ResourceType.TOPIC, actual.getResourceType());
+            assertEquals("v0001", actual.getVersion());
+            assertEquals("some notes", actual.getNotes());
+            assertEquals(OperationType.CREATE, actual.getOperation());
+            assertEquals("topic-name-1", actual.getResourceName());
+            assertEquals(ResourceType.TOPIC, actual.getResourceType());
+            assertNotNull(actual.getTimestamp());
+
+            var actualAttributes = actual.getAttributes();
+            assertNotNull(actualAttributes);
+            assertEquals("2", actualAttributes.get("partitions"));
+            assertEquals("1", actualAttributes.get("replicationFactor"));
+
+            var actualConfig = (Map<String, Object>)actualAttributes.get("config");
+            assertNotNull(actualConfig);
+            assertEquals("snappy", actualConfig.get("compression.type"));
+
         }
     }
 

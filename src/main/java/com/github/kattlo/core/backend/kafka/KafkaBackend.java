@@ -168,13 +168,19 @@ public class KafkaBackend implements Backend {
         commit.setHistory((List<Map<String, Object>>)
             stateToCommit.get("history"));
 
-        var record = new ProducerRecord<>(TOPIC_T, applied.key(), commit);
+        var resourceRecord = new ProducerRecord<>(TOPIC_T, applied.key(), commit);
+        var historyRecord = new ProducerRecord<>(TOPIC_T_HISTORY, applied.key(), applied);
 
-        var producer = producer(configs, ResourceCommitSerializer.class);
-        var future = producer.send(record);
+        try(var resourceProducer = producer(configs, ResourceCommitSerializer.class);
+            var historyProducer = producer(configs, MigrationSerializer.class)){
 
-        try {
-            future.get();
+            var resourceFuture = resourceProducer.send(resourceRecord);
+            var resourceMetadada = resourceFuture.get();
+            log.debug("Resource state produced at {}", resourceMetadada);
+
+            var historyFuture = historyProducer.send(historyRecord);
+            var historyMetadata = historyFuture.get();
+            log.debug("History entry produced at {}", historyMetadata);
 
             var newState = new Resource();
             newState.setVersion(applied.getVersion());
