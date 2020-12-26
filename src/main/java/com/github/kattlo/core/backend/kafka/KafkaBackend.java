@@ -167,9 +167,6 @@ public class KafkaBackend implements Backend {
         commit.setAttributes((Map<String, Object>)
             stateToCommit.get("attributes"));
 
-        commit.setHistory((List<Map<String, Object>>)
-            stateToCommit.get("history"));
-
         var resourceRecord = new ProducerRecord<>(TOPIC_T, applied.key(), commit);
         var historyRecord = new ProducerRecord<>(TOPIC_T_HISTORY, applied.key(), applied);
 

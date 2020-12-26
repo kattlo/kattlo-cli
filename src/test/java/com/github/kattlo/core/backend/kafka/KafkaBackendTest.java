@@ -275,11 +275,11 @@ public class KafkaBackendTest {
             assertNotNull(actualConfig);
             assertEquals("snappy", actualConfig.get("compression.type"));
 
-            var actualHistories = actual.getHistory();
-            assertEquals(1, actualHistories.size());
+            //var actualHistories = actual.getHistory();
+            //assertEquals(1, actualHistories.size());
 
-            var actualHistory = actualHistories.iterator().next();
-            assertEquals(applied.asMigrationMap(), actualHistory);
+            //var actualHistory = actualHistories.iterator().next();
+            //assertEquals(applied.asMigrationMap(), actualHistory);
         }
     }
 
@@ -696,7 +696,7 @@ public class KafkaBackendTest {
 
         var commit = ResourceCommit.from(applied);
         commit.setAttributes(Map.copyOf(applied.getAttributes()));
-        commit.getHistory().add(applied.asMigrationMap());
+        //commit.getHistory().add(applied.asMigrationMap());
 
         var record =
             new ConsumerRecord<>(KafkaBackend.TOPIC_T_HISTORY,

@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 
 import com.github.kattlo.core.backend.OperationType;
@@ -37,7 +36,6 @@ public class InMemoryMigrationBackendTest {
         commit.setResourceName("topic-1");
         commit.setTimestamp(LocalDateTime.now());
         commit.setAttributes(Map.of());
-        commit.setHistory(List.of());
 
         InMemoryMigrationBackend
             .MIGRATIONS.put("{TOPIC}applied", commit);

@@ -1,9 +1,7 @@
 package com.github.kattlo.core.backend.kafka;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.github.kattlo.core.backend.Migration;
@@ -34,11 +32,6 @@ public class ResourceCommit {
     private Map<String, Object> attributes;
 
     /**
-     * History of migrated changes
-     */
-    private List<Map<String, Object>> history;
-
-    /**
      * Creates a copy of migration with empty {@link ResourceCommit#attributes}
      * and {@link ResourceCommit#history}
      */
@@ -53,7 +46,6 @@ public class ResourceCommit {
         commit.setTimestamp(migration.getTimestamp());
 
         commit.setAttributes(new HashMap<>());
-        commit.setHistory(new ArrayList<>());
 
         return commit;
     }
