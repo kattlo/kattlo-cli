@@ -69,3 +69,13 @@ kattlo \
   topic \
   --directory='topic/06_create_patch_config_to_default'
 ```
+
+- Create a topic and patch to add new config
+
+```bash
+kattlo \
+  --config-file='.kattlo.yaml' \
+  --kafka-config-file='kafka.properties' \
+  topic \
+  --directory='topic/07_create_patch_add_new_config'
+```
