@@ -12,12 +12,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TopicResourceJoinner {
 
+    public static final String ATTRIBUTES_KEYWORD = "attributes";
+    public static final String CONFIG_KEYWORD = "config";
+    public static final String ORIGINAL_KEYWORD = "original";
+
     @SuppressWarnings("unchecked")
     public Map<String, Object> join(Map<String, Object> left, Migration right) {
 
         var attributesLeft = new HashMap<String, Object>();
         attributesLeft.putAll(Optional
-            .ofNullable(left.get("attributes"))
+            .ofNullable(left.get(ATTRIBUTES_KEYWORD))
             .map(a -> (Map<String, Object>)a)
             .orElse(new HashMap<String, Object>()));
 
@@ -26,21 +30,21 @@ public class TopicResourceJoinner {
 
         var leftCopy = new HashMap<String, Object>();
         leftCopy.putAll(left);
-        leftCopy.put("attributes", attributesLeft);
+        leftCopy.put(ATTRIBUTES_KEYWORD, attributesLeft);
 
         var rightCopy = new HashMap<String, Object>();
         rightCopy.putAll(right.asMigrationMap());
 
-        rightCopy.remove("attributes");
-        rightCopy.remove("original");
+        rightCopy.remove(ATTRIBUTES_KEYWORD);
+        rightCopy.remove(ORIGINAL_KEYWORD);
 
         //config
-        var leftConfig = Optional.ofNullable(attributesLeft.get("config"))
+        var leftConfig = Optional.ofNullable(attributesLeft.get(CONFIG_KEYWORD))
             .map(c -> (Map<String, Object>)c)
             .orElse(Map.of());
         log.debug("Left config: {}", leftConfig);
 
-        var rightConfig = Optional.ofNullable(attributesRight.get("config"))
+        var rightConfig = Optional.ofNullable(attributesRight.get(CONFIG_KEYWORD))
             .map(c -> (Map<String, Object>)c)
             .orElse(Map.of());
         log.debug("Right config: {}", rightConfig);
@@ -53,13 +57,13 @@ public class TopicResourceJoinner {
         var newAttributes = new HashMap<>();
         newAttributes.putAll(attributesLeft);
         newAttributes.putAll(attributesRight);
-        newAttributes.put("config", newConfig);
+        newAttributes.put(CONFIG_KEYWORD, newConfig);
         log.debug("Joined attributes: {}", newAttributes);
 
         var joined = new HashMap<String, Object>();
         joined.putAll(leftCopy);
         joined.putAll(rightCopy);
-        joined.put("attributes", newAttributes);
+        joined.put(ATTRIBUTES_KEYWORD, newAttributes);
 
         log.debug("Joined migration: {}", joined);
 
