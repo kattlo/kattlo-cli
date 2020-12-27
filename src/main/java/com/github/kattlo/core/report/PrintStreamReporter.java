@@ -19,8 +19,16 @@ public class PrintStreamReporter implements Reporter {
         att1 -> vlu2
     */
 
+    /*
+    ** Error **
+        <message>
+        <details>
+    */
+
 
     private static final String EMPTY = "";
+    private static final String _1_SPACE = " ";
+    private static final String _2_SPACE = "  ";
 
     private final PrintStream out;
     public PrintStreamReporter(PrintStream out) {
@@ -47,33 +55,44 @@ public class PrintStreamReporter implements Reporter {
             default:
                 throw new IllegalArgumentException(migration.getResourceType().name());
         }
-        out.print(" ");
+        out.print(_1_SPACE);
         out.println(migration.getResourceType());
 
-        out.print("  ");
+        out.print(_2_SPACE);
         out.println(migration.getVersion());
 
-        out.print("  ");
+        out.print(_2_SPACE);
         out.print("original ->");
-        out.print(" ");
+        out.print(_1_SPACE);
         out.println(migration.getOriginal().getPath());
 
-        out.print("  ");
+        out.print(_2_SPACE);
         out.print("resource ->");
-        out.print(" ");
+        out.print(_1_SPACE);
         out.println(migration.getResourceName());
 
         Optional.ofNullable(migration.getAttributes())
             .ifPresent(attributes ->
                 attributes.entrySet().stream()
                     .forEach(kv -> {
-                        out.print("  ");
+                        out.print(_2_SPACE);
                         out.print(kv.getKey());
-                        out.print(" ");
+                        out.print(_1_SPACE);
                         out.print("->");
-                        out.print(" ");
+                        out.print(_1_SPACE);
                         out.println(kv.getValue());
                     }));
     }
 
+    @Override
+    public void report(Throwable e) {
+        Objects.requireNonNull(e, "Provide a non-null exception instance");
+
+        out.println(EMPTY);
+        out.println("** Error **");
+        out.print(_2_SPACE);
+        out.println(e.getMessage());
+        e.printStackTrace(out);
+
+    }
 }

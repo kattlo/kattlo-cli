@@ -10,6 +10,7 @@ import javax.inject.Inject;
 
 import com.github.kattlo.EntryCommand;
 import com.github.kattlo.core.backend.Backend;
+import com.github.kattlo.core.backend.BackendException;
 import com.github.kattlo.core.backend.Resource;
 import com.github.kattlo.core.backend.ResourceType;
 import com.github.kattlo.core.kafka.Kafka;
@@ -162,6 +163,9 @@ public class TopicCommand implements Runnable {
         }catch(IOException e) {
             throw new CommandLine.ExecutionException(spec.commandLine(),
                 "failing to read migrations: " + e.getMessage());
+        }catch(BackendException e){
+            reporter.report(e);
+            throw e;
         }
     }
 }

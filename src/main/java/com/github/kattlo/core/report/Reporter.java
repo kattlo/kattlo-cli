@@ -8,5 +8,5 @@ import com.github.kattlo.core.backend.Migration;
 public interface Reporter {
 
     void report(Migration migration);
-
+    void report(Throwable cause);
 }
