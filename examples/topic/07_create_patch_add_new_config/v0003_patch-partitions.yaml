@@ -1,0 +1,4 @@
+operation: patch
+notes: Patch partitions to 11
+topic: 07_create_patch_add_new_config
+partitions: 11

@@ -1,0 +1,7 @@
+operation: patch
+notes: Add new configurtions
+topic: 07_create_patch_add_new_config
+config:
+  delete.retention.ms: 0
+  max.message.bytes: 563200
+  message.timestamp.type: LogAppendTime
