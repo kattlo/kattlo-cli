@@ -102,7 +102,6 @@ public class KafkaBackendTest {
         consumer.schedulePollTask(() -> {
             //consumer.rebalance(Collections.singletonList(tp));
             consumer.updateBeginningOffsets(Map.of(tp, Long.valueOf(0)));
-            //System.out.println(consumer.assignment());
             //consumer.addRecord(record);
             //consumer.seek(tp, 0);
         });
@@ -275,11 +274,6 @@ public class KafkaBackendTest {
             assertNotNull(actualConfig);
             assertEquals("snappy", actualConfig.get("compression.type"));
 
-            //var actualHistories = actual.getHistory();
-            //assertEquals(1, actualHistories.size());
-
-            //var actualHistory = actualHistories.iterator().next();
-            //assertEquals(applied.asMigrationMap(), actualHistory);
         }
     }
 
