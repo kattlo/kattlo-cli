@@ -193,6 +193,7 @@ public class KafkaBackend implements Backend {
             return newState;
 
         }catch(InterruptedException | ExecutionException e){
+            //TODO report failure
             throw new BackendException(e.getMessage(), e);
         }
     }

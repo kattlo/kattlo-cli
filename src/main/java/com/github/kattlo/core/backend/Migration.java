@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  * @author fabiojose
  */
+@RegisterForReflection
 @Slf4j
 @Data
 @AllArgsConstructor

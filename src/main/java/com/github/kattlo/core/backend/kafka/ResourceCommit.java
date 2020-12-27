@@ -9,13 +9,17 @@ import com.github.kattlo.core.backend.OperationType;
 import com.github.kattlo.core.backend.ResourceType;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * @author fabiojose
  */
 @RegisterForReflection
-@Data
+@Getter
+@Setter
+@ToString
 public class ResourceCommit {
 
     private String version;
@@ -30,6 +34,17 @@ public class ResourceCommit {
      * Current attributes state
      */
     private Map<String, Object> attributes;
+
+    public boolean equals(Object another){
+        if(! (another instanceof ResourceCommit)){
+            return false;
+        }
+
+        var r = (ResourceCommit)another;
+
+        return getResourceType().equals(r.getResourceType()) &&
+                getResourceName().equals(r.getResourceName());
+    }
 
     /**
      * Creates a copy of migration with empty {@link ResourceCommit#attributes}

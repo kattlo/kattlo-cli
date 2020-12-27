@@ -3,13 +3,17 @@ package com.github.kattlo.core.backend;
 import java.util.Map;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author fabiojose
  */
-@Data
 @RegisterForReflection
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Original {
 
     private String path;
