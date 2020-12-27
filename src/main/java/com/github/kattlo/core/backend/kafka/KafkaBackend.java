@@ -222,7 +222,7 @@ public class KafkaBackend implements Backend {
             final var key = Migration.keyFor(type, name);
 
             int attempsForEmpty = 0;
-            while(!result.isPresent()){
+            while(Boolean.TRUE){
 
                 var records = consumer.poll(Duration.ofMillis(MAX_POLL_TIME_MS));
                 if(!records.isEmpty()){
@@ -243,8 +243,9 @@ public class KafkaBackend implements Backend {
                     if(attempsForEmpty < MAX_ATTEMP_FOR_EMPTY){
                         attempsForEmpty++;
                         log.debug("Attemp for empty # {}", attempsForEmpty);
+
                     } else {
-                        log.debug("Current state does not exists");
+                        log.debug("Current state {}", result);
 
                         break;
                     }
