@@ -16,11 +16,6 @@ public class TopicResourceJoinnerTest {
     private final TopicResourceJoinner joinner = new TopicResourceJoinner();
 
     @Test
-    public void should_return_the_new_resource_map_of_properties() {
-
-    }
-
-    @Test
     public void should_join_the_values_of_config_map() {
 
         // setup
