@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Properties;
 
 import com.github.kattlo.topic.TopicCommand;
+import com.github.kattlo.util.VersionUtil;
 
 import io.quarkus.picocli.runtime.annotations.TopCommand;
 import picocli.CommandLine;
@@ -22,7 +23,7 @@ import picocli.CommandLine.Model.CommandSpec;
 @TopCommand
 @Command(
     name = "kattlo",
-    version = "0.1",
+    versionProvider = VersionUtil.QuarkusVersionProvider.class,
     mixinStandardHelpOptions = true,
     subcommands = {
         TopicCommand.class,
