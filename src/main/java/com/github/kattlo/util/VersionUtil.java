@@ -20,6 +20,19 @@ import picocli.CommandLine.IVersionProvider;
 @UtilityClass
 public class VersionUtil {
 
+    private static final IVersionProvider VERSION_PROVIDER =
+        new VersionUtil.QuarkusVersionProvider();
+
+
+    public static String appVersion() {
+
+        try {
+            return VERSION_PROVIDER.getVersion()[0];
+        }catch(Exception e) {
+            return "";
+        }
+    }
+
     @RegisterForReflection
     public static class QuarkusVersionProvider implements IVersionProvider {
 

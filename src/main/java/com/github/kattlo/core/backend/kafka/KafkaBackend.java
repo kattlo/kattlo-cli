@@ -21,6 +21,7 @@ import com.github.kattlo.core.backend.Resource;
 import com.github.kattlo.core.backend.ResourceStatus;
 import com.github.kattlo.core.backend.ResourceType;
 import com.github.kattlo.core.backend.TopicResourceJoinner;
+import com.github.kattlo.util.VersionUtil;
 
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -166,6 +167,7 @@ public class KafkaBackend implements Backend {
         commit.setTimestamp(applied.getTimestamp());
         commit.setAttributes((Map<String, Object>)
             stateToCommit.get("attributes"));
+        commit.setKattlo(VersionUtil.appVersion());
 
         var resourceRecord = new ProducerRecord<>(TOPIC_T, applied.key(), commit);
         var historyRecord = new ProducerRecord<>(TOPIC_T_HISTORY, applied.key(), applied);

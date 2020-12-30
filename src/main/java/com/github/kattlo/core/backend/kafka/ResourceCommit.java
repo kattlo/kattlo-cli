@@ -35,6 +35,9 @@ public class ResourceCommit {
      */
     private Map<String, Object> attributes;
 
+    // The kattlo version
+    private String kattlo;
+
     public boolean equals(Object another){
         if(! (another instanceof ResourceCommit)){
             return false;
