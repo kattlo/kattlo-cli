@@ -93,6 +93,13 @@ kattlo \
 
 TODO
 
+## Best Practices
+
+- Always create a new migration file and never change an applied one
+- Create a directory for each resource that you want to manage
+  - Kattlo is able to process many distinct resources migrations within same directory,
+  but you get better organization following that practice
+
 ### File Naming
 
 All migrations are defined using physical files, and they must follow
@@ -100,7 +107,7 @@ this naming pattern:
 
 - `v[0-9]{4}_[\\w\\-]{0,246}\\.ya?ml`
 
-Simplifing to will be:
+Simplifing:
 
 - `v0000_the-name-of-my-migration.yaml`
 - where `v0000` will be the version of resource migration, from `1` to `n`
@@ -110,8 +117,8 @@ Simplifing to will be:
 
 Every migration file must have exatcly one resource migration.
 
-Never mix `create`, `patch` or `remove` in the same file, or mix
-same operations for distinct resources.
+Never mix `create`, `patch` or `remove` in the same file or same operations
+for distinct resources.
 
 ## Migrations
 
@@ -129,7 +136,7 @@ Resources can be:
 
 ### Topics
 
-This is the way to manage topics resources within Apache Kafka® cluster.
+This is the way to manage topics resources within Apache Kafka®.
 
 To __create__ a topic:
 ```yaml
@@ -193,10 +200,11 @@ configurations, outherwise you will be not able to perform the migrations.
 In order to manage the migrations, we use four special topics:
 
 - `__kattlo-topics-state`: the topics' migrations state
+- `__kattlo-topics-history`: the topics' migrations history
 
 ### `__kattlo-topics-state`
 
-> To persist migrations per topic.
+> To persist the current state per topic.
 
 This topic has the following configurations:
 
@@ -212,13 +220,39 @@ kafka-topics.sh --create \
   --partitions 50 \
   --topic '__kattlo-topics-state' \
   --config 'cleanup.policy=compact' \
+  --config 'segment.ms=3000' \
+  --config 'segment.bytes=104857600' \
+  --config 'compression.type=producer' \
+  --config 'message.timestamp.type=CreateTime' \
+  --config 'delete.retention.ms=0' \
+  --config 'min.cleanable.dirty.ratio=0.0001'
+```
+
+### `__kattlo-topics-history`
+
+> To persist the histories for topics.
+
+This topic has the following configurations:
+
+- partitions: `50`
+- replication-factor: `2`
+
+Kafka CLI to create the state topic:
+
+```bash
+kafka-topics.sh --create \
+  --bootstrap-server 'localhost:9092' \
+  --replication-factor 1 \
+  --partitions 50 \
+  --topic '__kattlo-topics-history' \
+  --config 'cleanup.policy=delete' \
   --config 'retention.ms=-1' \
   --config 'segment.ms=3000' \
   --config 'segment.bytes=104857600' \
   --config 'compression.type=producer' \
   --config 'message.timestamp.type=CreateTime' \
   --config 'delete.retention.ms=0' \
-  --config 'min.cleanable.dirty.ratio=0.1'
+  --config 'min.cleanable.dirty.ratio=0.0001'
 ```
 
 ## Build and Run
