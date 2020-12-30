@@ -36,7 +36,7 @@ dependencies {
 }
 
 group 'com.github.kattlo'
-version '0.1.0-SNAPSHOT'
+version '0.1.0'
 
 compileJava {
     options.encoding = 'UTF-8'
