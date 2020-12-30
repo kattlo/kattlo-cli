@@ -141,6 +141,8 @@ public class TopicCommand implements Runnable {
                         migrationModel.getTopic(),
                         Path.of(directory.getAbsolutePath()));
 
+                // TODO May report nothing todo?
+                //  when no new file found
                 newers.forEach(to -> {
 
                     // create, patch or remove?
@@ -159,13 +161,15 @@ public class TopicCommand implements Runnable {
 
                     log.debug("New Topic's state {}", current);
                 });
+
             }
         }catch(IOException e) {
             throw new CommandLine.ExecutionException(spec.commandLine(),
                 "failing to read migrations: " + e.getMessage());
         }catch(BackendException e){
             reporter.report(e);
-            throw e;
+            throw new CommandLine.ExecutionException(spec.commandLine(),
+                "general error: " + e.getMessage(), e);
         }
     }
 }
