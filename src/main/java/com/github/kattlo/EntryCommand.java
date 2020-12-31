@@ -68,17 +68,6 @@ public class EntryCommand {
         return configurationValues;
     }
 
-    @Option(
-        names = "--debug",
-        description = "Verbose mode"
-    )
-    public void setVerbose(boolean[] verbose) {
-        this.verbose = verbose.length > 0;
-
-        //Logger log = Logger.getLogger("ROOT");
-        //log.info("Testing . . .");
-    }
-
     public boolean isVerbose(){
         return verbose;
     }
