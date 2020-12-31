@@ -269,11 +269,12 @@ TODO
 
 You can then execute your native executable with: `./build/kattlo-1.0-SNAPSHOT-runner`
 
-### Running the application in dev mode
+### Running in verbose mode
 
-You can run your application in dev mode that enables live coding using:
-```
-./gradlew quarkusDev
+If you are experiencing issues, run Kattlo with logging set to DEBUG.
+
+```bash
+kattlo -Dquarkus.log.level=DEBUG ...
 ```
 
 ### Packaging and running the application
