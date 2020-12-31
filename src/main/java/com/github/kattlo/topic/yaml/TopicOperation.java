@@ -85,6 +85,7 @@ public class TopicOperation {
 
         result.setVersion(getVersion());
         result.setOperation(OperationType.valueOf(getOperation().toUpperCase()));
+        result.setNotes(getNotes());
         result.setResourceType(ResourceType.TOPIC);
         result.setResourceName(getTopic());
         result.setTimestamp(LocalDateTime.now());
