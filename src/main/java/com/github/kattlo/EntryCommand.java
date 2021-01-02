@@ -34,8 +34,6 @@ public class EntryCommand {
     private File configuration;
     private Properties configurationValues;
 
-    private boolean verbose;
-
     private File kafkaConfiguration;
     private Properties kafkaConfigurationValues;
 
@@ -67,10 +65,6 @@ public class EntryCommand {
         }
 
         return configurationValues;
-    }
-
-    public boolean isVerbose(){
-        return verbose;
     }
 
     @Option(
