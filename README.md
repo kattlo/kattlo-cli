@@ -89,6 +89,25 @@ kattlo \
   topic
 ```
 
+The current directory contains `kafka.properties` and `.kattlo.yaml`:
+```bash
+kattlo \
+  topic \
+  --directory='examples/topics/01_create_with_config'
+```
+
+Want to use the `kafka.properties`, but in another cluster:
+```bash
+kattlo \
+  --config-file='examples/.kattlo.yaml' \
+  --kafka-config-file='examples/kafka.properties' \
+  --bootstrap-servers='my.kafka:9092' \
+  topic \
+  --directory='examples/topics/01_create_with_config'
+```
+
+The option `--bootstrap-servers` overrides the config [`bootstrap.servers`](https://kafka.apache.org/documentation/#adminclientconfigs_bootstrap.servers).
+
 ## Main Concepts
 
 TODO
