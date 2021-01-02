@@ -10,7 +10,10 @@ import java.util.Properties;
 import com.github.kattlo.topic.TopicCommand;
 import com.github.kattlo.util.VersionUtil;
 
+import org.apache.kafka.clients.admin.AdminClientConfig;
+
 import io.quarkus.picocli.runtime.annotations.TopCommand;
+import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -29,6 +32,7 @@ import picocli.CommandLine.Model.CommandSpec;
         TopicCommand.class,
     }
 )
+@Slf4j
 public class EntryCommand {
 
     private File configuration;
@@ -36,6 +40,8 @@ public class EntryCommand {
 
     private File kafkaConfiguration;
     private Properties kafkaConfigurationValues;
+
+    private String bootstrapServers;
 
     @Spec
     private CommandSpec spec;
@@ -86,6 +92,16 @@ public class EntryCommand {
             try{
                 kafkaConfigurationValues
                     .load(new FileReader(kafkaConfiguration));
+
+                if(!Objects.nonNull(getBootstrapServers())){
+                    var oldBootstrapServers =
+                      kafkaConfigurationValues
+                        .put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG,
+                            getBootstrapServers());
+
+                    log.debug("bootstrap.servers overwritten by {}", getBootstrapServers());
+                    log.debug("Old bootstrap.servers {}", oldBootstrapServers);
+                }
             }catch(IOException e){
                 throw new CommandLine
                     .ParameterException(spec.commandLine(),
@@ -93,6 +109,20 @@ public class EntryCommand {
             }
         }
         return kafkaConfigurationValues;
+    }
+
+    @Option(
+        names = {
+            "--bootstrap-servers"
+        },
+        description = "host/port pairs to connect the Apache Kafka®",
+        required = false
+    )
+    public void setBootstrapServers(String bootstrapServers) {
+        this.bootstrapServers = bootstrapServers;
+    }
+    public String getBootstrapServers() {
+        return bootstrapServers;
     }
 
     public void validateOptions() {
