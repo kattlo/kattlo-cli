@@ -46,8 +46,9 @@ public class EntryCommand {
         names = {
             "--config-file"
         },
-        description = "Configuration file YAML for migrations",
-        required = true
+        description = "Kattlo configurations",
+        required = true,
+        defaultValue = ".kattlo.yaml"
     )
     public void setConfiguration(File configuration) {
         this.configuration = Objects.requireNonNull(configuration);
@@ -76,8 +77,9 @@ public class EntryCommand {
         names = {
             "--kafka-config-file"
         },
-        description = "Properties file for Apache Kafka® Admin Client",
-        required = true
+        description = "Properties file for Apache Kafka® clients",
+        required = true,
+        defaultValue = "kafka.properties"
     )
     public void setKafkaConfiguration(File kafkaConfiguration) {
         this.kafkaConfiguration = Objects.requireNonNull(kafkaConfiguration);
