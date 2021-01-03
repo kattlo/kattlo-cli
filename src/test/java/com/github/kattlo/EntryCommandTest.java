@@ -5,6 +5,7 @@ import picocli.CommandLine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -46,5 +47,29 @@ public class EntryCommandTest {
 
         assertEquals(2, actual);
 
+    }
+
+    @Test
+    public void should_override_the_bootstrap_servers() {
+
+        var expected = "configure-me:9092";
+        String[] args = {
+            "--config-file=./src/test/resources/.kattlo.yaml",
+            "--kafka-config-file=./src/test/resources/kafka.properties",
+            "--bootstrap-servers=" + expected,
+            "topic",
+            "--directory=."
+        };
+
+        var command = new CommandLine(entry);
+
+        command.execute(args);
+
+        //assert
+        EntryCommand actualCommand = command.getCommand();
+        var actualProperties = actualCommand.getKafkaConfiguration();
+        var actual = actualProperties.getProperty(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG);
+
+        assertEquals(expected, actual);
     }
 }

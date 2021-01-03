@@ -93,7 +93,7 @@ public class EntryCommand {
                 kafkaConfigurationValues
                     .load(new FileReader(kafkaConfiguration));
 
-                if(!Objects.nonNull(getBootstrapServers())){
+                if(Objects.nonNull(getBootstrapServers())){
                     var oldBootstrapServers =
                       kafkaConfigurationValues
                         .put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG,
