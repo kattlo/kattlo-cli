@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
-import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,12 +18,12 @@ import org.mapstruct.factory.Mappers;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
-import io.quarkus.runtime.annotations.RegisterForReflection;
-import lombok.Data;
+import lombok.experimental.UtilityClass;
 
 /**
  * @author fabiojose
  */
+@UtilityClass
 public class Loader {
 
     private static final Constructor CONSTRUCTOR =
@@ -145,15 +144,4 @@ public class Loader {
 
     }
 
-    @Data
-    @RegisterForReflection
-    public static class Model {
-        private String operation;
-        private String notes;
-        private String topic;
-        private Integer partitions;
-        private Integer replicationFactor;
-
-        private Map<String, Object> config;
-    }
 }
