@@ -119,6 +119,8 @@ public class TopicImportCommand implements Runnable {
         try(var admin = kafka.adminFor(parent.getParent()
                 .getKafkaConfiguration())){
 
+            backend.init(parent.getParent().getKafkaConfiguration());
+
             // describe topic
             var description =
               TopicUtils.describe(topicName, admin)
