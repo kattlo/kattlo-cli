@@ -110,7 +110,7 @@ The option `--bootstrap-servers` overrides the config [`bootstrap.servers`](http
 
 ### Import
 
-To import existing topics for Kattlo manage it.
+To import existing topics to Kattlo.
 
 ```bash
 kattlo \
