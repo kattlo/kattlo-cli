@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.nio.file.Path;
 
-import com.github.kattlo.topic.yaml.Loader.Model;
-
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
