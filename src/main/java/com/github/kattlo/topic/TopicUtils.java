@@ -5,16 +5,20 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.TopicDescription;
+import org.apache.kafka.common.config.ConfigResource;
+import org.apache.kafka.common.config.ConfigResource.Type;
 
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author fabiojose
  */
+@UtilityClass
 @Slf4j
 public final class TopicUtils {
-    private TopicUtils(){}
 
     public static Optional<TopicDescription> describe(String topic, AdminClient admin)
             throws ExecutionException, InterruptedException {
@@ -26,5 +30,18 @@ public final class TopicUtils {
         log.debug("Description of {}: {}", topic, descriptions);
 
         return Optional.ofNullable(descriptions.get(topic));
+    }
+
+    public static Optional<Config> configsOf(String topic, AdminClient admin)
+            throws ExecutionException, InterruptedException {
+
+        log.debug("Try to get configs of {}", topic);
+        var resource = new ConfigResource(Type.TOPIC, topic);
+        var result = admin.describeConfigs(List.of(resource));
+
+        var config = result.all().get().get(resource);
+        log.debug("Configs of {}: {}", topic, config);
+
+        return Optional.ofNullable(config);
     }
 }
