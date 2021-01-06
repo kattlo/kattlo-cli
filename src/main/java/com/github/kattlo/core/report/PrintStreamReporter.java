@@ -36,7 +36,12 @@ public class PrintStreamReporter implements Reporter {
     }
 
     @Override
-    public void report(Migration migration) {
+    public void report(Migration migration){
+        report(migration, Boolean.FALSE);
+    }
+
+    @Override
+    public void report(Migration migration, boolean isImport) {
         Objects.requireNonNull(migration,
             "Provide a non-null migration instance");
 
@@ -44,7 +49,11 @@ public class PrintStreamReporter implements Reporter {
 
         switch(migration.getOperation()){
             case CREATE:
-                out.print("+ create");
+                if(!isImport){
+                    out.print("+ create");
+                } else {
+                    out.print("= import");
+                }
                 break;
             case PATCH:
                 out.print("~ patch");

@@ -10,6 +10,8 @@ import javax.inject.Inject;
 import com.github.kattlo.core.backend.Backend;
 import com.github.kattlo.core.backend.OperationType;
 import com.github.kattlo.core.kafka.Kafka;
+import com.github.kattlo.core.report.PrintStreamReporter;
+import com.github.kattlo.core.report.Reporter;
 import com.github.kattlo.topic.yaml.Model;
 import com.github.kattlo.topic.yaml.TopicOperation;
 import com.github.kattlo.topic.yaml.Writer;
@@ -17,6 +19,7 @@ import com.github.kattlo.topic.yaml.Writer;
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.ConfigEntry;
 import org.apache.kafka.clients.admin.TopicDescription;
+import org.apache.kafka.common.protocol.types.Field.Bool;
 
 import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
@@ -48,6 +51,8 @@ public class TopicImportCommand implements Runnable {
 
     @Inject
     Kafka kafka;
+
+    private final Reporter reporter = new PrintStreamReporter(System.out);
 
     private String topicName;
 
@@ -151,7 +156,8 @@ public class TopicImportCommand implements Runnable {
             var state = backend.commit(migration);
             log.debug("Existing topic imported as {}", state);
 
-            // TODO report the import
+            // report the import
+            reporter.report(migration, Boolean.TRUE);
 
         }catch(InterruptedException | ExecutionException e){
             throw new CommandLine.ExecutionException(spec.commandLine(),

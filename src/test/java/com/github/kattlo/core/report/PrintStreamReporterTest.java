@@ -239,4 +239,30 @@ public class PrintStreamReporterTest {
         assertThat(actual, containsString(expected));
     }
 
+    @Test
+    public void should_report_a_import() {
+
+        var expected = "= import TOPIC";
+
+        var create = new Migration();
+        create.setVersion("v0001");
+        create.setOperation(OperationType.CREATE);
+        create.setNotes("notes");
+        create.setResourceType(ResourceType.TOPIC);
+        create.setResourceName("topic-name");
+        create.setTimestamp(LocalDateTime.now());
+
+        var original = new Original();
+        original.setContent("Y29udGVudA==");
+        original.setContentType("text/yaml");
+        original.setPath("/path/to/migration.yaml");
+        create.setOriginal(original);
+
+        reporter.report(create, Boolean.TRUE);
+
+        var actual = buffer.toString();
+
+        // assert
+        assertThat(actual, containsString(expected));
+    }
 }
