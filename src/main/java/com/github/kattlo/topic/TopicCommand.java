@@ -36,7 +36,10 @@ import picocli.CommandLine.Model.CommandSpec;
  */
 @Command(
     name = "topic",
-    description = "Migrations for Topics"
+    description = "Migrations for Topics",
+    subcommands = {
+        TopicImportCommand.class
+    }
 )
 @AllArgsConstructor
 @NoArgsConstructor
@@ -76,8 +79,15 @@ public class TopicCommand implements Runnable {
     public void setDirectory(File directory){
         this.directory = Objects.requireNonNull(directory);
     }
+    public File getDirectory() {
+        return directory;
+    }
 
-    private void validateOptions() {
+    public EntryCommand getParent() {
+        return parent;
+    }
+
+    void validateOptions() {
         parent.validateOptions();
 
         if(!directory.canRead()){
