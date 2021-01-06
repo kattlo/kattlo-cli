@@ -31,6 +31,10 @@ public class Writer {
     private static final Yaml YAML =
         new Yaml(OPTIONS);
 
+
+    /**
+     * @throws WriteException If any error happens during the write
+     */
     public static void write(Model model, Path file) {
 
         try{

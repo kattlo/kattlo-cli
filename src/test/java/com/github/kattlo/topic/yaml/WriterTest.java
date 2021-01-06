@@ -11,6 +11,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.yaml.snakeyaml.Yaml;
 
+@SuppressWarnings("unchecked")
 public class WriterTest {
 
     private static Yaml YAML = new Yaml();
