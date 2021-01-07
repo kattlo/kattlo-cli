@@ -51,7 +51,7 @@ In the `.kattlo.yaml` configuration file you may define the following
 properties:
 
 ```yaml
-TODO
+# to future uses, then, will be an empty file
 ```
 
 In the Kafka Admin client file you may put the properties described at [official documentation](https://kafka.apache.org/documentation/#adminclientconfigs).
@@ -131,10 +131,6 @@ migration with create operation and the necessary stuff to enable that
 topic as a managed resource.
 
 - file automatically create within `--directory`: `v0001_create-topic.yaml`
-
-## Main Concepts
-
-TODO
 
 ## Best Practices
 
