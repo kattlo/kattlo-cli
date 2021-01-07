@@ -19,7 +19,6 @@ import com.github.kattlo.topic.yaml.Writer;
 import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.clients.admin.ConfigEntry;
 import org.apache.kafka.clients.admin.TopicDescription;
-import org.apache.kafka.common.protocol.types.Field.Bool;
 
 import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
