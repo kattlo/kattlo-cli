@@ -13,12 +13,12 @@ configurations for:
 
 :bulb: Check the [examples directory](./examples) :bulb:
 
-## Kattlo helps with
+## Kattlo is good for ...
 
+- enterprises that needs a stable way to change Apache Kafka® configurations
 - maintain the configuration and avoid drifts
 - helps to known when a topic was removed
 - access the history of migrations
-- and more . . .
 
 ## Install
 
@@ -32,8 +32,11 @@ sudo mv kattlo /usr/sbin/kattlo
 ## Released Features
 
 - [x] Topic migrations
+  - [x] apply migrations
+  - [x] import existing topics
 - [ ] ACL migrations
 - [ ] Schema migrations
+- [ ] Connect migrations
 - [ ] ksqlDB migrations
 - [ ] Cluster migrations
 
