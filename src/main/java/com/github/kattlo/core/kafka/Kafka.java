@@ -45,7 +45,13 @@ public class Kafka {
 
     static final String TOPIC_T_HISTORY = "__kattlo-topics-history";
     static final Map<String, Object> TOPIC_T_HISTORY_CONFIG = Map.of(
-
+        "cleanup.policy", "delete",
+        "delete.retention.ms", "0",
+        "max.message.bytes", "1048588",
+        "message.timestamp.type", "CreateTime",
+        "min.cleanable.dirty.ratio", "0.0001",
+        "retention.ms", "-1",
+        "segment.bytes", "104857600"
     );
 
     public AdminClient adminFor(Properties configs) {
