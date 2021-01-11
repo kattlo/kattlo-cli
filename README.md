@@ -248,24 +248,7 @@ In order to manage the migrations, we use four special topics:
 This topic has the following configurations:
 
 - partitions: `50`
-- replication-factor: `2`
-
-Kafka CLI to create the state topic:
-
-```bash
-kafka-topics.sh --create \
-  --bootstrap-server 'localhost:9092' \
-  --replication-factor 1 \
-  --partitions 50 \
-  --topic '__kattlo-topics-state' \
-  --config 'cleanup.policy=compact' \
-  --config 'segment.ms=3000' \
-  --config 'segment.bytes=104857600' \
-  --config 'compression.type=producer' \
-  --config 'message.timestamp.type=CreateTime' \
-  --config 'delete.retention.ms=0' \
-  --config 'min.cleanable.dirty.ratio=0.0001'
-```
+- desired replication-factor: `2`
 
 ### `__kattlo-topics-history`
 
@@ -274,25 +257,7 @@ kafka-topics.sh --create \
 This topic has the following configurations:
 
 - partitions: `50`
-- replication-factor: `2`
-
-Kafka CLI to create the state topic:
-
-```bash
-kafka-topics.sh --create \
-  --bootstrap-server 'localhost:9092' \
-  --replication-factor 1 \
-  --partitions 50 \
-  --topic '__kattlo-topics-history' \
-  --config 'cleanup.policy=delete' \
-  --config 'retention.ms=-1' \
-  --config 'segment.ms=3000' \
-  --config 'segment.bytes=104857600' \
-  --config 'compression.type=producer' \
-  --config 'message.timestamp.type=CreateTime' \
-  --config 'delete.retention.ms=0' \
-  --config 'min.cleanable.dirty.ratio=0.0001'
-```
+- desired replication-factor: `2`
 
 ## Build and Run
 
