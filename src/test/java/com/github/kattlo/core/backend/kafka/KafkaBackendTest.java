@@ -32,6 +32,7 @@ import org.apache.kafka.common.TopicPartition;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -58,10 +59,14 @@ public class KafkaBackendTest {
     @Mock
     private Future<RecordMetadata> future;
 
+    @Mock
+    private KafkaBackendConfig backendConfig;
+
     @Spy
+    @InjectMocks
     private KafkaBackend backend = new KafkaBackend(new Properties());
 
-    MigrationPartitioner partitioner = new MigrationPartitioner();
+    private MigrationPartitioner partitioner = new MigrationPartitioner();
 
     @AfterEach
     public void afterEach(){
@@ -71,7 +76,7 @@ public class KafkaBackendTest {
     private void setupConsumer(ConsumerRecord<String, ResourceCommit> record){
 
         consumer.schedulePollTask(() -> {
-            var tp = new TopicPartition(KafkaBackend.TOPIC_T,
+            var tp = new TopicPartition(KafkaBackendConfig.TOPIC_T_STATE,
                 partitioner.partition(record.value().getResourceType(),
                     record.value().getResourceName()));
 
@@ -96,7 +101,7 @@ public class KafkaBackendTest {
 
     private void setupConsumer(ResourceType type, String name) {
 
-        var tp = new TopicPartition(KafkaBackend.TOPIC_T,
+        var tp = new TopicPartition(KafkaBackendConfig.TOPIC_T_STATE,
             partitioner.partition(type, name));
 
         consumer.schedulePollTask(() -> {
@@ -106,7 +111,7 @@ public class KafkaBackendTest {
             //consumer.seek(tp, 0);
         });
 
-        var tpHistory = new TopicPartition(KafkaBackend.TOPIC_T_HISTORY,
+        var tpHistory = new TopicPartition(KafkaBackendConfig.TOPIC_T_HISTORY,
             partitioner.partition(type, name));
 
         migrationConsumer.schedulePollTask(() -> {
@@ -146,6 +151,12 @@ public class KafkaBackendTest {
 
             mocked.when(() -> KafkaBackend.consumer(any(), any()))
                 .thenReturn(consumer);
+
+            when(backendConfig.topicsStateTopicName(any()))
+                .thenReturn(KafkaBackendConfig.TOPIC_T_STATE);
+
+            when(backendConfig.topicsHistoryTopicName(any()))
+                .thenReturn(KafkaBackendConfig.TOPIC_T_HISTORY);
 
             setupConsumer(ResourceType.TOPIC, topic);
 
@@ -196,6 +207,12 @@ public class KafkaBackendTest {
             mocked.when(() -> KafkaBackend.consumer(any(), any()))
                 .thenReturn(consumer);
 
+            when(backendConfig.topicsStateTopicName(any()))
+                .thenReturn(KafkaBackendConfig.TOPIC_T_STATE);
+
+            when(backendConfig.topicsHistoryTopicName(any()))
+                .thenReturn(KafkaBackendConfig.TOPIC_T_HISTORY);
+
             setupConsumer(ResourceType.TOPIC, topic);
 
             // act
@@ -207,7 +224,7 @@ public class KafkaBackendTest {
 
             var actual = records.iterator().next();
 
-            assertEquals(KafkaBackend.TOPIC_T, actual.topic());
+            assertEquals(KafkaBackendConfig.TOPIC_T_STATE, actual.topic());
         }
 
     }
@@ -243,6 +260,12 @@ public class KafkaBackendTest {
 
             mocked.when(() -> KafkaBackend.consumer(any(), any()))
                 .thenReturn(consumer);
+
+            when(backendConfig.topicsStateTopicName(any()))
+                .thenReturn(KafkaBackendConfig.TOPIC_T_STATE);
+
+            when(backendConfig.topicsHistoryTopicName(any()))
+                .thenReturn(KafkaBackendConfig.TOPIC_T_HISTORY);
 
             setupConsumer(ResourceType.TOPIC, topic);
 
@@ -310,6 +333,12 @@ public class KafkaBackendTest {
             mocked.when(() -> KafkaBackend.consumer(any(), any()))
                 .thenReturn(consumer);
 
+            when(backendConfig.topicsStateTopicName(any()))
+                .thenReturn(KafkaBackendConfig.TOPIC_T_STATE);
+
+            when(backendConfig.topicsHistoryTopicName(any()))
+                .thenReturn(KafkaBackendConfig.TOPIC_T_HISTORY);
+
             setupConsumer(ResourceType.TOPIC, topic);
 
             // act
@@ -321,7 +350,7 @@ public class KafkaBackendTest {
 
             var actual = records.get(1);
 
-            assertEquals(KafkaBackend.TOPIC_T_HISTORY, actual.topic());
+            assertEquals(KafkaBackendConfig.TOPIC_T_HISTORY, actual.topic());
         }
 
     }
@@ -357,6 +386,12 @@ public class KafkaBackendTest {
 
             mocked.when(() -> KafkaBackend.consumer(any(), any()))
                 .thenReturn(consumer);
+
+            when(backendConfig.topicsStateTopicName(any()))
+                .thenReturn(KafkaBackendConfig.TOPIC_T_STATE);
+
+            when(backendConfig.topicsHistoryTopicName(any()))
+                .thenReturn(KafkaBackendConfig.TOPIC_T_HISTORY);
 
             setupConsumer(ResourceType.TOPIC, topic);
 
@@ -424,6 +459,12 @@ public class KafkaBackendTest {
             mocked.when(() -> KafkaBackend.consumer(any(), any()))
                 .thenReturn(consumer);
 
+            when(backendConfig.topicsStateTopicName(any()))
+                .thenReturn(KafkaBackendConfig.TOPIC_T_STATE);
+
+            when(backendConfig.topicsHistoryTopicName(any()))
+                .thenReturn(KafkaBackendConfig.TOPIC_T_HISTORY);
+
             setupConsumer(ResourceType.TOPIC, topic);
 
             doReturn(future)
@@ -470,6 +511,12 @@ public class KafkaBackendTest {
 
             mocked.when(() -> KafkaBackend.consumer(any(), any()))
                 .thenReturn(consumer);
+
+            when(backendConfig.topicsStateTopicName(any()))
+                .thenReturn(KafkaBackendConfig.TOPIC_T_STATE);
+
+            when(backendConfig.topicsHistoryTopicName(any()))
+                .thenReturn(KafkaBackendConfig.TOPIC_T_HISTORY);
 
             setupConsumer(ResourceType.TOPIC, topic);
 
@@ -520,9 +567,12 @@ public class KafkaBackendTest {
         commit.setAttributes(Map.copyOf(applied.getAttributes()));
 
         var record =
-            new ConsumerRecord<>(KafkaBackend.TOPIC_T,
+            new ConsumerRecord<>(KafkaBackendConfig.TOPIC_T_STATE,
                 partitioner.partition(applied.getResourceType(), applied.getResourceName()),
                 0, applied.key(), commit);
+
+        when(backendConfig.topicsStateTopicName(any()))
+            .thenReturn(KafkaBackendConfig.TOPIC_T_STATE);
 
         setupConsumer(record);
 
@@ -598,9 +648,15 @@ public class KafkaBackendTest {
         v0001Commit.setAttributes(Map.copyOf(v0001.getAttributes()));
 
         var v0001Record =
-            new ConsumerRecord<>(KafkaBackend.TOPIC_T,
+            new ConsumerRecord<>(KafkaBackendConfig.TOPIC_T_STATE,
                 partitioner.partition(v0001.getResourceType(), v0001.getResourceName()),
                 0, v0001.key(), v0001Commit);
+
+        when(backendConfig.topicsStateTopicName(any()))
+            .thenReturn(KafkaBackendConfig.TOPIC_T_STATE);
+
+        when(backendConfig.topicsHistoryTopicName(any()))
+            .thenReturn(KafkaBackendConfig.TOPIC_T_HISTORY);
 
         setupConsumer(v0001Record);
 
@@ -652,6 +708,9 @@ public class KafkaBackendTest {
             mocked.when(() -> KafkaBackend.consumer(any(), any()))
                 .thenReturn(consumer);
 
+            when(backendConfig.topicsStateTopicName(any()))
+                .thenReturn(KafkaBackendConfig.TOPIC_T_STATE);
+
             setupConsumer(ResourceType.TOPIC, topic);
 
             // act
@@ -693,11 +752,14 @@ public class KafkaBackendTest {
         //commit.getHistory().add(applied.asMigrationMap());
 
         var record =
-            new ConsumerRecord<>(KafkaBackend.TOPIC_T_HISTORY,
+            new ConsumerRecord<>(KafkaBackendConfig.TOPIC_T_HISTORY,
                 partitioner.partition(applied.getResourceType(), applied.getResourceName()),
                 0, applied.key(), applied);
 
-        setupConsumer(record, KafkaBackend.TOPIC_T_HISTORY);
+        when(backendConfig.topicsHistoryTopicName(any()))
+            .thenReturn(KafkaBackendConfig.TOPIC_T_HISTORY);
+
+        setupConsumer(record, KafkaBackendConfig.TOPIC_T_HISTORY);
 
         try(var mocked = mockStatic(KafkaBackend.class)){
             mocked.when(() -> KafkaBackend.consumer(any(), any()))
@@ -723,6 +785,9 @@ public class KafkaBackendTest {
         try(var mocked = mockStatic(KafkaBackend.class)){
             mocked.when(() -> KafkaBackend.consumer(any(), any()))
                 .thenReturn(migrationConsumer);
+
+            when(backendConfig.topicsHistoryTopicName(any()))
+                .thenReturn(KafkaBackendConfig.TOPIC_T_HISTORY);
 
             setupConsumer(ResourceType.TOPIC, topic);
 

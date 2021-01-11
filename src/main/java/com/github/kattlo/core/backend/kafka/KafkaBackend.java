@@ -45,9 +45,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class KafkaBackend implements Backend {
 
-    static final String TOPIC_T = "__kattlo-topics-state";
-    static final String TOPIC_T_HISTORY = "__kattlo-topics-history";
-
     private static final String CLIENT_ID = "kattlo-cli";
     private static final String GROUP_ID = "kattlo-cli";
 
@@ -60,14 +57,17 @@ public class KafkaBackend implements Backend {
     private final TopicResourceJoinner topicJoinner =
         new TopicResourceJoinner();
 
+    private KafkaBackendConfig backendConfig;
     private boolean initialized = false;
     private Properties configs;
 
     public KafkaBackend() {
+        backendConfig = new KafkaBackendConfig();
         configs = new Properties();
     }
 
     public KafkaBackend(final Properties configs){
+        backendConfig = new KafkaBackendConfig();
         this.configs = Objects.requireNonNull(configs);
         this.initialized = true;
     }
@@ -169,8 +169,11 @@ public class KafkaBackend implements Backend {
             stateToCommit.get("attributes"));
         commit.setKattlo(VersionUtil.appVersion());
 
-        var resourceRecord = new ProducerRecord<>(TOPIC_T, applied.key(), commit);
-        var historyRecord = new ProducerRecord<>(TOPIC_T_HISTORY, applied.key(), applied);
+        var resourceRecord = new ProducerRecord<>(
+            backendConfig.topicsStateTopicName(configs), applied.key(), commit);
+
+        var historyRecord = new ProducerRecord<>(
+            backendConfig.topicsHistoryTopicName(configs), applied.key(), applied);
 
         try(var resourceProducer = producer(configs, ResourceCommitSerializer.class);
             var historyProducer = producer(configs, MigrationSerializer.class)){
@@ -213,7 +216,8 @@ public class KafkaBackend implements Backend {
 
         try(var consumer = consumer(configs, ResourceCommitDeserializer.class)){
             var tp = Collections.singletonList(
-                new TopicPartition(TOPIC_T, partition));
+                new TopicPartition(
+                    backendConfig.topicsStateTopicName(configs), partition));
 
             consumer.assign(tp);
             log.debug("Consumer assigned to {}", consumer.assignment());
@@ -280,7 +284,8 @@ public class KafkaBackend implements Backend {
 
         try(var consumer = consumer(configs, MigrationDeserializer.class)){
             var tp = Collections.singletonList(
-                new TopicPartition(TOPIC_T_HISTORY, partition));
+                new TopicPartition(backendConfig
+                    .topicsHistoryTopicName(configs), partition));
 
             consumer.assign(tp);
             log.debug("Consumer assigned to {}", consumer.assignment());

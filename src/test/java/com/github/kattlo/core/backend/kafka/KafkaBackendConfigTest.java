@@ -1,11 +1,10 @@
-package com.github.kattlo.core.kafka;
+package com.github.kattlo.core.backend.kafka;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,6 +17,7 @@ import java.util.Optional;
 import java.util.Properties;
 
 import com.github.kattlo.core.exception.TopicDescriptionException;
+import com.github.kattlo.core.kafka.Kafka;
 import com.github.kattlo.topic.TopicUtils;
 import com.github.kattlo.topic.migration.TopicCreateException;
 
@@ -33,18 +33,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class KafkaTest {
+public class KafkaBackendConfigTest {
 
-    @Spy
-    private Kafka kafka = new Kafka();
+    @Mock
+    private Kafka kafka;
 
     @Mock
     private AdminClient admin;
@@ -64,7 +64,13 @@ public class KafkaTest {
     @Captor
     private ArgumentCaptor<Collection<NewTopic>> newTopicCaptor;
 
+    @InjectMocks
+    private KafkaBackendConfig backendConfig;
+
     private void mockitoWhen() throws Exception {
+
+        when(kafka.adminFor(any()))
+            .thenReturn(admin);
 
         when(admin.createTopics(anyCollection()))
             .thenReturn(result);
@@ -98,10 +104,8 @@ public class KafkaTest {
             mocked.when(() -> TopicUtils.describe(anyString(), any()))
                 .thenThrow(new InterruptedException("failure"));
 
-            doReturn(admin).when(kafka).adminFor(any());
-
             assertThrows(TopicDescriptionException.class, ()->
-                kafka.topicFor("__kattlo-topics-state", 1, Map.of(), configs));
+                backendConfig.topicFor("__kattlo-topics-state", 1, Map.of(), configs));
 
         }
     }
@@ -125,9 +129,7 @@ public class KafkaTest {
             mocked.when(() -> TopicUtils.describe(anyString(), any()))
                 .thenReturn(Optional.of(description));
 
-            doReturn(admin).when(kafka).adminFor(any());
-
-            var actual = kafka.topicFor(topic, 1, Map.of(), configs);
+            var actual = backendConfig.topicFor(topic, 1, Map.of(), configs);
 
             assertEquals(topic, actual);
         }
@@ -149,10 +151,9 @@ public class KafkaTest {
             mocked.when(() -> TopicUtils.describe(anyString(), any()))
                 .thenReturn(Optional.empty());
 
-            doReturn(admin).when(kafka).adminFor(any());
             mockitoWhen();
 
-            kafka.topicFor(topic, partitions, config, configs);
+            backendConfig.topicFor(topic, partitions, config, configs);
 
             verify(admin).createTopics(newTopicCaptor.capture());
             var actual = newTopicCaptor.getValue();
@@ -175,14 +176,13 @@ public class KafkaTest {
             mocked.when(() -> TopicUtils.describe(anyString(), any()))
                 .thenReturn(Optional.empty());
 
-            doReturn(admin).when(kafka).adminFor(any());
             mockitoWhen();
 
             when(future.get())
                 .thenThrow(new InterruptedException("failure"));
 
             assertThrows(TopicCreateException.class, ()->
-                kafka.topicFor("__kattlo-topics-state", 1, Map.of(), configs));
+                backendConfig.topicFor("__kattlo-topics-state", 1, Map.of(), configs));
 
         }
     }
@@ -196,10 +196,9 @@ public class KafkaTest {
             mocked.when(() -> TopicUtils.describe(anyString(), any()))
                 .thenReturn(Optional.empty());
 
-            doReturn(admin).when(kafka).adminFor(any());
             mockitoWhen();
 
-            kafka.topicsStateTopicName(configs);
+            backendConfig.topicsStateTopicName(configs);
 
             verify(admin).createTopics(newTopicCaptor.capture());
             var actual = newTopicCaptor.getValue();
@@ -207,8 +206,8 @@ public class KafkaTest {
             assertEquals(1, actual.size());
 
             var newTopic = actual.iterator().next();
-            assertEquals(Kafka.TOPIC_T_PARTITIONS, newTopic.numPartitions());
-            assertEquals(Kafka.TOPIC_T_STATE_CONFIG, newTopic.configs());
+            assertEquals(backendConfig.TOPIC_T_PARTITIONS, newTopic.numPartitions());
+            assertEquals(backendConfig.TOPIC_T_STATE_CONFIG, newTopic.configs());
         }
     }
 
@@ -221,10 +220,9 @@ public class KafkaTest {
             mocked.when(() -> TopicUtils.describe(anyString(), any()))
                 .thenReturn(Optional.empty());
 
-            doReturn(admin).when(kafka).adminFor(any());
             mockitoWhen();
 
-            kafka.topicsHistoryTopicName(configs);
+            backendConfig.topicsHistoryTopicName(configs);
 
             verify(admin).createTopics(newTopicCaptor.capture());
             var actual = newTopicCaptor.getValue();
@@ -232,8 +230,8 @@ public class KafkaTest {
             assertEquals(1, actual.size());
 
             var newTopic = actual.iterator().next();
-            assertEquals(Kafka.TOPIC_T_PARTITIONS, newTopic.numPartitions());
-            assertEquals(Kafka.TOPIC_T_HISTORY_CONFIG, newTopic.configs());
+            assertEquals(backendConfig.TOPIC_T_PARTITIONS, newTopic.numPartitions());
+            assertEquals(backendConfig.TOPIC_T_HISTORY_CONFIG, newTopic.configs());
         }
     }
 
@@ -246,10 +244,9 @@ public class KafkaTest {
             mocked.when(() -> TopicUtils.describe(anyString(), any()))
                 .thenReturn(Optional.empty());
 
-            doReturn(admin).when(kafka).adminFor(any());
             mockitoWhen();
 
-            kafka.topicsHistoryTopicName(configs);
+            backendConfig.topicsHistoryTopicName(configs);
 
             verify(admin).createTopics(newTopicCaptor.capture());
             var actual = newTopicCaptor.getValue();
@@ -257,7 +254,7 @@ public class KafkaTest {
             assertEquals(1, actual.size());
 
             var newTopic = actual.iterator().next();
-            assertEquals(Kafka.TOPIC_T_DESIRED_REPLICATION_FACTOR, newTopic.replicationFactor());
+            assertEquals(backendConfig.TOPIC_T_DESIRED_REPLICATION_FACTOR, newTopic.replicationFactor());
         }
     }
 }
