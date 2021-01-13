@@ -38,7 +38,8 @@ import picocli.CommandLine.Model.CommandSpec;
     name = "topic",
     description = "Migrations for Topics",
     subcommands = {
-        TopicImportCommand.class
+        TopicImportCommand.class,
+        TopicInfoCommand.class
     }
 )
 @AllArgsConstructor
