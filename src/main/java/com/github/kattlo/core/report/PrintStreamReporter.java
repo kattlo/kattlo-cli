@@ -217,6 +217,9 @@ public class PrintStreamReporter implements Reporter {
                 out.print(a.getValue());
                 out.println();
             });
+
+            out.println();
+            out.println();
         });
     }
 
