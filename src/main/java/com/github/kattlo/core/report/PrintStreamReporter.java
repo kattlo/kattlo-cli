@@ -1,38 +1,40 @@
 package com.github.kattlo.core.report;
 
 import java.io.PrintStream;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
 
 import com.github.kattlo.core.backend.Migration;
+import com.github.kattlo.core.backend.Resource;
 
 /**
  * @author fabiojose
  */
 public class PrintStreamReporter implements Reporter {
-    /*
-    + create a TOPIC
-      v0001
-        original -> /path/to/migration.yaml
-        resource -> topic-name
-        att1 -> vlu1
-        att1 -> vlu2
-    */
-
-    /*
-    ** Error **
-        <message>
-        <details>
-    */
-
 
     private static final String EMPTY = "";
     private static final String _1_SPACE = " ";
     private static final String _2_SPACE = "  ";
 
+    private Jsonb json;
+
     private final PrintStream out;
     public PrintStreamReporter(PrintStream out) {
         this.out = Objects.requireNonNull(out);
+    }
+
+    private Jsonb getJson(){
+        if(Objects.isNull(json)){
+            json = JsonbBuilder.create();
+        }
+
+        return json;
     }
 
     @Override
@@ -103,5 +105,149 @@ public class PrintStreamReporter implements Reporter {
         out.println(e.getMessage());
         e.printStackTrace(out);
 
+    }
+
+    private void currentPlain(Resource resource) {
+
+        out.println(resource.getStatus().name());
+        out.print(resource.getResourceType().name());
+        out.print(_1_SPACE);
+        out.print(":");
+        out.print(_1_SPACE);
+        out.println(resource.getResourceName());
+
+        out.print("version");
+        out.print(":");
+        out.print(_1_SPACE);
+        out.println(resource.getVersion());
+
+        Optional.ofNullable(resource.getAttributes())
+            .ifPresent(attributes ->
+                attributes.entrySet().stream()
+                    .sorted((v1, v2) -> v1.getKey().compareTo(v2.getKey()))
+                    .forEach(kv -> {
+                        out.print(_2_SPACE);
+                        out.print(kv.getKey());
+                        out.print(_1_SPACE);
+                        out.print("->");
+                        out.print(_1_SPACE);
+                        out.println(kv.getValue());
+                    }));
+    }
+
+    private void currentJson(Resource resource) {
+
+        getJson().toJson(resource, out);
+
+    }
+
+    @Override
+    public void current(Resource resource, ReportFormat format) {
+        Objects.requireNonNull(resource, "Provide a not null resource");
+        Objects.requireNonNull(format, "Provide a not null format");
+
+        if(ReportFormat.PLAIN.equals(format)){
+            currentPlain(resource);
+        } else if(ReportFormat.JSON.equals(format)){
+            currentJson(resource);
+        } else {
+            throw new IllegalArgumentException(format.name());
+        }
+    }
+
+    public void historyPlain(Stream<Migration> migrations) {
+
+        /*
+        TOPIC: topic-name-0
+
+          v0003 -> PATCH
+          <timestamp>
+          <notes>
+          <original path>
+            <attributes>
+
+
+          v0002 -> PATCH
+          <timestamp>
+          <notes>
+          <original path>
+            <attributes>
+
+        */
+
+        var sorted =
+          migrations
+            .sorted((m1, m2) -> m2.getVersion().compareTo(m1.getVersion()))
+            .collect(Collectors.toList());
+
+        var latest = sorted.iterator().next();
+
+        out.print(latest.getResourceType());
+        out.print(":");
+        out.print(_1_SPACE);
+        out.println(latest.getResourceName());
+        out.println();
+
+        sorted.forEach(m -> {
+            out.print(_2_SPACE);
+            out.print(m.getVersion());
+            out.print(_1_SPACE);
+            out.print("->");
+            out.print(_1_SPACE);
+            out.print(m.getOperation().name());
+            out.println();
+
+            out.print(_2_SPACE);
+            out.println(m.getTimestamp());
+
+            out.print(_2_SPACE);
+            out.println(m.getNotes());
+
+            out.print(_2_SPACE);
+            out.println(m.getOriginal().getPath());
+
+            out.print(_2_SPACE);
+            m.getAttributes().entrySet().forEach(a -> {
+                out.print(_2_SPACE);
+                out.print(_2_SPACE);
+                out.print(a.getKey());
+                out.print(_1_SPACE);
+                out.print("->");
+                out.print(_1_SPACE);
+                out.print(a.getValue());
+                out.println();
+            });
+        });
+    }
+
+    public void historyJson(Stream<Migration> migrations) {
+
+        var sorted =
+          migrations
+            .sorted((m1, m2) -> m2.getVersion().compareTo(m1.getVersion()))
+            .collect(Collectors.toList());
+
+        var latest = sorted.iterator().next();
+
+        var model = Map.of(
+            latest.getResourceType().name(), latest.getResourceName(),
+            "history", sorted
+        );
+
+        getJson().toJson(model, out);
+    }
+
+    @Override
+    public void history(Stream<Migration> migrations, ReportFormat format) {
+        Objects.requireNonNull(migrations, "Provide a not null migrations");
+        Objects.requireNonNull(format, "Provide a not null format");
+
+        if(ReportFormat.PLAIN.equals(format)){
+            historyPlain(migrations);
+        } else if(ReportFormat.JSON.equals(format)){
+            historyJson(migrations);
+        } else {
+            throw new IllegalArgumentException(format.name());
+        }
     }
 }
