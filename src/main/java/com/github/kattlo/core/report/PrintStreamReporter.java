@@ -13,9 +13,12 @@ import javax.json.bind.JsonbBuilder;
 import com.github.kattlo.core.backend.Migration;
 import com.github.kattlo.core.backend.Resource;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @author fabiojose
  */
+@Slf4j
 public class PrintStreamReporter implements Reporter {
 
     private static final String EMPTY = "";
@@ -137,6 +140,7 @@ public class PrintStreamReporter implements Reporter {
 
     private void currentJson(Resource resource) {
 
+        log.debug("To serialize as json current state {}", resource);
         getJson().toJson(resource, out);
 
     }
@@ -188,7 +192,6 @@ public class PrintStreamReporter implements Reporter {
             out.print(_2_SPACE);
             out.println(m.getOriginal().getPath());
 
-            out.print(_2_SPACE);
             m.getAttributes().entrySet().forEach(a -> {
                 out.print(_2_SPACE);
                 out.print(_2_SPACE);

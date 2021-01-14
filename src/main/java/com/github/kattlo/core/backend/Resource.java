@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.github.kattlo.core.backend.kafka.ResourceCommit;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ import lombok.NonNull;
  *
  * @author fabiojose
  */
+@RegisterForReflection
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -54,6 +56,7 @@ public class Resource {
         resource.setResourceName(commit.getResourceName());
         resource.setTimestamp(commit.getTimestamp());
         resource.setAttributes(Map.copyOf(commit.getAttributes()));
+
 
         return resource;
     }
