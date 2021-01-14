@@ -34,11 +34,17 @@ sudo mv kattlo /usr/sbin/kattlo
 - [x] Topic migrations
   - [x] apply migrations
   - [x] import existing topics
+  - [x] show info and history
+  - [ ] new migration
+  - [ ] rules enforcement
 - [ ] ACL migrations
 - [ ] Schema migrations
 - [ ] Connect migrations
 - [ ] ksqlDB migrations
 - [ ] Cluster migrations
+- [ ] Utilities
+  - [ ] new config for consumers
+  - [ ] new config for producers
 
 ## Usage
 
@@ -110,6 +116,33 @@ kattlo \
 ```
 
 The option `--bootstrap-servers` overrides the config [`bootstrap.servers`](https://kafka.apache.org/documentation/#adminclientconfigs_bootstrap.servers).
+
+
+Showing topic current state:
+
+> Include the option `--format=JSON` to show Json instead plain text
+
+```bash
+kattlo \
+  --config-file='examples/.kattlo.yaml' \
+  --kafka-config-file='examples/kafka.properties' \
+  --bootstrap-servers='my.kafka:9092' \
+  topic info \
+  '<topic-name>'
+```
+
+Showing topic history:
+
+> Include the option `--format=JSON` to show Json instead plain text
+
+```bash
+kattlo \
+  --config-file='examples/.kattlo.yaml' \
+  --kafka-config-file='examples/kafka.properties' \
+  --bootstrap-servers='my.kafka:9092' \
+  topic info --history \
+  '<topic-name>'
+```
 
 ### Import
 
