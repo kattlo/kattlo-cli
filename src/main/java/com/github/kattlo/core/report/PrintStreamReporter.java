@@ -157,24 +157,6 @@ public class PrintStreamReporter implements Reporter {
 
     public void historyPlain(Stream<Migration> migrations) {
 
-        /*
-        TOPIC: topic-name-0
-
-          v0003 -> PATCH
-          <timestamp>
-          <notes>
-          <original path>
-            <attributes>
-
-
-          v0002 -> PATCH
-          <timestamp>
-          <notes>
-          <original path>
-            <attributes>
-
-        */
-
         var sorted =
           migrations
             .sorted((m1, m2) -> m2.getVersion().compareTo(m1.getVersion()))
