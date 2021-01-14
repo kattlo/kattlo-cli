@@ -120,7 +120,7 @@ The option `--bootstrap-servers` overrides the config [`bootstrap.servers`](http
 
 Showing topic current state:
 
-> Include the option `--format=JSON` to show Json instead plain text
+> Include the option `--format=JSON` to printout json instead plain text
 
 ```bash
 kattlo \
@@ -133,7 +133,7 @@ kattlo \
 
 Showing topic history:
 
-> Include the option `--format=JSON` to show Json instead plain text
+> Include the option `--format=JSON` to printout json instead plain text
 
 ```bash
 kattlo \
