@@ -1,3 +1,5 @@
+![Kattlo](./artwork/kattlo.png)
+
 # Apache Kafka® Configuration Made Easy
 
 Use an approach like Database Migrations to manage your evolutionary
@@ -331,3 +333,7 @@ If you want to build an _über-jar_, just add the `--uber-jar` option to the com
 ## Made with :purple_heart: by
 
 - fabiojose
+
+## Notes
+
+- Kattlo icon by <a href="http://www.freepik.com/" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon"> www.flaticon.com</a>
