@@ -19,11 +19,13 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author fabiojose
  */
 @UtilityClass
+@Slf4j
 public class Loader {
 
     private static final Constructor CONSTRUCTOR =
@@ -130,7 +132,8 @@ public class Loader {
                     MAPPER.map(load(file), file))
                 .filter(o -> o.getTopic().equals(topic))
                 .sorted(Comparator.comparing(TopicOperation::getVersion))
-                .filter(o -> o.getVersion().compareTo(currentVersion) > 0);
+                .filter(o -> o.getVersion().compareTo(currentVersion) > 0)
+                .peek(o -> log.debug("Newer TopicOperation {}", 0));
     }
 
     public static Stream<TopicOperation> all(final String topic,
@@ -140,7 +143,8 @@ public class Loader {
             list(directory)
                 .map(file -> MAPPER.map(load(file), file))
                 .filter(o -> o.getTopic().equals(topic))
-                .sorted(Comparator.comparing(TopicOperation::getVersion));
+                .sorted(Comparator.comparing(TopicOperation::getVersion))
+                .peek(o -> log.debug("TopicOperation loaded {}", o));
 
     }
 

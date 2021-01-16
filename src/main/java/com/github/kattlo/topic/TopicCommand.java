@@ -113,8 +113,9 @@ public class TopicCommand implements Runnable {
 
             backend.init(parent.getKafkaConfiguration());
 
-            for(int i = 0; i < migrationFiles.size(); i++){
-                var migrationFile = migrationFiles.get(i);
+            var iterator = migrationFiles.iterator();
+            while(iterator.hasNext()){
+                var migrationFile = iterator.next();
                 log.debug("Migration file {}", migrationFile);
 
                 //TODO Validate yaml against schema??
@@ -140,9 +141,15 @@ public class TopicCommand implements Runnable {
                 Loader.all(migrationModel.getTopic(),
                         Path.of(directory.getAbsolutePath()))
                     .forEach(to -> {
+                        log.debug("File to remove from files list: {}", to.getFile());
                         migrationFiles.removeIf(p ->
                             p.equals(to.getFile()));
                     });
+
+                log.debug("Current files within migrationFiles {}", migrationFiles);
+
+                // update the iterator with updated migrationFiles'
+                iterator = migrationFiles.iterator();
 
                 // Load newer migrations if any
                 // TODO use the list of all migrations
