@@ -1,4 +1,4 @@
-package com.github.kattlo.topic;
+package com.github.kattlo;
 
 import javax.inject.Inject;
 
@@ -23,18 +23,19 @@ import picocli.CommandLine.Model.CommandSpec;
  */
 @Command(
     name = "info",
-    description = "To show the topic current state or the history of migrations",
+    description = "To show the resource state or the history of migrations",
     showDefaultValues = true
 )
 @Slf4j
-public class TopicInfoCommand implements Runnable {
+public class InfoCommand implements Runnable {
 
+    private ResourceType resource;
     private ReportFormat format;
     private boolean history;
-    private String topic;
+    private String name;
 
     @ParentCommand
-    TopicCommand parent;
+    EntryCommand parent;
 
     @Spec
     CommandSpec spec;
@@ -46,6 +47,17 @@ public class TopicInfoCommand implements Runnable {
     Kafka kafka;
 
     private Reporter reporter = new PrintStreamReporter(System.out);
+
+    @Option(
+        names = {
+            "--resource"
+        },
+        paramLabel = "The resource type",
+        required = true
+    )
+    private void setResource(ResourceType resource){
+        this.resource = resource;
+    }
 
     @Option(
         names = {
@@ -71,10 +83,10 @@ public class TopicInfoCommand implements Runnable {
 
     @Parameters(
         index = "0",
-        paramLabel = "Topic name"
+        paramLabel = "resource name"
     )
-    public void setTopic(String topic){
-        this.topic = topic;
+    public void setName(String name){
+        this.name = name;
     }
 
     private void validateOptions() {
@@ -85,15 +97,15 @@ public class TopicInfoCommand implements Runnable {
     public void run() {
         validateOptions();
 
-        log.debug("Showing the info of topic {}", topic);
+        log.debug("Showing the info of resource {} {}", resource, name);
 
-        try(var admin = kafka.adminFor(parent.getParent()
+        try(var admin = kafka.adminFor(parent
                 .getKafkaConfiguration())){
 
-            backend.init(parent.getParent().getKafkaConfiguration());
+            backend.init(parent.getKafkaConfiguration());
 
             if(!history){
-                var current = backend.current(ResourceType.TOPIC, topic);
+                var current = backend.current(resource, name);
 
                 if(current.isPresent()){
                     reporter.current(current.get(), format);
@@ -102,7 +114,7 @@ public class TopicInfoCommand implements Runnable {
                         "Topic not managed by Kattlo");
                 }
             } else {
-                var history = backend.history(ResourceType.TOPIC, topic);
+                var history = backend.history(resource, name);
 
                 reporter.history(history, format);
             }
