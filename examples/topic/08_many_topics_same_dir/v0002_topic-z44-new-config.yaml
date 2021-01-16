@@ -1,0 +1,7 @@
+operation: patch
+notes: Add new configurtions to topic-z44
+topic: 08_topic-z44
+config:
+  delete.retention.ms: 0
+  max.message.bytes: 563200
+  message.timestamp.type: LogAppendTime

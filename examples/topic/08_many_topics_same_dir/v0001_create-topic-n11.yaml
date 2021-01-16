@@ -1,0 +1,7 @@
+operation: create
+notes: |
+  08_topic-n11 in the same dir with topic-z44
+topic: 08_topic-n11
+config:
+  compression.type: gzip
+  cleanup.policy  : compact

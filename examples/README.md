@@ -79,3 +79,16 @@ kattlo \
   topic \
   --directory='topic/07_create_patch_add_new_config'
 ```
+
+- Many topics migrations in the same directory
+
+ > Do not use this approach, otherwise your migration management will become a
+ mess
+
+ ```bash
+kattlo \
+  --config-file='.kattlo.yaml' \
+  --kafka-config-file='kafka.properties' \
+  topic \
+  --directory='topic/08_many_tipics_same_dir'
+ ```

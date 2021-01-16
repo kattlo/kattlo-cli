@@ -1,0 +1,7 @@
+operation: create
+notes: |
+  08_topic-z44 in the same dir with topic-n11
+topic: 08_topic-z44
+config:
+  cleanup.policy : delete
+  retention.ms   : '-1'
