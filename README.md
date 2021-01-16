@@ -119,7 +119,6 @@ kattlo \
 
 The option `--bootstrap-servers` overrides the config [`bootstrap.servers`](https://kafka.apache.org/documentation/#adminclientconfigs_bootstrap.servers).
 
-
 Showing topic current state:
 
 > Include the option `--format=JSON` to printout json instead plain text
@@ -128,8 +127,7 @@ Showing topic current state:
 kattlo \
   --config-file='examples/.kattlo.yaml' \
   --kafka-config-file='examples/kafka.properties' \
-  --bootstrap-servers='my.kafka:9092' \
-  topic info \
+  info --resource=TOPIC \
   '<topic-name>'
 ```
 
@@ -141,8 +139,7 @@ Showing topic history:
 kattlo \
   --config-file='examples/.kattlo.yaml' \
   --kafka-config-file='examples/kafka.properties' \
-  --bootstrap-servers='my.kafka:9092' \
-  topic info --history \
+  info --resource=TOPIC --history \
   '<topic-name>'
 ```
 
