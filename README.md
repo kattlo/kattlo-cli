@@ -21,6 +21,7 @@ configurations for:
 - maintain the configuration and avoid drifts
 - helps to known when a topic was removed
 - access the history of migrations
+- your DevOps toolset to properly manages the topic within clusters
 
 ## Install
 
