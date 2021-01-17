@@ -45,7 +45,8 @@ sudo mv kattlo /usr/sbin/kattlo
 - [ ] Connect migrations
 - [ ] ksqlDB migrations
 - [ ] Cluster migrations
-- [ ] Utilities
+- [x] Utilities
+  - [x] init project
   - [ ] new config for consumers
   - [ ] new config for producers
 
