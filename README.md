@@ -145,6 +145,25 @@ kattlo \
   '<topic-name>'
 ```
 
+### Init
+
+To init new Kattlo project you just run the following command:
+
+```bash
+kattlo init --directory='/path/to/initialize'
+```
+
+Use the `--bootstrap-servers` to generate the Kattlo config
+with right Kafka addresses:
+
+```bash
+kattlo --bootstrap-servers='my-kafka-b1:9092,my-kafka-b2:9092' \
+  init --directory='/path/to/initialize'
+```
+
+> If you suppress the `--directory` option, the current folder will be
+initialized.
+
 ### Import
 
 To import existing topics to Kattlo.
