@@ -30,7 +30,8 @@ import picocli.CommandLine.Model.CommandSpec;
     mixinStandardHelpOptions = true,
     subcommands = {
         TopicCommand.class,
-        InfoCommand.class
+        InfoCommand.class,
+        InitCommand.class
     }
 )
 @Slf4j
