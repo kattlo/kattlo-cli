@@ -30,7 +30,8 @@ import picocli.CommandLine.Model.CommandSpec;
 
 @Command(
     name = "import",
-    description = "To import existing topic"
+    description = "To import existing topic",
+    mixinStandardHelpOptions = true
 )
 @Slf4j
 public class TopicImportCommand implements Runnable {

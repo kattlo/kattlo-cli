@@ -37,6 +37,7 @@ import picocli.CommandLine.Model.CommandSpec;
 @Command(
     name = "topic",
     description = "Migrations for Topics",
+    mixinStandardHelpOptions = true,
     subcommands = {
         TopicImportCommand.class
     }

@@ -24,7 +24,8 @@ import picocli.CommandLine.Model.CommandSpec;
 @Command(
     name = "info",
     description = "To show the resource state or the history of migrations",
-    showDefaultValues = true
+    showDefaultValues = true,
+    mixinStandardHelpOptions = true
 )
 @Slf4j
 public class InfoCommand implements Runnable {
