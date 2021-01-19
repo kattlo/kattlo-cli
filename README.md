@@ -38,7 +38,7 @@ sudo mv kattlo /usr/sbin/kattlo
   - [x] apply migrations
   - [x] import existing topics
   - [x] show info and history
-  - [ ] new migration
+  - [x] new migration
   - [ ] rules enforcement
 - [ ] ACL migrations
 - [ ] Schema migrations
@@ -163,6 +163,18 @@ kattlo --bootstrap-servers='my-kafka-b1:9092,my-kafka-b2:9092' \
 
 > If you suppress the `--directory` option, the current folder will be
 initialized.
+
+### Gen
+
+To make easy the process to write down the migrations, you may use
+then gen command to genereate migration files:
+
+```bash
+kattlo gen migration --resource=TOPIC --diretory='/path/to/gen/migration'
+```
+
+> If you suppress the `--directory` option, the migration example will
+be gerenated in the current directory.
 
 ### Import
 
