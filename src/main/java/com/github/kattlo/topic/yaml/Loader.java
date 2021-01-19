@@ -40,6 +40,9 @@ public class Loader {
     public static final Pattern VERSION_PATTERN =
         Pattern.compile("(v[0-9]{4})");
 
+    public static final Pattern VERSION_NUMBER_PATTERN =
+        Pattern.compile("([0-9]{4})");
+
     public static final Pattern FILE_NAME_PATTERN =
         Pattern.compile("v[0-9]{4}_[\\w\\-]{0,246}\\.ya?ml");
 
@@ -77,6 +80,17 @@ public class Loader {
                 .filter(found -> found)
                 .map(f -> m.group());
 
+    }
+
+    public static Optional<String> versionNumberOf(String version){
+
+        final Matcher m =
+            VERSION_NUMBER_PATTERN.matcher(version);
+
+        return
+            Optional.of(m.find())
+                .filter(found -> found)
+                .map(f -> m.group());
     }
 
     /**

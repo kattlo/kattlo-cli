@@ -31,7 +31,7 @@ import picocli.CommandLine.Model.CommandSpec;
     subcommands = {
         TopicCommand.class,
         InfoCommand.class,
-        InitCommand.class
+        GenCommand.class
     }
 )
 @Slf4j
