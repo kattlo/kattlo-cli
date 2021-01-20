@@ -9,8 +9,8 @@ on:
 
 jobs:
   build-jar:
+    name: Runnable Jar
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 11
@@ -67,3 +67,110 @@ jobs:
           asset_path: build/kattlo-${{steps.get_version.outputs.VERSION}}.jar
           asset_name: kattlo-${{steps.get_version.outputs.VERSION}}.jar
           asset_content_type: application/java-archive
+
+      - name: Write Upload URL To File
+        if: contains(github.ref, 'v')
+        run: |
+          echo "${{steps.create_release.outputs.upload_url}}" > upload_url.txt
+
+      - name: Publish Upload URL
+        if: contains(github.ref, 'v')
+        uses: actions/upload-artifact@v2-preview
+        with:
+          name: 'upload_url.txt'
+          path: 'upload_url.txt'
+
+  build-non-windows-image:
+    name: Build Non-Windows Image
+    needs: [build-jar-job]
+    strategy:
+      matrix:
+        os: ['ubuntu-latest', 'macos-latest']
+        include:
+          - os: 'ubuntu-latest'
+            label: 'linux'
+          - os: 'macos-latest'
+            label: 'mac'
+    runs-on: ${{matrix.os}}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Java 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Setup GraalVM Environment
+        uses: DeLaGuardo/setup-graalvm@2.0
+        with:
+          graalvm-version: '20.2.0.java11'
+
+      - name: Install Native Image Plugin
+        run: |
+          gu install native-image
+
+      - name: Get Version Number
+        id: get_version
+        run: |
+          echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
+          echo ::set-output name=VERSION_BUILD::$(./gradlew properties -q | grep "version:" | awk '{print $2}')
+
+      - name: Get JAR Artifact
+        uses: actions/download-artifact@v2-preview
+        with:
+          name: kattlo-${{steps.get_version.outputs.VERSION}}.jar
+
+      - name: 'Get Release URL'
+        if: contains(github.ref, 'v')
+        uses: actions/download-artifact@v2-preview
+        with:
+          name: 'upload_url.txt'
+
+      - name: 'Get Upload URL'
+        id: get_url
+        if: contains(github.ref, 'v')
+        run: |
+          echo ::set-output name=UPLOAD_URL::$(cat upload_url.txt)
+
+      - name: Build Native Image
+        run: |
+          native-image -J-Djava.util.logging.manager=org.jboss.logmanager.LogManager \
+            -J-Duser.language=en \
+            -J-Dfile.encoding=UTF-8 \
+            --report-unsupported-elements-at-runtime \
+            --allow-incomplete-classpath \
+            -H:IncludeResources=.*yaml\$ \
+            -H:Log=registerResource: \
+            --initialize-at-build-time= \
+            -H:InitialCollectionPolicy=com.oracle.svm.core.genscavenge.CollectionPolicy\$BySpaceAndTime \
+            -H:+JNI \
+            -H:FallbackThreshold=0 \
+            -H:+ReportExceptionStackTraces \
+            -H:-AddAllCharsets \
+            -H:EnableURLProtocols=http \
+            --no-server \
+            -H:-UseServiceLoaderFeature \
+            -H:+StackTrace \
+            -jar kattlo-${{steps.get_version.outputs.VERSION}}.jar \
+            kattlo-${{steps.get_version.outputs.VERSION}}
+
+      - name: Publish Native Image
+        if: success()
+        uses: actions/upload-artifact@v2-preview
+        with:
+          name: 'kattlo-${{steps.get_version.outputs.VERSION}}-${{matrix.label}}'
+          path: 'kattlo-${{steps.get_version.outputs.VERSION}}'
+
+      - name: Release Native Image Asset
+        if: success() && contains(github.ref, 'v')
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          upload_url: ${{steps.get_url.outputs.UPLOAD_URL}}
+          asset_name: 'kattlo-${{steps.get_version.outputs.VERSION}}-${{matrix.label}}'
+          asset_path: 'kattlo-${{steps.get_version.outputs.VERSION}}'
+          asset_content_type: application/octet-stream
