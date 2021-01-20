@@ -38,7 +38,7 @@ sudo mv kattlo /usr/sbin/kattlo
   - [x] apply migrations
   - [x] import existing topics
   - [x] show info and history
-  - [x] new migration
+  - [x] generated migration example
   - [ ] rules enforcement
 - [ ] ACL migrations
 - [ ] Schema migrations
