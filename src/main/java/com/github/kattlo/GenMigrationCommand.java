@@ -6,10 +6,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.Optional;
 
 import com.github.kattlo.core.backend.ResourceType;
 import com.github.kattlo.core.exception.WriteException;
+import com.github.kattlo.core.report.PrintStreamReporter;
+import com.github.kattlo.core.report.Reporter;
 import com.github.kattlo.topic.yaml.Loader;
 
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +48,8 @@ public class GenMigrationCommand implements Runnable {
 
     @Spec
     CommandSpec spec;
+
+    private Reporter reporter = new PrintStreamReporter(System.out);
 
     @Option(
         names = {
@@ -132,6 +137,7 @@ public class GenMigrationCommand implements Runnable {
                     .lines()
                     .forEach(l -> write(l, out));
 
+            reporter.generated(Path.of(fileName.toURI()));
         }
     }
 
