@@ -197,6 +197,7 @@ jobs:
         run: |
           choco install visualstudio2017-workload-vctools
       - name: 'Get Version Number'
+        id: get_version
         run: |
           echo ::set-output name=VERSION::$(./gradlew properties -q | grep "version:" | awk '{print $2}')
         shell: bash
