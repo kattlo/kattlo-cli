@@ -41,4 +41,8 @@ jobs:
         - sdk install java 20.0.0.r11-grl
         - gu.cmd install native-image
         - native-image.cmd --version
+      script:
+        - "./gradlew quarkusBuild --uber-jar"
+        - ./build.bat
+        - cp /c/Windows/System32/VCRUNTIME140.dll .
 
