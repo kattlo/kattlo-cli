@@ -233,6 +233,10 @@ jobs:
             -H:+ReportExceptionStackTraces ^
             -jar kattlo-${{steps.get_version.outputs.VERSION}}.jar ^
             kattlo
+
+      - name: Zip
+        shell: bash
+        run: |
           cp /c/Windows/System32/VCRUNTIME140.dll .
           zip kattlo-${{steps.get_version.outputs.VERSION}}-windows.zip kattlo.exe VCRUNTIME140.dll
 
