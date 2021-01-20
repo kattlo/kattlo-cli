@@ -171,7 +171,7 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           upload_url: ${{steps.get_url.outputs.UPLOAD_URL}}
-          asset_name: 'kattlo-${{matrix.label}}-${{steps.get_version.outputs.VERSION}}'
+          asset_name: 'kattlo-${{steps.get_version.outputs.VERSION}}-${{matrix.label}}'
           asset_path: 'kattlo-${{steps.get_version.outputs.VERSION}}'
           asset_content_type: application/octet-stream
 
