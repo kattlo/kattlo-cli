@@ -1,5 +1,0 @@
-operation: create
-notes: 'Create the payments topic'
-topic: payments
-partitions: 1
-replicationFactor: 1

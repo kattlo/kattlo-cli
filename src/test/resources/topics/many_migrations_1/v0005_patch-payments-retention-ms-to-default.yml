@@ -1,5 +1,0 @@
-operation: patch
-notes: 'Configure retention to cluster default value'
-topic: payments
-config:
-  retention.ms: $default

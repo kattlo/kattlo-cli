@@ -1,5 +1,0 @@
-operation: patch
-notes: 'Retain events forever'
-topic: payments
-config:
-  retention.ms: -1

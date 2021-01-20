@@ -1,5 +1,0 @@
-operation: patch
-notes: 'Durable events using lz4 compression'
-topic: payments
-config:
-  compression.type: lz4

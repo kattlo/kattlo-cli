@@ -1,0 +1,16 @@
+rules:
+  topic:
+    pattern: 'java regex'
+    partitions:
+      '>=': 2
+    replicationFactor:
+      '>=': 2
+    config:
+      compression.type:
+        in:
+        - lz4
+        - snappy
+      max.message.bytes:
+        '<=': 921600
+      min.in.sync.replicas:
+        '>=': 2
