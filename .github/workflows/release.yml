@@ -234,11 +234,21 @@ jobs:
             -jar kattlo-${{steps.get_version.outputs.VERSION}}.jar ^
             kattlo
 
-      - name: Zip
+      - uses: suisei-cn/actions-download-file@v1
+        id: downloadfile  # Remember to give an ID if you need the output
+        name: Download the file
+        with:
+          url: "https://ufpr.dl.sourceforge.net/project/gnuwin32/zip/3.0/zip-3.0-bin.zip"
+          target: public/
+
+      - name: Copy VCRuntime
         shell: bash
         run: |
           cp /c/Windows/System32/VCRUNTIME140.dll .
-          zip kattlo-${{steps.get_version.outputs.VERSION}}-windows.zip kattlo.exe VCRUNTIME140.dll
+
+      - uses: montudor/action-zip@v0.1.1
+        with:
+          args: zip kattlo-${{steps.get_version.outputs.VERSION}}-windows.zip kattlo.exe VCRUNTIME140.dll
 
       - name: 'Get Release URL'
         if: contains(github.ref, 'v')
