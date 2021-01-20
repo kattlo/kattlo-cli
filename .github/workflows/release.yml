@@ -5,7 +5,7 @@ on:
     tags:
       - "v*"
     branches:
-      - 'master'
+      - 'main'
 
 jobs:
   build-jar:
@@ -106,6 +106,8 @@ jobs:
         uses: DeLaGuardo/setup-graalvm@2.0
         with:
           graalvm-version: '20.2.0.java11'
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
       - name: Install Native Image Plugin
         run: |
