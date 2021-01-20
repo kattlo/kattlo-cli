@@ -26,19 +26,20 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle
 
       - name: Get Version Number
+        id: get_version
         run: |
-          echo "::set-env name=VERSION_BUILD::$(./gradlew properties -q | grep "version:" | awk '{print $2}')"
-          echo "::set-env name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)"
+          echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
+          echo ::set-output name=VERSION_BUILD::$(./gradlew properties -q | grep "version:" | awk '{print $2}')
 
       - name: Runnable Jar
         run: |
           ./gradlew test quarkusBuild --uber-jar
-          cp build/kattlo-${{env.VERSION_BUILD}}-runner.jar build/kattlo-${{env.VERSION}}.jar
+          cp build/kattlo-${{steps.get_version.outputs.VERSION_BUILD}}-runner.jar build/kattlo-${{steps.get_version.outputs.VERSION}}.jar
 
       - name: Publish JAR
         uses: actions/upload-artifact@v2-preview
         with:
-          name: kattlo-${{env.VERSION}}.jar
+          name: kattlo-${{steps.get_version.outputs.VERSION}}.jar
           path: build/*.jar
 
       - name: Create Release
@@ -63,6 +64,6 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           upload_url: ${{steps.create_release.outputs.upload_url}}
-          asset_path: build/kattlo-${{env.VERSION}}.jar
-          asset_name: kattlo-${{env.VERSION}}.jar
+          asset_path: build/kattlo-${{steps.get_version.outputs.VERSION}}.jar
+          asset_name: kattlo-${{steps.get_version.outputs.VERSION}}.jar
           asset_content_type: application/java-archive
