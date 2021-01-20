@@ -7,6 +7,7 @@ import static org.hamcrest.core.StringContains.containsString;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -452,12 +453,26 @@ public class PrintStreamReporterTest {
         // act
         reporter.history(Stream.of(migration1, migration2), format);
         var actualJson = buffer.toString();
-        System.out.println(actualJson);
 
         // assert
         var actual = JsonbBuilder.create().fromJson(actualJson, Map.class);
 
         assertEquals(topic, actual.get("TOPIC"));
         assertNotNull(actual.get("history"));
+    }
+
+    @Test
+    public void should_report_a_generated_resource() {
+
+        /*
+            Generated at: /path/to/file
+        */
+        var expected = "\nGenerated at: /path/to/file\n";
+
+        reporter.generated(Path.of("/path/to/file"));
+
+        var actual = buffer.toString();
+
+        assertThat(actual, containsString(expected));
     }
 }

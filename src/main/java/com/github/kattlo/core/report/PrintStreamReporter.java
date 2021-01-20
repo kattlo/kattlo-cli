@@ -1,6 +1,7 @@
 package com.github.kattlo.core.report;
 
 import java.io.PrintStream;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -12,6 +13,7 @@ import javax.json.bind.JsonbBuilder;
 
 import com.github.kattlo.core.backend.Migration;
 import com.github.kattlo.core.backend.Resource;
+import com.github.kattlo.core.backend.ResourceType;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -237,5 +239,16 @@ public class PrintStreamReporter implements Reporter {
         } else {
             throw new IllegalArgumentException(format.name());
         }
+    }
+
+    @Override
+    public void generated(Path path){
+
+        out.println();
+        out.print("Generated at:");
+        out.print(_1_SPACE);
+        out.print(path);
+        out.println();
+
     }
 }
