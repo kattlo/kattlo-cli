@@ -254,8 +254,8 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v2-preview
         with:
-          name: 'kattlo-${{steps.get_version.outputs.VERSION}}.exe'
-          path: 'kattlo-${{steps.get_version.outputs.VERSION}}.exe'
+          name: kattlo-${{steps.get_version.outputs.VERSION}}-windows.zip
+          path: kattlo-${{steps.get_version.outputs.VERSION}}-windows.zip
 
       - name: 'Release Windows Image Asset'
         if: success() && contains(github.ref, 'v')
@@ -265,6 +265,6 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           upload_url: ${{steps.get_url.output.UPLOAD_URL}}
-          asset_name: 'kattlo-${{steps.get_version.outputs.VERSION}}.exe'
-          asset_path: 'kattlo-${{steps.get_version.outputs.VERSION}}.exe'
+          asset_name: kattlo-${{steps.get_version.outputs.VERSION}}-windows.zip
+          asset_path: kattlo-${{steps.get_version.outputs.VERSION}}-windows.zip
           asset_content_type: application/octet-stream
