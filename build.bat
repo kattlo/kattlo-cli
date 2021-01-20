@@ -19,4 +19,4 @@ call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliar
 -H:EnableURLProtocols=http ^
 --no-server ^
 -H:-UseServiceLoaderFeature ^
--H:+StackTrace kattlo-0.1.0-runner
+-H:+StackTrace kattlo
