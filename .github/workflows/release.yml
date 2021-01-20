@@ -214,8 +214,7 @@ jobs:
           JAVA_HOME: ./graalvm-ce-java11-20.2.0
         run: |
           call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
-          ./graalvm-ce-java11-20.2.0/bin/native-image --no-server \
-            -J-Djava.util.logging.manager=org.jboss.logmanager.LogManager \
+          ./graalvm-ce-java11-20.2.0/bin/native-image -J-Djava.util.logging.manager=org.jboss.logmanager.LogManager \
             -J-Duser.language=en \
             -J-Dfile.encoding=UTF-8 \
             --report-unsupported-elements-at-runtime \
@@ -223,7 +222,6 @@ jobs:
             -H:IncludeResources=.*yaml\$ \
             -H:Log=registerResource: \
             --initialize-at-build-time= \
-            -H:InitialCollectionPolicy=com.oracle.svm.core.genscavenge.CollectionPolicy\$BySpaceAndTime \
             -H:+JNI \
             -H:FallbackThreshold=0 \
             -H:+ReportExceptionStackTraces \
@@ -232,6 +230,7 @@ jobs:
             --no-server \
             -H:-UseServiceLoaderFeature \
             -H:+StackTrace \
+            -H:+ReportExceptionStackTraces \
             -jar kattlo-${{steps.get_version.outputs.VERSION}}.jar \
             kattlo
           cp /c/Windows/System32/VCRUNTIME140.dll .
