@@ -46,4 +46,16 @@ jobs:
         - "./gradlew quarkusBuild --uber-jar"
         - ./build.bat
         - cp /c/Windows/System32/VCRUNTIME140.dll .
+        - zip kattlo.zip kattlo.exe VCRUNTIME140.dll
 
+before_deploy:
+  - echo 'deploy'
+
+deploy:
+  provider: releases
+  api_key: "GITHUB OAUTH TOKEN"
+  file: ''
+  skip_cleanup: true
+  draft: true
+  on:
+    tags: true
