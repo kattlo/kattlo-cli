@@ -53,6 +53,7 @@ jobs:
         - cp /c/Windows/System32/VCRUNTIME140.dll .
         - zip kattlo-windows-x86_64-${TRAVIS_TAG}.zip kattlo.exe VCRUNTIME140.dll
         - mv kattlo-windows-x86_64-${TRAVIS_TAG}.zip release
+        - ps
         - travis_wait ls
         - exit 0
 
