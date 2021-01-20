@@ -80,9 +80,9 @@ jobs:
           name: 'upload_url.txt'
           path: 'upload_url.txt'
 
-  build-non-windows-image:
+  build-native-image:
     name: Build Non-Windows Image
-    needs: [build-jar-job]
+    needs: [build-jar]
     strategy:
       matrix:
         os: ['ubuntu-latest', 'macos-latest']
