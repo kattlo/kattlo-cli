@@ -14,7 +14,7 @@ jobs:
       services:
         - docker
       script:
-        - "./gradlew clean build -Dquarkus.package.type=native -Dquarkus.native.container-build=true -Dquarkus.native.additional-build-args=--report-unsupported-elements-at-runtime,--allow-incomplete-classpath,-H:IncludeResources='.*yaml$',-H:Log=registerResource:"
+        - "./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true -Dquarkus.native.additional-build-args=--report-unsupported-elements-at-runtime,--allow-incomplete-classpath,-H:IncludeResources='.*yaml$',-H:Log=registerResource:"
 
     - language: java
       name: Jar
@@ -22,7 +22,7 @@ jobs:
         - openjdk11
         - openjdk14
       script:
-        - "./gradlew clean test quarkusBuild --uber-jar"
+        - "./gradlew test quarkusBuild --uber-jar"
       after_success:
         - bash <(curl -s https://codecov.io/bash)
 
@@ -49,11 +49,14 @@ jobs:
         - zip kattlo.zip kattlo.exe VCRUNTIME140.dll
 
 before_deploy:
-  - echo 'deploy'
+  - cp build/kattlo-0.1.0-runner kattlo-linux-x86_64-${TRAVIS_TAG}
+  - cp build/kattlo-0.1.0-runner.jar kattlo-${TRAVIS_TAG}.jar
+  - zip kattlo-windows-x86_64-${TRAVIS_TAG}.zip kattlo.exe VCRUNTIME140.dll
 
 deploy:
   provider: releases
-  api_key: "GITHUB OAUTH TOKEN"
+  api_key:
+    secure: "NpvLrF3p16HUQVdwUpQwtKocAVpPqt5EbdUVlE05+D0X070v5WVq0dxDqK+5gwLWhAos8P2lqKFrGW5P+DcmyiDXsNgJTdSmoDnDJVM4MYmX/r2xSDDKh0Z8NQP2X53EEQwkSQOOphg5w01+oLP3vqa3jIEjU5ErtRTF4N2GeIJqj7GLkYo7rnJQ++ETsBd8A5ILSd0sBIWoucsfjvkUZYNQIlL3QGQPo4irjlpUeeCKSw4/20n0pw1hbJiaPnAKYLSF5vyHNohX1jPY3Shbca7XW9n9kT7WR7IRoF3jL4MB/h9/Nz6iygwBBr5yOhr3zT0L0wOEPalpYEhFC4Fv55brB/9KWQgcydZNPFyMkX/ALVMvbxMESDIbqz+cOeLUK9EaH+S4QCk1KbVlEZYipEajcEd6mCKMnW7Ola5lvHZchVlKnUKeE0lKlGp5JBIPxdJbvPN6S4hXtiTRBUEMQ9FGYlIDF/Xb/XZ8k8q0OcEm7T2Cp4fzbndJwbaFObCmNaArK+uaWsx2uPyTY0ER9ZRtoJ3bXB1IZolvtpW1WUMHy8x2Wyg0+3DJugd7ARnmW1mFrKBcqUce6ogU5IRNrX8TuRaiKkvqWYJWQg53ZZOiWKcFFO+TMwojSFIU0pcd1IDx9rtzfdb5hlXEWdisYXPtsEmV9QnVZB7r9q5R1yU="
   file: ''
   skip_cleanup: true
   draft: true
