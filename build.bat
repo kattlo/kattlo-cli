@@ -18,6 +18,5 @@ call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliar
 -H:+ReportExceptionStackTraces ^
 -H:-AddAllCharsets ^
 -H:EnableURLProtocols=http ^
---no-server ^
 -H:-UseServiceLoaderFeature ^
 -H:+StackTrace kattlo
