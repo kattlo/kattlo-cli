@@ -40,8 +40,8 @@ sudo mv kattlo /usr/sbin/kattlo
   - [x] show info and history
   - [x] generated migration example
   - [ ] rules enforcement
-- [ ] ACL migrations
 - [ ] Schema migrations
+- [ ] ACL migrations
 - [ ] Connect migrations
 - [ ] ksqlDB migrations
 - [ ] Cluster migrations
