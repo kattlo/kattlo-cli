@@ -1,5 +1,5 @@
 #thanks to https://github.com/recursivecodes/simple-socket-fn-logger/blob/master/.github/workflows/simple-socket-fn-logger.yaml
-name: release
+name: Release
 on:
   push:
     tags:
@@ -171,6 +171,96 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           upload_url: ${{steps.get_url.outputs.UPLOAD_URL}}
-          asset_name: 'kattlo-${{steps.get_version.outputs.VERSION}}-${{matrix.label}}'
+          asset_name: 'kattlo-${{matrix.label}}-${{steps.get_version.outputs.VERSION}}'
           asset_path: 'kattlo-${{steps.get_version.outputs.VERSION}}'
+          asset_content_type: application/octet-stream
+
+  build-windows-image:
+    needs: [build-jar]
+    name: Build Windows Image
+    runs-on: windows-latest
+
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v1
+
+      - name: 'Download GraalVM'
+        run: |
+          Invoke-RestMethod -Uri https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-20.1.0/graalvm-ce-java11-windows-amd64-20.2.0.zip -OutFile 'graal.zip'
+      - name: 'Install GraalVM'
+        run: |
+          Expand-Archive -path 'graal.zip' -destinationpath '.'
+      - name: 'Install Native Image'
+        run: |
+          graalvm-ce-java11-20.2.0\bin\gu.cmd install native-image
+      - name: 'Set up Visual C Build Tools Workload for Visual Studio 2017 Build Tools'
+        run: |
+          choco install visualstudio2017-workload-vctools
+      - name: 'Get Version Number'
+        run: |
+          echo ::set-output name=VERSION::$(./gradlew properties -q | grep "version:" | awk '{print $2}')
+        shell: bash
+
+      - name: 'Get JAR Artifact'
+        uses: actions/download-artifact@v2-preview
+        with:
+          name: 'kattlo-${{steps.get_version.outputs.VERSION}}.jar'
+
+      - name: 'Build Native Image'
+        shell: cmd
+        env:
+          JAVA_HOME: ./graalvm-ce-java11-20.2.0
+        run: |
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
+          ./graalvm-ce-java11-20.2.0/bin/native-image --no-server \
+            -J-Djava.util.logging.manager=org.jboss.logmanager.LogManager \
+            -J-Duser.language=en \
+            -J-Dfile.encoding=UTF-8 \
+            --report-unsupported-elements-at-runtime \
+            --allow-incomplete-classpath \
+            -H:IncludeResources=.*yaml\$ \
+            -H:Log=registerResource: \
+            --initialize-at-build-time= \
+            -H:InitialCollectionPolicy=com.oracle.svm.core.genscavenge.CollectionPolicy\$BySpaceAndTime \
+            -H:+JNI \
+            -H:FallbackThreshold=0 \
+            -H:+ReportExceptionStackTraces \
+            -H:-AddAllCharsets \
+            -H:EnableURLProtocols=http \
+            --no-server \
+            -H:-UseServiceLoaderFeature \
+            -H:+StackTrace \
+            -jar kattlo-${{steps.get_version.outputs.VERSION}}.jar \
+            kattlo-${{steps.get_version.outputs.VERSION}}
+
+      - name: 'Get Release URL'
+        if: contains(github.ref, 'v')
+        uses: actions/download-artifact@v2-preview
+        with:
+          name: 'upload_url.txt'
+
+      - name: 'Get Upload URL'
+        id: get_url
+        if: contains(github.ref, 'v')
+        run: |
+          echo "::set-output name=UPLOAD_URL::$(cat upload_url.txt)"
+        shell: bash
+
+      - name: 'Publish Windows Image'
+        if: success()
+        uses: actions/upload-artifact@v2-preview
+        with:
+          name: 'kattlo-${{steps.get_version.outputs.VERSION}}.exe'
+          path: 'kattlo-${{steps.get_version.outputs.VERSION}}.exe'
+
+      - name: 'Release Windows Image Asset'
+        if: success() && contains(github.ref, 'v')
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          upload_url: ${{steps.get_url.output.UPLOAD_URL}}
+          asset_name: 'kattlo-${{steps.get_version.outputs.VERSION}}.exe'
+          asset_path: 'kattlo-${{steps.get_version.outputs.VERSION}}.exe'
           asset_content_type: application/octet-stream
