@@ -467,7 +467,7 @@ public class PrintStreamReporterTest {
         /*
             Generated at: /path/to/file
         */
-        var expected = "\nGenerated at: /path/to/file\n";
+        var expected = "\n\nGenerated at: /path/to/file\n\n";
 
         reporter.generated(Path.of("/path/to/file"));
 

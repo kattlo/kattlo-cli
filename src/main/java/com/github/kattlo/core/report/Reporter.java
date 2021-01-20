@@ -5,7 +5,6 @@ import java.util.stream.Stream;
 
 import com.github.kattlo.core.backend.Migration;
 import com.github.kattlo.core.backend.Resource;
-import com.github.kattlo.core.backend.ResourceType;
 
 /**
  * @author fabiojose
