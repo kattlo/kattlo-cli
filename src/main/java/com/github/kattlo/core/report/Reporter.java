@@ -19,4 +19,7 @@ public interface Reporter {
     void history(Stream<Migration> migrations, ReportFormat format);
 
     void generated(Path path);
+
+    void uptodate();
+
 }

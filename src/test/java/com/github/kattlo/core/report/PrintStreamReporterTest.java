@@ -475,4 +475,16 @@ public class PrintStreamReporterTest {
 
         assertThat(actual, containsString(expected));
     }
+
+    @Test
+    public void should_report_the_up_to_date() {
+
+        var expected = "\n\nEverything is up to date.\n\n";
+
+        reporter.uptodate();
+
+        var actual = buffer.toString();
+
+        assertThat(actual, containsString(expected));
+    }
 }

@@ -252,4 +252,14 @@ public class PrintStreamReporter implements Reporter {
         out.println();
 
     }
+
+    @Override
+    public void uptodate() {
+
+        out.println();
+        out.println();
+        out.print("Everything is up to date.");
+        out.println();
+        out.println();
+    }
 }
