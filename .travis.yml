@@ -18,6 +18,7 @@ jobs:
         - docker
       script:
         - "./gradlew clean build -Dquarkus.package.type=native -Dquarkus.native.container-build=true -Dquarkus.native.additional-build-args=--report-unsupported-elements-at-runtime,--allow-incomplete-classpath,-H:IncludeResources='.*yaml$',-H:Log=registerResource:"
+
     - language: java
       name: Jar
       jdk:
@@ -25,3 +26,20 @@ jobs:
         - openjdk14
       script:
         - "./gradlew quarkusBuild --uber-jar"
+
+    - os: windows
+      language: shell
+      env: JAVA_HOME="$HOME/.sdkman/candidates/java/current"
+      before_install:
+        - choco install zip unzip
+        - choco install visualstudio2017-workload-vctools
+        - curl -sL https://get.sdkman.io | bash
+        - mkdir -p "$HOME/.sdkman/etc/"
+        - echo sdkman_auto_answer=true > "$HOME/.sdkman/etc/config"
+        - echo sdkman_auto_selfupdate=true >> "$HOME/.sdkman/etc/config"
+        - "source $HOME/.sdkman/bin/sdkman-init.sh"
+      install:
+        - sdk install java 20.0.0.r11-grl
+        - gu.cmd install native-image
+        - native-image.cmd --version
+
