@@ -39,7 +39,7 @@ jobs:
         - echo sdkman_auto_selfupdate=true >> "$HOME/.sdkman/etc/config"
         - "source $HOME/.sdkman/bin/sdkman-init.sh"
       install:
-        - sdk install java 20.0.0.r11-grl
+        - sdk install java 20.2.0.r11-grl
         - gu.cmd install native-image
         - native-image.cmd --version
       script:
