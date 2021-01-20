@@ -159,27 +159,30 @@ public class TopicCommand implements Runnable {
                         migrationModel.getTopic(),
                         Path.of(directory.getAbsolutePath()));
 
-                // TODO May report nothing todo?
-                //  when no new file found
-                newers.forEach(to -> {
+                var newersList = newers.collect(Collectors.toList());
+                if(newersList.isEmpty()){
+                    reporter.uptodate();
 
-                    // create, patch or remove?
-                    final var strategy = strategyOf(to);
+                } else {
+                    newersList.forEach(to -> {
 
-                    var migration = to.toMigration();
-                    reporter.report(migration);
+                        // create, patch or remove?
+                        final var strategy = strategyOf(to);
 
-                    // apply the strategy
-                    strategy.execute(admin);
+                        var migration = to.toMigration();
+                        reporter.report(migration);
 
-                    log.debug("Migration to commit {}", migration);
+                        // apply the strategy
+                        strategy.execute(admin);
 
-                    // commit the applied migration
-                    var current = backend.commit(migration);
+                        log.debug("Migration to commit {}", migration);
 
-                    log.debug("New Topic's state {}", current);
-                });
+                        // commit the applied migration
+                        var current = backend.commit(migration);
 
+                        log.debug("New Topic's state {}", current);
+                    });
+                }
             }
         }catch(IOException e) {
             throw new CommandLine.ExecutionException(spec.commandLine(),
