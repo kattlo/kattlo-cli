@@ -2,6 +2,7 @@ call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliar
 
 %HOME%/.sdkman/candidates/java/current/bin/native-image.cmd ^
 --verbose ^
+--static ^
 -J-Djava.util.logging.manager=org.jboss.logmanager.LogManager ^
 -J-Duser.language=en ^
 -J-Dfile.encoding=UTF-8 ^
