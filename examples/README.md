@@ -90,5 +90,5 @@ kattlo \
   --config-file='.kattlo.yaml' \
   --kafka-config-file='kafka.properties' \
   topic \
-  --directory='topic/08_many_tipics_same_dir'
+  --directory='topic/08_many_topics_same_dir'
  ```
