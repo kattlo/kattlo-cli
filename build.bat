@@ -5,7 +5,7 @@ call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliar
 -J-Djava.util.logging.manager=org.jboss.logmanager.LogManager ^
 -J-Duser.language=en ^
 -J-Dfile.encoding=UTF-8 ^
--J-Xmx5g ^
+-J-Xmx6g ^
 --report-unsupported-elements-at-runtime ^
 --allow-incomplete-classpath ^
 -H:IncludeResources=.*yaml\$ ^
