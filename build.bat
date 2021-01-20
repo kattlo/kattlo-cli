@@ -10,7 +10,6 @@ call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliar
 -H:IncludeResources=.*yaml\$ ^
 -H:Log=registerResource: ^
 --initialize-at-build-time= ^
--H:InitialCollectionPolicy=com.oracle.svm.core.genscavenge.CollectionPolicy\$BySpaceAndTime ^
 -H:+JNI ^
 -jar build\kattlo-0.1.0-runner.jar ^
 -H:FallbackThreshold=0 ^
