@@ -246,6 +246,11 @@ jobs:
         run: |
           cp /c/Windows/System32/VCRUNTIME140.dll .
 
+      - name: Zip
+        shell: pwsh
+        run: |
+          Compress-Archive -Path VCRUNTIME140.dll, kattlo.exe -CompressionLevel Optimal -DestinationPath kattlo-${{steps.get_version.outputs.VERSION}}-windows.zip
+
       - uses: montudor/action-zip@v0.1.1
         with:
           args: zip kattlo-${{steps.get_version.outputs.VERSION}}-windows.zip kattlo.exe VCRUNTIME140.dll
