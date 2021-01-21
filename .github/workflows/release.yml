@@ -151,6 +151,7 @@ jobs:
             -H:-AddAllCharsets \
             -H:EnableURLProtocols=http \
             --no-server \
+            --no-fallback \
             -H:-UseServiceLoaderFeature \
             -H:+StackTrace \
             -jar kattlo-${{steps.get_version.outputs.VERSION}}.jar \
@@ -228,6 +229,7 @@ jobs:
             -H:-AddAllCharsets ^
             -H:EnableURLProtocols=http ^
             --no-server ^
+            --no-fallback ^
             -H:-UseServiceLoaderFeature ^
             -H:+StackTrace ^
             -H:+ReportExceptionStackTraces ^
