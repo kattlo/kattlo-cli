@@ -189,16 +189,6 @@ jobs:
           asset_path: 'kattlo-${{steps.get_version.outputs.VERSION}}'
           asset_content_type: application/octet-stream
 
-      - uses: kentik/pkg@v1
-        if: success() && contains(matrix.label, 'linux')
-        name: Build deb Package
-        with:
-          name: kattlo
-          version: ${{steps.get_version.outputs.VERSION_BUILD}}
-          arch: x86_64
-          format: deb
-          package: linux-package.yaml
-
       - uses: kentik/pkg@v1.0.0-rc6
         if: success() && contains(matrix.label, 'linux')
         name: Build rpm Package
