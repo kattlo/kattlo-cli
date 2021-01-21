@@ -134,28 +134,34 @@ jobs:
         run: |
           echo ::set-output name=UPLOAD_URL::$(cat upload_url.txt)
 
-      - name: Build Native Image
+      - name: Build Native
         run: |
-          native-image -J-Djava.util.logging.manager=org.jboss.logmanager.LogManager \
-            -J-Duser.language=en \
-            -J-Dfile.encoding=UTF-8 \
-            --report-unsupported-elements-at-runtime \
-            --allow-incomplete-classpath \
-            -H:IncludeResources=.*yaml\$ \
-            -H:Log=registerResource: \
-            --initialize-at-build-time= \
-            -H:InitialCollectionPolicy=com.oracle.svm.core.genscavenge.CollectionPolicy\$BySpaceAndTime \
-            -H:+JNI \
-            -H:FallbackThreshold=0 \
-            -H:+ReportExceptionStackTraces \
-            -H:-AddAllCharsets \
-            -H:EnableURLProtocols=http \
-            --no-server \
-            --no-fallback \
-            -H:-UseServiceLoaderFeature \
-            -H:+StackTrace \
-            -jar kattlo-${{steps.get_version.outputs.VERSION}}.jar \
-            kattlo-${{steps.get_version.outputs.VERSION}}
+          ./gradlew clean build -Dquarkus.package.type=native \
+            -Dquarkus.native.container-build=false \
+            -Dquarkus.native.additional-build-args=--report-unsupported-elements-at-runtime,--allow-incomplete-classpath,-H:IncludeResources='.*yaml$',-H:Log=registerResource:,--no-fallback
+
+      #- name: Build Native Image
+      #  run: |
+      #    native-image -J-Djava.util.logging.manager=org.jboss.logmanager.LogManager \
+      #      -J-Duser.language=en \
+      #      -J-Dfile.encoding=UTF-8 \
+      #      --report-unsupported-elements-at-runtime \
+      #      --allow-incomplete-classpath \
+      #      -H:IncludeResources=.*yaml\$ \
+      #      -H:Log=registerResource: \
+      #      --initialize-at-build-time= \
+      #      -H:InitialCollectionPolicy=com.oracle.svm.core.genscavenge.CollectionPolicy\$BySpaceAndTime \
+      #      -H:+JNI \
+      #      -H:FallbackThreshold=0 \
+      #      -H:+ReportExceptionStackTraces \
+      #      -H:-AddAllCharsets \
+      #      -H:EnableURLProtocols=http \
+      #      --no-server \
+      #      --no-fallback \
+      #      -H:-UseServiceLoaderFeature \
+      #      -H:+StackTrace \
+      #      -jar kattlo-${{steps.get_version.outputs.VERSION}}.jar \
+      #      kattlo-${{steps.get_version.outputs.VERSION}}
 
       - name: Publish Native Image
         if: success()
