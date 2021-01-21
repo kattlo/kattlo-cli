@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.hamcrest.core.StringContains.containsString;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -40,8 +39,8 @@ public class PrintStreamReporterTest {
     private PrintStream out;
     private PrintStreamReporter reporter;
 
-    private String path(String path) {
-        return path.replaceAll("/", File.separator);
+    private Path path(String path) {
+        return Path.of(path);
     }
 
     private String linefeed(String s) {
