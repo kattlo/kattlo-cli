@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.file.Path;
 import java.util.Optional;
 
 import com.github.kattlo.EntryCommand;
@@ -79,8 +80,8 @@ public class TopicCommandTest {
     @Captor
     private ArgumentCaptor<TopicOperation> topicOperationCaptor;
 
-    private String path(String path) {
-        return path.replaceAll("/", File.separator);
+    private Path path(String path) {
+        return Path.of(path);
     }
 
     private void mockitoWhen() throws Exception {
@@ -116,7 +117,7 @@ public class TopicCommandTest {
         int actual = cli.execute(args);
 
         assertEquals(2, actual);
-        assertTrue(err.toString().contains(path("./_not_exists not found or")));
+        assertTrue(err.toString().contains(path("./_not_exists not found or").toString()));
     }
 
     @Test
