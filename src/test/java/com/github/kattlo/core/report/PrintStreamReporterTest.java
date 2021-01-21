@@ -138,7 +138,7 @@ public class PrintStreamReporterTest {
     @Test
     public void should_report_the_original() {
 
-        var expected = "  original -> " + File.separator + "path" + File.separator + "to" + File.separator + "migration.yaml";
+        var expected = "  original -> /path/to/migration.yaml";
 
         var create = new Migration();
         create.setVersion("v0001");
