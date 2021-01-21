@@ -476,7 +476,7 @@ public class PrintStreamReporterTest {
         /*
             Generated at: /path/to/file
         */
-        var expected = linefeed("\n\nGenerated at: /path/to/file\n\n");
+        var expected = linefeed("\n\nGenerated at: " + path("/path/to/file\n\n"));
 
         reporter.generated(Path.of("/path/to/file"));
 

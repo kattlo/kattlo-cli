@@ -79,6 +79,10 @@ public class TopicCommandTest {
     @Captor
     private ArgumentCaptor<TopicOperation> topicOperationCaptor;
 
+    private String path(String path) {
+        return path.replaceAll("/", File.separator);
+    }
+
     private void mockitoWhen() throws Exception {
 
         when(backend.current(any(), anyString()))
@@ -112,7 +116,7 @@ public class TopicCommandTest {
         int actual = cli.execute(args);
 
         assertEquals(2, actual);
-        assertTrue(err.toString().contains("./_not_exists not found or"));
+        assertTrue(err.toString().contains(path("./_not_exists not found or")));
     }
 
     @Test
