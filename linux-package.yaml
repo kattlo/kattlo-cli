@@ -1,0 +1,11 @@
+meta:
+  description: Kattlo is a tool to manage Apache Kafka Topics, Schemas, ACLs, etc.
+  vendor: Kattlo
+  maintainer: Fábio José <fabiojose@gmail.com>
+  url: https://github.com/kattlo/kattlo-cli
+  license: APACHE-2
+files:
+  "/usr/bin/kattlo":
+    file: katto
+    mode: "0755"
+    user: "root"
