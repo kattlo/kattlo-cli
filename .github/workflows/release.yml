@@ -199,7 +199,7 @@ jobs:
           format: deb
           package: linux-package.yaml
 
-      - uses: kentik/pkg@v1
+      - uses: kentik/pkg@v1.0.0-rc6
         if: success() && contains(matrix.label, 'linux')
         name: Build rpm Package
         with:
@@ -209,7 +209,7 @@ jobs:
           format: rpm
           package: linux-package.yaml
 
-      - uses: kentik/pkg@v1
+      - uses: kentik/pkg@v1.0.0-rc6
         if: success() && contains(matrix.label, 'linux')
         name: Build deb Package
         with:
