@@ -41,7 +41,7 @@ public class PrintStreamReporterTest {
     private PrintStreamReporter reporter;
 
     private String path(String path) {
-        return path.replaceAll("/", File.pathSeparator);
+        return path.replaceAll("/", File.separator);
     }
 
     private String linefeed(String s) {
