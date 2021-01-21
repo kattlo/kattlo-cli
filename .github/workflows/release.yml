@@ -163,6 +163,11 @@ jobs:
       #      -jar kattlo-${{steps.get_version.outputs.VERSION}}.jar \
       #      kattlo-${{steps.get_version.outputs.VERSION}}
 
+      - name: Copy Natine Artifact
+        shell: bash
+        run: |
+          cp build/kattlo-${{steps.get_version.outputs.VERSION_BUILD}}-runner kattlo-${{steps.get_version.outputs.VERSION}}
+
       - name: Publish Native Image
         if: success()
         uses: actions/upload-artifact@v2-preview
@@ -215,32 +220,41 @@ jobs:
         with:
           name: 'kattlo-${{steps.get_version.outputs.VERSION}}.jar'
 
-      - name: 'Build Native Image'
+      - name: Build Native
         shell: cmd
         env:
           JAVA_HOME: ./graalvm-ce-java11-20.2.0
         run: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
-          ./graalvm-ce-java11-20.2.0/bin/native-image -J-Djava.util.logging.manager=org.jboss.logmanager.LogManager ^
-            -J-Duser.language=en ^
-            -J-Dfile.encoding=UTF-8 ^
-            --report-unsupported-elements-at-runtime ^
-            --allow-incomplete-classpath ^
-            -H:IncludeResources=.*yaml\$ ^
-            -H:Log=registerResource: ^
-            --initialize-at-build-time= ^
-            -H:+JNI ^
-            -H:FallbackThreshold=0 ^
-            -H:+ReportExceptionStackTraces ^
-            -H:-AddAllCharsets ^
-            -H:EnableURLProtocols=http ^
-            --no-server ^
-            --no-fallback ^
-            -H:-UseServiceLoaderFeature ^
-            -H:+StackTrace ^
-            -H:+ReportExceptionStackTraces ^
-            -jar kattlo-${{steps.get_version.outputs.VERSION}}.jar ^
-            kattlo
+          ./gradlew.bat clean build -Dquarkus.package.type=native ^
+            -Dquarkus.native.container-build=false ^
+            -Dquarkus.native.graalvm-home=./graalvm-ce-java11-20.2.0 ^
+            -Dquarkus.native.additional-build-args=--report-unsupported-elements-at-runtime,--allow-incomplete-classpath,-H:IncludeResources='.*yaml$',-H:Log=registerResource:,--no-fallback
+      #- name: 'Build Native Image'
+      #  shell: cmd
+      #  env:
+      #    JAVA_HOME: ./graalvm-ce-java11-20.2.0
+      #  run: |
+      #    call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
+      #    ./graalvm-ce-java11-20.2.0/bin/native-image -J-Djava.util.logging.manager=org.jboss.logmanager.LogManager ^
+      #      -J-Duser.language=en ^
+      #      -J-Dfile.encoding=UTF-8 ^
+      #      --report-unsupported-elements-at-runtime ^
+      #      --allow-incomplete-classpath ^
+      #      -H:IncludeResources=.*yaml\$ ^
+      #      -H:Log=registerResource: ^
+      #      --initialize-at-build-time= ^
+      #      -H:+JNI ^
+      #      -H:FallbackThreshold=0 ^
+      #      -H:+ReportExceptionStackTraces ^
+      #      -H:-AddAllCharsets ^
+      #      -H:EnableURLProtocols=http ^
+      #      --no-server ^
+      #      --no-fallback ^
+      #      -H:-UseServiceLoaderFeature ^
+      #      -H:+StackTrace ^
+      #      -H:+ReportExceptionStackTraces ^
+      #      -jar kattlo-${{steps.get_version.outputs.VERSION}}.jar ^
+      #      kattlo
 
       - uses: suisei-cn/actions-download-file@v1
         id: downloadfile  # Remember to give an ID if you need the output
