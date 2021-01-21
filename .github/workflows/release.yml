@@ -136,7 +136,7 @@ jobs:
 
       - name: Build Native
         run: |
-          ./gradlew clean build -Dquarkus.package.type=native \
+          ./gradlew clean build --no-daemon -Dquarkus.package.type=native \
             -Dquarkus.native.container-build=false \
             -Dquarkus.native.additional-build-args=--report-unsupported-elements-at-runtime,--allow-incomplete-classpath,-H:IncludeResources='.*yaml$',-H:Log=registerResource:,--no-fallback
 
@@ -225,7 +225,7 @@ jobs:
         env:
           JAVA_HOME: ./graalvm-ce-java11-20.2.0
         run: |
-          ./gradlew.bat clean build -Dquarkus.package.type=native ^
+          ./gradlew.bat clean build --no-daemon -Dquarkus.package.type=native ^
             -Dquarkus.native.container-build=false ^
             -Dquarkus.native.graalvm-home=./graalvm-ce-java11-20.2.0 ^
             -Dquarkus.native.additional-build-args=--report-unsupported-elements-at-runtime,--allow-incomplete-classpath,-H:IncludeResources='.*yaml$',-H:Log=registerResource:,--no-fallback
