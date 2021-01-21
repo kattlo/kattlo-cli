@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.hamcrest.core.StringContains.containsString;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -38,6 +39,14 @@ public class PrintStreamReporterTest {
     private ByteArrayOutputStream buffer;
     private PrintStream out;
     private PrintStreamReporter reporter;
+
+    private String path(String path) {
+        return path.replaceAll("/", File.separator);
+    }
+
+    private String linefeed(String s) {
+        return s.replaceAll("\\n", System.lineSeparator());
+    }
 
     @BeforeEach
     public void beforeEach(){
@@ -133,7 +142,7 @@ public class PrintStreamReporterTest {
     @Test
     public void should_report_the_original() {
 
-        var expected = "  original -> /path/to/migration.yaml";
+        var expected = "  original -> " + path("/path/to/migration.yaml");
 
         var create = new Migration();
         create.setVersion("v0001");
@@ -277,7 +286,7 @@ public class PrintStreamReporterTest {
     @Test
     public void should_report_then_plain_format_current() {
 
-        var expected = "AVAILABLE\nTOPIC : topic-name-0\nversion: v0002";
+        var expected = linefeed("AVAILABLE\nTOPIC : topic-name-0\nversion: v0002");
         var format = ReportFormat.PLAIN;
 
         var topic = "topic-name-0";
@@ -306,7 +315,7 @@ public class PrintStreamReporterTest {
     @Test
     public void should_report_then_plain_format_current_with_attributes() {
 
-        var expected = "  config -> {compression.type=snappy}\n  partitions -> 7\n  replicationFactor -> 2";
+        var expected = linefeed("  config -> {compression.type=snappy}\n  partitions -> 7\n  replicationFactor -> 2");
 
         var format = ReportFormat.PLAIN;
 
@@ -367,7 +376,7 @@ public class PrintStreamReporterTest {
     public void should_report_the_plain_format_of_history() {
 
         // setup
-        var expected = "TOPIC: topic-name-0\n\n  v0002 -> PATCH";
+        var expected = linefeed("TOPIC: topic-name-0\n\n  v0002 -> PATCH");
         var topic = "topic-name-0";
         var format = ReportFormat.PLAIN;
 
@@ -467,7 +476,7 @@ public class PrintStreamReporterTest {
         /*
             Generated at: /path/to/file
         */
-        var expected = "\n\nGenerated at: /path/to/file\n\n";
+        var expected = linefeed("\n\nGenerated at: /path/to/file\n\n");
 
         reporter.generated(Path.of("/path/to/file"));
 
@@ -479,7 +488,7 @@ public class PrintStreamReporterTest {
     @Test
     public void should_report_the_up_to_date() {
 
-        var expected = "\n\nEverything is up to date.\n\n";
+        var expected = linefeed("\n\nEverything is up to date.\n\n");
 
         reporter.uptodate();
 
