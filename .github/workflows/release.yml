@@ -209,6 +209,7 @@ jobs:
         shell: bash
         run: |
           ls -alh ./graalvm-ce-java11-20.2.0/bin
+          pwd
           ./graalvm-ce-java11-20.2.0/bin/native-image.cmd --version
       - name: 'Set up Visual C Build Tools Workload for Visual Studio 2017 Build Tools'
         run: |
@@ -225,6 +226,7 @@ jobs:
         env:
           JAVA_HOME: ./graalvm-ce-java11-20.2.0
         run: |
+          pwd
           ./gradlew.bat clean build --no-daemon -Dquarkus.package.type=native ^
             -Dquarkus.native.container-build=false ^
             -Dquarkus.native.graalvm-home=./graalvm-ce-java11-20.2.0 ^
