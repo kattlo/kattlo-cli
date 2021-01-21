@@ -210,6 +210,7 @@ jobs:
         run: |
           ls -alh
           ls -alh ./graalvm-ce-java11-20.2.0/bin
+          native-image --version
           cp ./graalvm-ce-java11-20.2.0/bin/native-image ./graalvm-ce-java11-20.2.0/bin/native-image.cmd
       - name: 'Set up Visual C Build Tools Workload for Visual Studio 2017 Build Tools'
         run: |
@@ -220,11 +221,6 @@ jobs:
           echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
           echo ::set-output name=VERSION_BUILD::$(./gradlew properties -q | grep "version:" | awk '{print $2}')
         shell: bash
-
-      - name: 'Get JAR Artifact'
-        uses: actions/download-artifact@v2-preview
-        with:
-          name: 'kattlo-${{steps.get_version.outputs.VERSION}}.jar'
 
       - name: Build Native
         shell: cmd
