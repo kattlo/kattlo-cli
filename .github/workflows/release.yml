@@ -208,6 +208,8 @@ jobs:
       - name: Fix native-image install
         shell: bash
         run: |
+          ls -alh
+          ls -alh ./graalvm-ce-java11-20.2.0/bin
           cp ./graalvm-ce-java11-20.2.0/bin/native-image ./graalvm-ce-java11-20.2.0/bin/native-image.cmd
       - name: 'Set up Visual C Build Tools Workload for Visual Studio 2017 Build Tools'
         run: |
