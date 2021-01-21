@@ -40,10 +40,6 @@ public class PrintStreamReporterTest {
     private PrintStream out;
     private PrintStreamReporter reporter;
 
-    private String path(String path) {
-        return path.replaceAll("/", File.separator);
-    }
-
     private String linefeed(String s) {
         return s.replaceAll("\\n", System.lineSeparator());
     }
@@ -142,7 +138,7 @@ public class PrintStreamReporterTest {
     @Test
     public void should_report_the_original() {
 
-        var expected = "  original -> " + path("/path/to/migration.yaml");
+        var expected = "  original -> " + File.separator + "path" + File.separator + "to" + File.separator + "migration.yaml";
 
         var create = new Migration();
         create.setVersion("v0001");
@@ -476,7 +472,7 @@ public class PrintStreamReporterTest {
         /*
             Generated at: /path/to/file
         */
-        var expected = linefeed("\n\nGenerated at: " + path("/path/to/file") + "\n\n");
+        var expected = linefeed("\n\nGenerated at: " + File.separator + "path" + File.separator + "to" + File.separator + "file\n\n");
 
         reporter.generated(Path.of("/path/to/file"));
 
