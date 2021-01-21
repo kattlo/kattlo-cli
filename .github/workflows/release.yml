@@ -226,7 +226,7 @@ jobs:
         env:
           JAVA_HOME: ./graalvm-ce-java11-20.2.0
         run: |
-          pwd
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
           ./gradlew.bat clean build --no-daemon -Dquarkus.package.type=native ^
             -Dquarkus.native.container-build=false ^
             -Dquarkus.native.graalvm-home=$(pwd)/graalvm-ce-java11-20.2.0 ^
