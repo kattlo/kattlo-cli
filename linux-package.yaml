@@ -6,6 +6,6 @@ meta:
   license: APACHE-2
 files:
   "/usr/bin/kattlo":
-    file: katto
+    file: kattlo
     mode: "0755"
     user: "root"
