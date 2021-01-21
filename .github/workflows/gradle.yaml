@@ -19,7 +19,7 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
       - name: Build with Gradle
-        run: ./gradlew test quarkusBuild --uber-jar
+        run: ./gradlew --no-daemon test quarkusBuild --uber-jar
 
   build-windows:
     runs-on: windows-latest
@@ -37,4 +37,4 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
       - name: Build with Gradle
-        run: ./gradlew.bat test quarkusBuild --uber-jar
+        run: ./gradlew.bat --no-daemon test quarkusBuild --uber-jar
