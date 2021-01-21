@@ -210,7 +210,7 @@ jobs:
         run: |
           ls -alh
           ls -alh ./graalvm-ce-java11-20.2.0/bin
-          native-image --version
+          ./graalvm-ce-java11-20.2.0/bin/native-image.cmd --version
           cp ./graalvm-ce-java11-20.2.0/bin/native-image ./graalvm-ce-java11-20.2.0/bin/native-image.cmd
       - name: 'Set up Visual C Build Tools Workload for Visual Studio 2017 Build Tools'
         run: |
