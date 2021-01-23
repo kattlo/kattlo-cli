@@ -199,6 +199,31 @@ jobs:
           format: rpm
           package: linux-package.yaml
 
+      - name: Fix rpm Package Name
+        if: success() && contains(matrix.label, 'linux')
+        shell: bash
+        run: |
+          cp kattlo-${{steps.get_version.outputs.VERSION_BUILD}}-1.x86_64.rpm kattlo-${{steps.get_version.outputs.VERSION}}.x86_64.rpm
+
+      - name: Publish rpm Package
+        if: success() && contains(matrix.label, 'linux')
+        uses: actions/upload-artifact@v2-preview
+        with:
+          name: 'kattlo-${{steps.get_version.outputs.VERSION}}.x86_64.rpm'
+          path: 'kattlo-${{steps.get_version.outputs.VERSION}}.x86_64.rpm'
+
+      - name: Release rpm Package
+        if: success() && contains(matrix.label, 'linux')
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          upload_url: ${{steps.get_url.outputs.UPLOAD_URL}}
+          asset_name: 'kattlo-${{steps.get_version.outputs.VERSION}}.x86_64.rpm'
+          asset_path: 'kattlo-${{steps.get_version.outputs.VERSION}}.x86_64.rpm'
+          asset_content_type: application/octet-stream
+
       - uses: kentik/pkg@v1.0.0-rc6
         if: success() && contains(matrix.label, 'linux')
         name: Build deb Package
@@ -208,6 +233,31 @@ jobs:
           arch: x86_64
           format: deb
           package: linux-package.yaml
+
+      - name: Fix deb Package Name
+        if: success() && contains(matrix.label, 'linux')
+        shell: bash
+        run: |
+          cp kattlo_${{steps.get_version.outputs.VERSION_BUILD}}-1_amd64.deb kattlo_${{steps.get_version.outputs.VERSION}}_amd64.deb
+
+      - name: Publish deb Package
+        if: success() && contains(matrix.label, 'linux')
+        uses: actions/upload-artifact@v2-preview
+        with:
+          name: 'kattlo_${{steps.get_version.outputs.VERSION}}_amd64.deb'
+          path: 'kattlo_${{steps.get_version.outputs.VERSION}}_amd64.deb'
+
+      - name: Release deb Package
+        if: success() && contains(matrix.label, 'linux')
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          upload_url: ${{steps.get_url.outputs.UPLOAD_URL}}
+          asset_name: 'kattlo_${{steps.get_version.outputs.VERSION}}_amd64.deb'
+          asset_path: 'kattlo_${{steps.get_version.outputs.VERSION}}_amd64.deb'
+          asset_content_type: application/octet-stream
 
   build-windows-image:
     needs: [build-jar]
