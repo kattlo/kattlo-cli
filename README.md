@@ -19,18 +19,45 @@ configurations for:
 
 - enterprises that needs a stable way to change Apache Kafka® configurations
 - maintain the configuration and avoid drifts
-- helps to known when a topic was removed
+- helps to known when a topic was removed (when its managed by Kattlo)
 - access the history of migrations
 - your DevOps toolset to properly manages the topic within clusters
 
 ## Install
 
+### Linux Binary
+
 ```bash
-curl ...
+curl 'https://github.com/kattlo/kattlo-cli/releases/download/v0.1.0/kattlo-v0.1.0-linux' \
+  -o 'kattlo'
 
 sudo chmod +x kattlo
-sudo mv kattlo /usr/sbin/kattlo
+sudo mv kattlo /usr/local/sbin/kattlo
 ```
+
+### Linux Packages
+
+The are `.deb` and `.rpm` packages available. Do a check in
+[the latest release](https://github.com/kattlo/kattlo-cli/releases/latest).
+
+### MacOS
+
+```bash
+curl 'https://github.com/kattlo/kattlo-cli/releases/download/v0.1.0/kattlo-v0.1.0-mac' \
+  -o 'kattlo'
+
+sudo chmod +x kattlo
+sudo mv kattlo /usr/local/bin/kattlo
+```
+
+### Windows
+
+- download the [latest release](https://github.com/kattlo/kattlo-cli/releases/latest) package for windows
+- unzip it
+- copy `VCRUNTIME140.dll` to `C:\Windows\System32\`
+- get the absolute path to that unzipped directory
+- add the absolute path of Kattlo to your `PATH` environment variable
+- open the prompt and type: `kattlo -V`
 
 ## Released Features
 
@@ -38,7 +65,7 @@ sudo mv kattlo /usr/sbin/kattlo
   - [x] apply migrations
   - [x] import existing topics
   - [x] show info and history
-  - [x] generated migration example
+  - [x] generate migration example
   - [ ] rules enforcement
 - [ ] Schema migrations
 - [ ] ACL migrations
