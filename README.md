@@ -328,7 +328,7 @@ Notes about `remove`:
 Kattlo needs to have all permissions to manage topics, ACLs and Schemas
 configurations, outherwise you will be not able to perform the migrations.
 
-In order to manage the migrations, we use four special topics:
+In order to manage the migrations we use special topics:
 
 - `__kattlo-topics-state`: the topics' migrations state
 - `__kattlo-topics-history`: the topics' migrations history
@@ -353,8 +353,6 @@ This topic has the following configurations:
 
 ## Build and Run
 
-TODO
-
 ### Native
 
 ```bash
@@ -364,6 +362,9 @@ TODO
 ```
 
 You can then execute your native executable with: `./build/kattlo-1.0-SNAPSHOT-runner`
+
+> Configure `-Dquarkus.native.container-build` to `false` if you want o use your graalvm
+installation instead of Docker image.
 
 ### Running in verbose mode
 
