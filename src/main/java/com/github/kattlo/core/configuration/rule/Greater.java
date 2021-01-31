@@ -47,7 +47,7 @@ public class Greater {
 
         return (
             (value instanceof Short)
-            ? operand.compareTo(((Short)value).shortValue()) < 0
+            ? operand.compareTo((Short)value) < 0
 
             : (value instanceof Integer)
               ? operand.compareTo(((Integer)value).shortValue()) < 0
