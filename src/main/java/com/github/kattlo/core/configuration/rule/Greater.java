@@ -9,66 +9,37 @@ public class Greater {
 
     private final Object operand;
     public Greater(Object operand) {
-        if(!NumberUtil.isNatural(operand)){
+        if(!NumberUtil.isNumber(operand)){
             throw new IllegalArgumentException("operand must be a number instance: " + operand);
         }
         this.operand = operand;
     }
 
-    private boolean longCompareTo(Long operand, Object value) {
+    private boolean compareTo(Number operand, Number value, Class<?> type) {
         return (
-            (value instanceof Long)
-            ? operand.compareTo((Long)value) < 0
+            type.equals(Long.class)
+            ? Long.compare(operand.longValue(), value.longValue()) < 0
 
-            : (value instanceof Integer)
-              ? operand.compareTo(((Integer)value).longValue()) < 0
+            : type.equals(Integer.class)
+              ? Integer.compare(operand.intValue(), value.intValue()) < 0
 
-              : (value instanceof Short)
-                ? operand.compareTo(((Short)value).longValue()) < 0
-                : false
-        );
-    }
+              : type.equals(Short.class)
+                ? Short.compare(operand.shortValue(), value.shortValue()) < 0
 
-    private boolean intCompareTo(Integer operand, Object value) {
-        return (
-            (value instanceof Integer)
-            ? operand.compareTo((Integer)value) < 0
+                : type.equals(Float.class)
+                  ? Float.compare(operand.floatValue(), value.floatValue()) < 0
 
-            : (value instanceof Long)
-              ? operand.compareTo(((Long)value).intValue()) < 0
-
-              : (value instanceof Short)
-                ? operand.compareTo(((Short)value).intValue()) < 0
-                : false
-        );
-    }
-
-    private boolean shortCompareTo(Short operand, Object value){
-
-        return (
-            (value instanceof Short)
-            ? operand.compareTo((Short)value) < 0
-
-            : (value instanceof Integer)
-              ? operand.compareTo(((Integer)value).shortValue()) < 0
-
-              : (value instanceof Long)
-                ? operand.compareTo(((Long)value).shortValue()) < 0
-                : false
+                  : type.equals(Double.class)
+                    ? Double.compare(operand.doubleValue(), value.doubleValue()) < 0
+                    : false
         );
     }
 
     public boolean execute(Object value) {
-        if(!NumberUtil.isNatural(value)){
+        if(!NumberUtil.isNumber(value)){
             throw new IllegalArgumentException("value must be a number instance: " + value);
         }
 
-        return (operand instanceof Long)
-               ? longCompareTo((Long)operand, value)
-               : (operand instanceof Integer)
-                 ? intCompareTo((Integer)operand, value)
-                 : (operand instanceof Short)
-                   ? shortCompareTo((Short)operand, value)
-                   : false;
+        return compareTo((Number)operand, (Number)value, operand.getClass());
     }
 }
