@@ -5,7 +5,7 @@ import com.github.kattlo.util.NumberUtil;
 /**
  * @author fabiojose
  */
-public class Greater {
+public class Greater implements Condition {
 
     private final Object operand;
     public Greater(Object operand) {
@@ -35,6 +35,7 @@ public class Greater {
         );
     }
 
+    @Override
     public boolean execute(Object value) {
         if(!NumberUtil.isNumber(value)){
             throw new IllegalArgumentException("value must be a number instance: " + value);

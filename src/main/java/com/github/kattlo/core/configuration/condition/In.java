@@ -6,7 +6,7 @@ import java.util.Objects;
 /**
  * @author fabiojose
  */
-public class In {
+public class In implements Condition {
 
     private final List<Object> operand;
 
@@ -19,6 +19,7 @@ public class In {
         this.operand = (List<Object>)operand;
     }
 
+    @Override
     public boolean execute(Object value) {
         Objects.requireNonNull(value, "provide a not-null instance for value argument");
 

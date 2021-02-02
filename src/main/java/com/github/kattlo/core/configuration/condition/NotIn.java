@@ -3,7 +3,7 @@ package com.github.kattlo.core.configuration.condition;
 /**
  * @author fabiojose
  */
-public class NotIn {
+public class NotIn implements Condition {
 
     private final In in;
 
@@ -11,6 +11,7 @@ public class NotIn {
         this.in = new In(operand);
     }
 
+    @Override
     public boolean execute(Object value) {
         return !in.execute(value);
     }

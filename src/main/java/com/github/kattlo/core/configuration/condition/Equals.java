@@ -9,11 +9,12 @@ import lombok.NonNull;
  * @author fabiojose
  */
 @AllArgsConstructor
-public class Equals {
+public class Equals implements Condition {
 
     @NonNull
     private final Object operand;
 
+    @Override
     public boolean execute(Object value) {
         return Objects.equals(this.operand, value);
     }

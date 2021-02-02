@@ -7,11 +7,12 @@ import lombok.NonNull;
  * @author fabiojose
  */
 @AllArgsConstructor
-public class NotEquals {
+public class NotEquals implements Condition {
 
     @NonNull
     private final Object operand;
 
+    @Override
     public boolean execute(Object value) {
         return !operand.equals(value);
     }
