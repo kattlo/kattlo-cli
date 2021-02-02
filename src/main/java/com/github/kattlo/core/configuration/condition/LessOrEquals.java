@@ -5,7 +5,7 @@ import com.github.kattlo.util.NumberUtil;
 /**
  * @author fabiojose
  */
-public class LessOrEquals implements Condition {
+public class LessOrEquals implements NumberCondition {
 
     private final Object operand;
     public LessOrEquals(Object operand) {
@@ -41,6 +41,6 @@ public class LessOrEquals implements Condition {
             throw new IllegalArgumentException("value must be a number instance: " + value);
         }
 
-        return compareTo((Number)operand, (Number)value, operand.getClass());
+        return compare((Number)operand, (Number)value, (v1, v2) -> v1 >= v2);
     }
 }
