@@ -4,6 +4,7 @@ import io.quarkus.test.junit.QuarkusTest;
 import picocli.CommandLine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.junit.jupiter.api.Test;
@@ -26,10 +27,13 @@ public class EntryCommandTest {
             "--directory=."
         };
 
-        int actual =
-            new CommandLine(entry).execute(args);
+        var command = new CommandLine(entry);
+        command.execute(args);
 
-        assertEquals(2, actual);
+        EntryCommand actualCommand = command.getCommand();
+
+        assertThrows(CommandLine.ParameterException.class, () ->
+            actualCommand.getConfiguration());
     }
 
     @Test

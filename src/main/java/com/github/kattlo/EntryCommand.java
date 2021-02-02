@@ -1,7 +1,6 @@
 package com.github.kattlo;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Objects;
@@ -38,7 +37,6 @@ import picocli.CommandLine.Model.CommandSpec;
 public class EntryCommand {
 
     private File configuration;
-    private Properties configurationValues;
 
     private File kafkaConfiguration;
     private Properties kafkaConfigurationValues;
@@ -53,26 +51,21 @@ public class EntryCommand {
             "--config-file"
         },
         description = "Kattlo configurations",
-        required = true,
+        required = false,
         defaultValue = ".kattlo.yaml"
     )
     public void setConfiguration(File configuration) {
         this.configuration = Objects.requireNonNull(configuration);
     }
 
-    public Properties getConfiguration() {
-        if(null== configurationValues){
-            configurationValues = new Properties();
-            try{
-                configurationValues.load(new FileInputStream(configuration));
-            }catch(IOException e){
-                throw new CommandLine
-                    .ParameterException(spec.commandLine(),
-                        configuration.getAbsolutePath() + " can't be read");
-            }
+    public File getConfiguration() {
+        if(this.configuration.exists()){
+            return configuration;
+        } else {
+            throw new CommandLine.
+                ParameterException(spec.commandLine(),
+                    configuration.getAbsolutePath() + " not found");
         }
-
-        return configurationValues;
     }
 
     @Option(
@@ -128,11 +121,7 @@ public class EntryCommand {
     }
 
     public void validateOptions() {
-        if(!configuration.exists()){
-            throw new CommandLine.
-                ParameterException(spec.commandLine(),
-                        configuration.getAbsolutePath() + " not found");
-        }
+        // .kattlo.yaml now is optional
 
         if(!kafkaConfiguration.exists()){
             throw new CommandLine.
