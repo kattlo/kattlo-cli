@@ -1,14 +1,14 @@
-package com.github.kattlo.core.configuration.rule;
+package com.github.kattlo.core.configuration.condition;
 
 import com.github.kattlo.util.NumberUtil;
 
 /**
  * @author fabiojose
  */
-public class LessOrEquals {
+public class Greater {
 
     private final Object operand;
-    public LessOrEquals(Object operand) {
+    public Greater(Object operand) {
         if(!NumberUtil.isNumber(operand)){
             throw new IllegalArgumentException("operand must be a number instance: " + operand);
         }
@@ -18,19 +18,19 @@ public class LessOrEquals {
     private boolean compareTo(Number operand, Number value, Class<?> type) {
         return (
             type.equals(Long.class)
-            ? Long.compare(operand.longValue(), value.longValue()) >= 0
+            ? Long.compare(operand.longValue(), value.longValue()) < 0
 
             : type.equals(Integer.class)
-              ? Integer.compare(operand.intValue(), value.intValue()) >= 0
+              ? Integer.compare(operand.intValue(), value.intValue()) < 0
 
               : type.equals(Short.class)
-                ? Short.compare(operand.shortValue(), value.shortValue()) >= 0
+                ? Short.compare(operand.shortValue(), value.shortValue()) < 0
 
                 : type.equals(Float.class)
-                  ? Float.compare(operand.floatValue(), value.floatValue()) >= 0
+                  ? Float.compare(operand.floatValue(), value.floatValue()) < 0
 
                   : type.equals(Double.class)
-                    ? Double.compare(operand.doubleValue(), value.doubleValue()) >= 0
+                    ? Double.compare(operand.doubleValue(), value.doubleValue()) < 0
                     : false
         );
     }

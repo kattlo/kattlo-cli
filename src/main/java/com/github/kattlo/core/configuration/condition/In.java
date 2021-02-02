@@ -1,4 +1,4 @@
-package com.github.kattlo.core.configuration.rule;
+package com.github.kattlo.core.configuration.condition;
 
 import java.util.List;
 import java.util.Objects;
