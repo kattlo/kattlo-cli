@@ -12,6 +12,10 @@ public interface Condition {
      */
     boolean execute(Object value);
 
+    static Condition byPass() {
+        return new ByPass();
+    }
+
     static Condition of(String condition, Object operand) {
 
         switch (Objects.requireNonNull(condition).trim().toLowerCase()) {

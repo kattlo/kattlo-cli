@@ -1,0 +1,22 @@
+rules:
+  topic:
+    namePattern: '^[a-zA-Z0-9\-]{1,255}$'
+    replicationFactor:
+      '==': 2
+    config:
+      compression.type:
+        in:
+        - lz4
+        - snappy
+      max.message.bytes:
+        '<=': 1048588
+      min.in.sync.replicas:
+        '>=': 2
+      message.timestamp.type:
+        '==': LogAppendTime
+      segment.ms:
+        '>=': 604800000
+      max.compaction.lag.ms:
+        '<=': 9223372036854775807
+  acl:
+    namePattern: '.*'
