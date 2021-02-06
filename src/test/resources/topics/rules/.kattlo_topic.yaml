@@ -18,6 +18,8 @@ rules:
         '==': LogAppendTime
       segment.ms:
         '>=': 604800000
+      retention.ms:
+        '!=': -1
       max.compaction.lag.ms:
         '<=': 9223372036854775807
       min.cleanable.dirty.ratio:
