@@ -81,8 +81,8 @@ sudo mv kattlo /usr/local/bin/kattlo
 
 ### Common Options
 
-- `--config-file`: Path to Kattlo configuration file for migrations
-- `--kafka-config-file`: Path to properties file to be used for Kafka Admin Client
+- `--config-file` (optional): Path to Kattlo configuration file for migrations
+- `--kafka-config-file` (required): Path to properties file to be used for Kafka Admin Client
 
 In the `.kattlo.yaml` configuration file you may define the following
 properties:
