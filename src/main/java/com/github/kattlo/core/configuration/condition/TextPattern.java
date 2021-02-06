@@ -26,4 +26,8 @@ public class TextPattern implements Condition {
         return matcher.matches();
     }
 
+    @Override
+    public String toString() {
+        return operand.toString();
+    }
 }

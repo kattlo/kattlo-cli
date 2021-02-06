@@ -23,4 +23,8 @@ public class LessOrEquals implements NumberCondition {
 
         return compare((Number)operand, (Number)value, (v1, v2) -> v1 >= v2);
     }
+
+    public String toString() {
+        return "<=" + operand;
+    }
 }

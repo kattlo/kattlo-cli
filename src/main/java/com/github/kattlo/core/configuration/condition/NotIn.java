@@ -15,4 +15,9 @@ public class NotIn implements Condition {
     public boolean execute(Object value) {
         return !in.execute(value);
     }
+
+    @Override
+    public String toString() {
+        return "!" + super.toString();
+    }
 }

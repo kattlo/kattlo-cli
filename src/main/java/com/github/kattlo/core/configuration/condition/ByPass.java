@@ -10,4 +10,8 @@ public class ByPass implements Condition {
         return true;
     }
 
+    @Override
+    public String toString(){
+        return "bypass";
+    }
 }

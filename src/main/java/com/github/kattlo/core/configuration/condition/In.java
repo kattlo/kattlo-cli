@@ -25,4 +25,9 @@ public class In implements Condition {
 
         return operand.contains(value);
     }
+
+    @Override
+    public String toString() {
+        return "in " + operand;
+    }
 }

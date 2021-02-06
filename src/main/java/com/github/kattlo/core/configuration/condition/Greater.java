@@ -23,4 +23,9 @@ public class Greater implements NumberCondition {
 
         return compare((Number)operand, (Number)value, (v1, v2) -> v1 < v2);
     }
+
+    @Override
+    public String toString() {
+        return ">" + operand;
+    }
 }

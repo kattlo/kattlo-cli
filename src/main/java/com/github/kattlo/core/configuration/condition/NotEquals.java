@@ -16,4 +16,9 @@ public class NotEquals implements Condition {
     public boolean execute(Object value) {
         return !operand.equals(value);
     }
+
+    @Override
+    public String toString(){
+        return "!=" + operand;
+    }
 }

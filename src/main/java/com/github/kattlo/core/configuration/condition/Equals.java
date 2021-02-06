@@ -19,4 +19,8 @@ public class Equals implements Condition {
         return Objects.equals(this.operand, value);
     }
 
+    @Override
+    public String toString() {
+        return "==" + operand;
+    }
 }
