@@ -124,4 +124,14 @@ public class TopicRuleEnforcementTest {
     public void should_fail_when_value_must_be_a_number_and_its_a_boolean() {
 
     }
+
+    @Test
+    public void should_fail_when_list_operator_is_not_the_in() {
+
+    }
+
+    @Test
+    public void should_fail_when_list_operator_is_not_the_notin() {
+
+    }
 }
