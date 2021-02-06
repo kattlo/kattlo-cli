@@ -1,0 +1,10 @@
+operation: create
+notes: For tests
+topic: Topic-Name
+#partitions: 1
+#replicationFactor: 1
+#config:
+#  compression.type: snappy
+#  retention.ms: 24324324234242
+#  min.cleanable.dirty.ratio: 0.2
+

@@ -1,0 +1,10 @@
+operation: create
+notes: For tests
+topic: topic-name
+#partitions: 1
+#replicationFactor: 1
+config:
+  compression.type: gzip
+  retention.ms: -1
+  min.cleanable.dirty.ratio: 0.000001
+
