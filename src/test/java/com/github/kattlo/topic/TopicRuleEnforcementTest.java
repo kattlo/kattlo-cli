@@ -129,17 +129,32 @@ public class TopicRuleEnforcementTest {
     }
 
     @Test
-    public void should_fail_when_value_must_be_a_number_and_its_a_boolean() {
+    public void should_fail_when_the_in_it_is_not_a_list() {
 
+        var configuration = new File("./src/test/resources/topics/rules/.kattlo_compression-in-type-not-a-list.yaml");
+        var migrationFile = Path.of("./src/test/resources/topics/rules/migration/v0000_compression-type-snappy.yaml");
+
+        var migration = mapper.map(Loader.load(migrationFile), migrationFile);
+
+        var actual =
+            assertThrows(IllegalArgumentException.class, () ->
+                enforcement.check(migration, configuration));
+
+        assertThat(actual.getMessage(), Matchers.containsString("instance of List"));
     }
 
     @Test
-    public void should_fail_when_list_operator_is_not_the_in() {
+    public void should_fail_when_the_notin_it_is_not_a_list() {
 
-    }
+        var configuration = new File("./src/test/resources/topics/rules/.kattlo_compression-notin-type-not-a-list.yaml");
+        var migrationFile = Path.of("./src/test/resources/topics/rules/migration/v0000_compression-type-snappy.yaml");
 
-    @Test
-    public void should_fail_when_list_operator_is_not_the_notin() {
+        var migration = mapper.map(Loader.load(migrationFile), migrationFile);
 
+        var actual =
+            assertThrows(IllegalArgumentException.class, () ->
+                enforcement.check(migration, configuration));
+
+        assertThat(actual.getMessage(), Matchers.containsString("instance of List"));
     }
 }
