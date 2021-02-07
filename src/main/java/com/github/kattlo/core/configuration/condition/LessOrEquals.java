@@ -25,6 +25,6 @@ public class LessOrEquals implements NumberCondition {
     }
 
     public String toString() {
-        return "<=" + operand;
+        return "<=" + NumberUtil.formatted(operand);
     }
 }

@@ -26,6 +26,6 @@ public class Greater implements NumberCondition {
 
     @Override
     public String toString() {
-        return ">" + operand;
+        return ">" + NumberUtil.formatted(operand);
     }
 }

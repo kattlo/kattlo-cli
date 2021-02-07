@@ -2,6 +2,8 @@ package com.github.kattlo.core.configuration.condition;
 
 import java.util.Objects;
 
+import com.github.kattlo.util.NumberUtil;
+
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 
@@ -21,6 +23,6 @@ public class Equals implements Condition {
 
     @Override
     public String toString() {
-        return "==" + operand;
+        return "==" + NumberUtil.formatted(operand);
     }
 }

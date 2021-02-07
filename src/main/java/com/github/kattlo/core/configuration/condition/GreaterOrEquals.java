@@ -26,6 +26,6 @@ public class GreaterOrEquals implements NumberCondition {
 
     @Override
     public String toString() {
-        return ">=" + operand;
+        return ">=" + NumberUtil.formatted(operand);
     }
 }

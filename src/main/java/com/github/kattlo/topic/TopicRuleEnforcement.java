@@ -15,6 +15,7 @@ import com.github.kattlo.core.configuration.ConfigurationLoader;
 import com.github.kattlo.core.configuration.condition.Condition;
 import com.github.kattlo.core.exception.LoadException;
 import com.github.kattlo.topic.yaml.TopicOperation;
+import com.github.kattlo.util.NumberUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -78,7 +79,8 @@ public class TopicRuleEnforcement {
                 .filter(c -> rules.getConfig().containsKey(c.getKey()))
                 .filter(c -> !rules.getConfig().get(c.getKey()).execute(c.getValue()))
                 .map(c -> String.format(CONFIG_MESSAGE, c.getKey(),
-                                    rules.getConfig().get(c.getKey()), c.getValue()))
+                                    rules.getConfig().get(c.getKey()),
+                                    NumberUtil.formatted(c.getValue())))
                 .collect(Collectors.toList())
             );
 

@@ -1,5 +1,7 @@
 package com.github.kattlo.core.configuration.condition;
 
+import com.github.kattlo.util.NumberUtil;
+
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 
@@ -19,6 +21,6 @@ public class NotEquals implements Condition {
 
     @Override
     public String toString(){
-        return "!=" + operand;
+        return "!=" + NumberUtil.formatted(operand);
     }
 }

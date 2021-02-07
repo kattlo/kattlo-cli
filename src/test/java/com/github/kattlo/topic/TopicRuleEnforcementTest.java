@@ -118,6 +118,14 @@ public class TopicRuleEnforcementTest {
     @Test
     public void should_fail_when_value_must_be_a_number_and_its_a_string() {
 
+        var configuration = new File("./src/test/resources/topics/rules/.kattlo_topic.yaml");
+        var migrationFile = Path.of("./src/test/resources/topics/rules/migration/v0000_min-cleanable-string.yaml");
+
+        var migration = mapper.map(Loader.load(migrationFile), migrationFile);
+
+        assertThrows(IllegalArgumentException.class, () ->
+            enforcement.check(migration, configuration));
+
     }
 
     @Test
