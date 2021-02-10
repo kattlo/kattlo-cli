@@ -11,10 +11,12 @@ import com.github.kattlo.core.configuration.condition.Condition;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author fabiojose
  */
+@Slf4j
 @Getter
 @RequiredArgsConstructor
 public class TopicRules {
@@ -31,8 +33,9 @@ public class TopicRules {
 
     @SuppressWarnings("unchecked")
     private static Condition condition(Map<String, Object> rules, String rule){
+        log.debug("rules map {}, rule to get {}", rules, rule);
 
-        return ofNullable(rules.get(rule))
+        var result = ofNullable(rules.get(rule))
             .filter(Objects::nonNull)
             .map(p -> (Map<String, Object>)p)
             .map(c -> c.entrySet())
@@ -41,6 +44,9 @@ public class TopicRules {
             .map(c -> Condition.of(c.getKey(), c.getValue()))
             .orElse(Condition.byPass());
 
+        log.debug("Condition created {}", result);
+
+        return result;
     }
 
     @SuppressWarnings("unchecked")
