@@ -13,7 +13,7 @@ public class In implements Condition {
     @SuppressWarnings("unchecked")
     public In(Object operand) {
         if(!(operand instanceof List)) {
-            throw new IllegalArgumentException("operand must be an instance of List: " + operand);
+            throw new IllegalArgumentException("operand must be an instance of java.util.List: " + operand);
         }
 
         this.operand = (List<Object>)operand;
