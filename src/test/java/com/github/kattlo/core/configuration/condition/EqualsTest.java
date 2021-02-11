@@ -1,5 +1,6 @@
 package com.github.kattlo.core.configuration.condition;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -59,5 +60,23 @@ public class EqualsTest {
         var equals = new Equals(value);
 
         assertFalse(equals.execute(0.5D));
+    }
+
+    @Test
+    public void should_result_true_when_human_readable_time_equals() {
+
+        var value = "2seconds";
+        var equals = new Equals(value);
+
+        assertTrue(equals.execute(2000l));
+    }
+
+    @Test
+    public void should_to_string_result_human_readable_when_available() {
+
+        var operand = "1day";
+        var equals = new Equals(operand);
+
+        assertEquals("==1day", equals.toString());
     }
 }
