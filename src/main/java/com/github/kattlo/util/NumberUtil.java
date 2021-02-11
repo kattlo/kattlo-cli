@@ -5,6 +5,7 @@ import java.text.DecimalFormatSymbols;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
@@ -61,6 +62,17 @@ public class NumberUtil {
         }
         return DAYS_PATTERN;
     }
+
+    private static final List<String> HUMAN_READABLE_SYMBOLS = List.of(
+        "gib",
+        "mib",
+        "kib",
+        "%",
+        "second",
+        "minute",
+        "hour",
+        "day"
+    );
 
     public static boolean isNumber(Object value) {
 
@@ -122,6 +134,19 @@ public class NumberUtil {
         }
 
         return result.get();
+    }
+
+    public static boolean isHumanReadableCandidate(String value) {
+        var toCompare = Objects.requireNonNull(value, "provide a not null value argument")
+            .trim().toLowerCase();
+
+        for(String symbol : HUMAN_READABLE_SYMBOLS){
+            if(toCompare.contains(symbol)){
+                return Boolean.TRUE;
+            }
+        }
+
+        return Boolean.FALSE;
     }
 
     /**
