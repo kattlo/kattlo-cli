@@ -1,5 +1,6 @@
 package com.github.kattlo.core.configuration.condition;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -477,5 +478,23 @@ public class LessTest {
         var condition = new Less(operand);
 
         assertFalse(condition.execute(92f));
+    }
+
+    @Test
+    public void should_result_true_when_human_readable() {
+
+        var operand = "2hours";
+        var condition = new Less(operand);
+
+        assertTrue(condition.execute(1 * 60 * 60 * 1000l));
+    }
+
+    @Test
+    public void should_to_string_result_human_readable_when_available() {
+
+        var operand = "5KiB";
+        var condition = new Less(operand);
+
+        assertEquals("<5KiB", condition.toString());
     }
 }
