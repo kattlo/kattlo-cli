@@ -1,5 +1,6 @@
 package com.github.kattlo.core.configuration.condition;
 
+import com.github.kattlo.util.MachineReadableSupport;
 import com.github.kattlo.util.NumberUtil;
 
 /**
@@ -7,12 +8,10 @@ import com.github.kattlo.util.NumberUtil;
  */
 public class LessOrEquals implements NumberCondition {
 
-    private final Object operand;
+    private final MachineReadableSupport support;
+
     public LessOrEquals(Object operand) {
-        if(!NumberUtil.isNumber(operand)){
-            throw new IllegalArgumentException("operand must be a number instance: " + operand);
-        }
-        this.operand = operand;
+        this.support = MachineReadableSupport.of(operand);
     }
 
     @Override
@@ -21,10 +20,14 @@ public class LessOrEquals implements NumberCondition {
             throw new IllegalArgumentException("value must be a number instance: " + value);
         }
 
-        return compare((Number)operand, (Number)value, (v1, v2) -> v1 >= v2);
+        return compare((Number)support.getMachineReadable(),
+            (Number)value, (v1, v2) -> v1 >= v2);
     }
 
     public String toString() {
-        return "<=" + NumberUtil.formatted(operand);
+        return "<=" +
+            support.getHumanReadable()
+            .orElseGet(() ->
+                NumberUtil.formatted(support.getMachineReadable()));
     }
 }
