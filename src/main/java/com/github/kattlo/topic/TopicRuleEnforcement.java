@@ -77,7 +77,8 @@ public class TopicRuleEnforcement {
             failures.addAll(
               operation.getConfig().entrySet().stream()
                 .filter(c -> rules.getConfig().containsKey(c.getKey()))
-                .filter(c -> !rules.getConfig().get(c.getKey()).execute(c.getValue()))
+                .filter(c -> !rules.getConfig().get(c.getKey())
+                    .execute(c.getValue()))
                 .map(c -> String.format(CONFIG_MESSAGE, c.getKey(),
                                     rules.getConfig().get(c.getKey()),
                                     NumberUtil.formatted(c.getValue())))
