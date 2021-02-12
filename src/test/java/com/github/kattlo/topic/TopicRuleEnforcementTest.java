@@ -140,7 +140,7 @@ public class TopicRuleEnforcementTest {
             assertThrows(IllegalArgumentException.class, () ->
                 enforcement.check(migration, configuration));
 
-        assertThat(actual.getMessage(), Matchers.containsString("instance of List"));
+        assertThat(actual.getMessage(), Matchers.containsString("instance of java.util.List"));
     }
 
     @Test
@@ -155,6 +155,6 @@ public class TopicRuleEnforcementTest {
             assertThrows(IllegalArgumentException.class, () ->
                 enforcement.check(migration, configuration));
 
-        assertThat(actual.getMessage(), Matchers.containsString("instance of List"));
+        assertThat(actual.getMessage(), Matchers.containsString("instance of java.util.List"));
     }
 }
