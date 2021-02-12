@@ -1,5 +1,6 @@
 package com.github.kattlo.util;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -18,6 +19,7 @@ public class MachineReadableSupport {
     }
 
     public static MachineReadableSupport of(Object value) {
+        Objects.requireNonNull(value, "provide a non-null value argument");
 
         MachineReadableSupport result;
         if(value instanceof String
