@@ -28,7 +28,7 @@ configurations for:
 ### Linux Binary
 
 ```bash
-curl 'https://github.com/kattlo/kattlo-cli/releases/download/v0.1.0/kattlo-v0.1.0-linux' \
+curl 'https://github.com/kattlo/kattlo-cli/releases/download/v0.1.1/kattlo-v0.1.1-linux' \
   -o 'kattlo'
 
 sudo chmod +x kattlo
@@ -43,7 +43,7 @@ The are `.deb` and `.rpm` packages available. Do a check in
 ### MacOS
 
 ```bash
-curl 'https://github.com/kattlo/kattlo-cli/releases/download/v0.1.0/kattlo-v0.1.0-mac' \
+curl 'https://github.com/kattlo/kattlo-cli/releases/download/v0.1.1/kattlo-v0.1.1-mac' \
   -o 'kattlo'
 
 sudo chmod +x kattlo
