@@ -1,11 +1,22 @@
 package com.github.kattlo.core.configuration.condition;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
 public class NotEqualsTest {
+
+    @Test
+    public void should_throw_when_operand_is_number_and_value_is_not() {
+
+        var equals = new NotEquals("2seconds");
+
+        assertThrows(IllegalArgumentException.class, () ->
+            equals.execute("s"));
+    }
 
     @Test
     public void should_result_false_when_string_equals() {
@@ -59,5 +70,23 @@ public class NotEqualsTest {
         var equals = new NotEquals(value);
 
         assertTrue(equals.execute(0.5D));
+    }
+
+    @Test
+    public void should_result_true_when_human_readable_time_not_equals() {
+
+        var value = "2seconds";
+        var equals = new NotEquals(value);
+
+        assertTrue(equals.execute(2001l));
+    }
+
+    @Test
+    public void should_to_string_result_human_readable_when_available() {
+
+        var operand = "1day";
+        var equals = new NotEquals(operand);
+
+        assertEquals("!=1day", equals.toString());
     }
 }

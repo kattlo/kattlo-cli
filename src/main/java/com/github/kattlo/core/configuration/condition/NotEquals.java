@@ -2,25 +2,26 @@ package com.github.kattlo.core.configuration.condition;
 
 import com.github.kattlo.util.NumberUtil;
 
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
-
 /**
  * @author fabiojose
  */
-@AllArgsConstructor
 public class NotEquals implements Condition {
 
-    @NonNull
-    private final Object operand;
+    private final Equals equals;
+
+    public NotEquals(Object operand){
+        this.equals = new Equals(operand);
+    }
 
     @Override
     public boolean execute(Object value) {
-        return !operand.equals(value);
+        return !equals.execute(value);
     }
 
     @Override
     public String toString(){
-        return "!=" + NumberUtil.formatted(operand);
+        return "!=" +
+            equals.getSupport().getHumanReadable()
+                .orElseGet(() ->  NumberUtil.formatted(equals.getSupport().getMachineReadable()));
     }
 }

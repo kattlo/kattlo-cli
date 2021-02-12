@@ -38,4 +38,8 @@ public class Equals implements Condition {
             support.getHumanReadable()
                 .orElseGet(() ->  NumberUtil.formatted(support.getMachineReadable()));
     }
+
+    MachineReadableSupport getSupport() {
+        return support;
+    }
 }
