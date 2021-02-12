@@ -18,6 +18,17 @@ public class Equals implements Condition {
 
     @Override
     public boolean execute(Object value) {
+        var operand = support.getMachineReadable();
+
+        if(NumberUtil.isNumber(operand)){
+            if(NumberUtil.isNumber(value)){
+                return NumberUtil.compare((Number)operand, (Number)value,
+                    (v1, v2) -> v1 == v2);
+            } else {
+                throw new IllegalArgumentException("value must be a number instance: " + value);
+            }
+        }
+
         return Objects.equals(support.getMachineReadable(), value);
     }
 
