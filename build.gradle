@@ -11,7 +11,7 @@ repositories {
 
 dependencies {
     implementation 'io.quarkus:quarkus-picocli'
-    implementation 'io.quarkus:quarkus-picocli:sources'
+    implementation 'io.quarkus:quarkus-picocli:1.11.3.Final'
     implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
     implementation 'info.picocli:picocli-codegen'
     implementation 'org.yaml:snakeyaml:1.27'
