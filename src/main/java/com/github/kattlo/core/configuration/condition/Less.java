@@ -6,12 +6,16 @@ import com.github.kattlo.util.NumberUtil;
 /**
  * @author fabiojose
  */
-public class Less implements NumberCondition {
+public class Less implements Condition {
 
     private final MachineReadableSupport support;
 
     public Less(Object operand) {
         this.support = MachineReadableSupport.of(operand);
+
+        if(!NumberUtil.isNumber(support.getMachineReadable())){
+            throw new IllegalArgumentException("operand must be a number instance: " + operand.getClass());
+        }
     }
 
     @Override
@@ -20,7 +24,7 @@ public class Less implements NumberCondition {
             throw new IllegalArgumentException("value must be a number instance: " + value);
         }
 
-        return compare((Number)support.getMachineReadable(),
+        return NumberUtil.compare((Number)support.getMachineReadable(),
             (Number)value, (v1, v2) -> v1 > v2);
     }
 

@@ -6,12 +6,16 @@ import com.github.kattlo.util.NumberUtil;
 /**
  * @author fabiojose
  */
-public class GreaterOrEquals implements NumberCondition {
+public class GreaterOrEquals implements Condition {
 
     private final MachineReadableSupport support;
 
     public GreaterOrEquals(Object operand) {
         this.support = MachineReadableSupport.of(operand);
+
+        if(!NumberUtil.isNumber(support.getMachineReadable())){
+            throw new IllegalArgumentException("operand must be a number instance: " + operand.getClass());
+        }
     }
 
     @Override
@@ -20,7 +24,7 @@ public class GreaterOrEquals implements NumberCondition {
             throw new IllegalArgumentException("value must be a number instance: " + value);
         }
 
-        return compare((Number)support.getMachineReadable(),
+        return NumberUtil.compare((Number)support.getMachineReadable(),
             (Number)value, (v1, v2) -> v1 <= v2);
     }
 
