@@ -6,6 +6,8 @@ import picocli.CommandLine;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.io.File;
+
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.junit.jupiter.api.Test;
 
@@ -80,7 +82,7 @@ public class EntryCommandTest {
     @Test
     public void should_result_alternative_config_file() {
 
-        var expected = "./src/test/resources/.kattlo.yaml";
+        var expected = new File("./src/test/resources/.kattlo.yaml");
         String[] args = {
             "--config-file=./src/test/resources/.kattlo.yaml",
             "--kafka-config-file=./src/test/resources/kafka.properties",
@@ -97,6 +99,6 @@ public class EntryCommandTest {
         EntryCommand actualCommand = command.getCommand();
         var actual = actualCommand.getConfiguration();
 
-        assertEquals(expected, actual.toString());
+        assertEquals(expected, actual);
     }
 }
