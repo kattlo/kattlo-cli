@@ -68,6 +68,16 @@ public class TopicCommand implements Runnable {
 
     private File directory;
 
+    private TopicRuleEnforcement ruleEnforcement;
+
+    private TopicRuleEnforcement getRuleEnforcement(File configuration) {
+        if(Objects.isNull(ruleEnforcement)){
+            ruleEnforcement = new TopicRuleEnforcement(configuration);
+        }
+
+        return ruleEnforcement;
+    }
+
     @Option(
         names = {
             "-d",
@@ -164,7 +174,12 @@ public class TopicCommand implements Runnable {
                     reporter.uptodate();
 
                 } else {
+                    var rules = getRuleEnforcement(parent.getConfiguration());
+
                     newersList.forEach(to -> {
+
+                        // check the migration against rules
+                        rules.check(to);
 
                         // create, patch or remove?
                         final var strategy = strategyOf(to);
@@ -191,6 +206,10 @@ public class TopicCommand implements Runnable {
             reporter.report(e);
             throw new CommandLine.ExecutionException(spec.commandLine(),
                 "general error: " + e.getMessage(), e);
+        }catch(TopicRuleException e){
+            reporter.report(e);
+            throw new CommandLine.ExecutionException(spec.commandLine(),
+                "rule check failure");
         }
     }
 }

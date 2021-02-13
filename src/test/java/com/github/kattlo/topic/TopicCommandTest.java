@@ -3,6 +3,7 @@ package com.github.kattlo.topic;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -36,6 +37,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Model.CommandSpec;
@@ -44,6 +47,7 @@ import picocli.CommandLine.Model.CommandSpec;
  * @author fabiojose
  */
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class TopicCommandTest {
 
     private EntryCommand entry = new EntryCommand();
@@ -91,6 +95,9 @@ public class TopicCommandTest {
 
         when(kafka.adminFor(any()))
             .thenReturn(admin);
+
+        when(parent.getConfiguration())
+            .thenReturn(new File("./src/test/resources/topics/rules/.kattlo_empty.yaml"));
 
     }
 
@@ -281,6 +288,9 @@ public class TopicCommandTest {
         when(kafka.adminFor(any()))
             .thenReturn(admin);
 
+        when(parent.getConfiguration())
+            .thenReturn(new File("./src/test/resources/topics/rules/.kattlo_empty.yaml"));
+
         command.setDirectory(directory);
 
         try(var mocked = mockStatic(Strategy.class)){
@@ -301,5 +311,36 @@ public class TopicCommandTest {
             assertEquals(topic, remove.getTopic());
         }
 
+    }
+
+    @Test
+    public void should_throws_when_create_migration_fails_against_rules() throws Exception {
+
+        // setup
+        final File directory = new File("./src/test/resources/topics/09_fail_topic_name");
+
+        when(backend.current(any(), anyString()))
+            .thenReturn(Optional.empty());
+
+        when(kafka.adminFor(any()))
+            .thenReturn(admin);
+
+        when(parent.getConfiguration())
+            .thenReturn(new File("./src/test/resources/topics/rules/.kattlo_human_readable.yaml"));
+
+        when(spec.commandLine())
+            .thenReturn(new CommandLine(command));
+
+        command.setDirectory(directory);
+
+        try(var mocked = mockStatic(Strategy.class)){
+            mocked.when(() -> Strategy.of(any()))
+                .thenReturn(strategy);
+
+            // act
+            assertThrows(CommandLine.ExecutionException.class, () ->
+                command.run());
+
+        }
     }
 }

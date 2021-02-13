@@ -1,0 +1,8 @@
+operation: create
+notes: 'This is a note'
+topic: An_invalid_topic-name
+partitions: 3
+replicationFactor: 2
+config:
+  compression.type: snappy
+  retention.ms: -1
