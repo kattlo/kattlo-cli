@@ -64,6 +64,7 @@ public class EntryCommand {
     public File getConfiguration() {
 
         this.configuration = Optional.ofNullable(configuration)
+            .filter(Objects::nonNull)
             .orElseGet(() -> new File(DEFAULT_CONFIG_FILE));
 
         if(this.configuration.exists()){
