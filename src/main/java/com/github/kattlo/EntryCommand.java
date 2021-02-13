@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 
 import com.github.kattlo.topic.TopicCommand;
@@ -37,6 +38,8 @@ import picocli.CommandLine.Model.CommandSpec;
 @Slf4j
 public class EntryCommand {
 
+    private static final String DEFAULT_CONFIG_FILE = ".kattlo.yml";
+
     private File configuration;
 
     private File kafkaConfiguration;
@@ -52,14 +55,17 @@ public class EntryCommand {
             "--config-file"
         },
         description = "Kattlo configurations",
-        required = false,
-        defaultValue = ".kattlo.yaml"
+        required = false
     )
     public void setConfiguration(File configuration) {
         this.configuration = Objects.requireNonNull(configuration);
     }
 
     public File getConfiguration() {
+
+        this.configuration = Optional.ofNullable(configuration)
+            .orElseGet(() -> new File(DEFAULT_CONFIG_FILE));
+
         if(this.configuration.exists()){
             return configuration;
         } else {
@@ -67,6 +73,7 @@ public class EntryCommand {
                 ParameterException(spec.commandLine(),
                     configuration.getAbsolutePath() + " not found");
         }
+
     }
 
     @Option(

@@ -76,4 +76,27 @@ public class EntryCommandTest {
 
         assertEquals(expected, actual);
     }
+
+    @Test
+    public void should_result_alternative_config_file() {
+
+        var expected = "./src/test/resources/.kattlo.yaml";
+        String[] args = {
+            "--config-file=./src/test/resources/.kattlo.yaml",
+            "--kafka-config-file=./src/test/resources/kafka.properties",
+            "--bootstrap-servers=" + expected,
+            "topic",
+            "--directory=."
+        };
+
+        var command = new CommandLine(entry);
+
+        command.execute(args);
+
+        //assert
+        EntryCommand actualCommand = command.getCommand();
+        var actual = actualCommand.getConfiguration();
+
+        assertEquals(expected, actual.toString());
+    }
 }
