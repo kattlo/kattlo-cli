@@ -505,7 +505,7 @@ public class PrintStreamReporterTest {
             "rule2",
             "rule3"
         );
-        var e = new TopicRuleException(details);
+        var e = new TopicRuleException(details, Path.of("file.yaml"));
 
         reporter.report(e);
 

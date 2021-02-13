@@ -131,6 +131,13 @@ public class PrintStreamReporter implements Reporter {
         });
         out.println();
 
+        out.print(_1_SPACE);
+        out.print("File:");
+        out.print(_1_SPACE);
+        out.print(e.getFile());
+        out.println();
+        out.println();
+
     }
 
     private void currentPlain(Resource resource) {

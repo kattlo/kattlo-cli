@@ -91,7 +91,7 @@ public class TopicRuleEnforcement {
             );
 
             if(!failures.isEmpty()){
-                throw new TopicRuleException(failures);
+                throw new TopicRuleException(failures, operation.getFile());
             }
 
         }catch(IOException e) {
