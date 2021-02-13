@@ -12,7 +12,6 @@ import java.util.Optional;
 import com.github.kattlo.core.backend.ResourceType;
 
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
 
 /**
  * @author fabiojose
@@ -23,8 +22,7 @@ public class ConfigurationLoader {
 
     private static Yaml getYaml() {
         if(null== YAML){
-            Constructor constructor = new Constructor(Map.class);
-            YAML = new Yaml(constructor);
+            YAML = new Yaml();
         }
 
         return YAML;
