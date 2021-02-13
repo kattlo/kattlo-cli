@@ -1,0 +1,10 @@
+operation: create
+topic: correct-topic-name-12
+partitions: 2
+replicationFactor: 3
+config:
+  compression.type: gzip
+  cleanup.policy  : compact
+  max.message.bytes: 1048576
+  segment.ms: 10800000
+  min.cleanable.dirty.ratio: 0.001

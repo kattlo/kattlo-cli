@@ -1,0 +1,26 @@
+rules:
+  topic:
+    namePattern: '^[a-z0-9\-]{1,255}$'
+    partitions:
+      '>=': 3
+    replicationFactor:
+      '==': 2
+    config:
+      compression.type:
+        in:
+        - lz4
+        - snappy
+      max.message.bytes:
+        '<=': 1048588
+      min.in.sync.replicas:
+        '>=': 2
+      message.timestamp.type:
+        '==': LogAppendTime
+      segment.ms:
+        '>=': 604800000
+      retention.ms:
+        '!=': -1
+      max.compaction.lag.ms:
+        '<=': 9223372036854775807
+      min.cleanable.dirty.ratio:
+        '>=': 0.00001

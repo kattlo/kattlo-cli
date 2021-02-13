@@ -1,0 +1,5 @@
+operation: create
+topic: Incorrect_Topic_Name
+config:
+  compression.type: snappy
+  cleanup.policy  : compact
