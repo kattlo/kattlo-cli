@@ -13,6 +13,7 @@ import javax.json.bind.JsonbBuilder;
 
 import com.github.kattlo.core.backend.Migration;
 import com.github.kattlo.core.backend.Resource;
+import com.github.kattlo.topic.TopicRuleException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -108,6 +109,27 @@ public class PrintStreamReporter implements Reporter {
         out.print(_2_SPACE);
         out.println(e.getMessage());
         e.printStackTrace(out);
+
+    }
+
+    @Override
+    public void report(TopicRuleException e) {
+        Objects.requireNonNull(e, "Provide a non-null exception instance");
+
+        out.println();
+        out.println();
+        out.print(_1_SPACE);
+        out.print("Topic Rule Violation:");
+        out.println();
+        out.println();
+        e.getDetails().forEach(detail -> {
+            out.print(_2_SPACE);
+            out.print("-");
+            out.print(_1_SPACE);
+            out.print(detail);
+            out.println();
+        });
+        out.println();
 
     }
 

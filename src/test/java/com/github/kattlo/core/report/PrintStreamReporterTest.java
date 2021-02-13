@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -21,6 +22,7 @@ import com.github.kattlo.core.backend.Original;
 import com.github.kattlo.core.backend.Resource;
 import com.github.kattlo.core.backend.ResourceStatus;
 import com.github.kattlo.core.backend.ResourceType;
+import com.github.kattlo.topic.TopicRuleException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -487,6 +489,25 @@ public class PrintStreamReporterTest {
         var expected = linefeed("\n\nEverything is up to date.\n\n");
 
         reporter.uptodate();
+
+        var actual = buffer.toString();
+
+        assertThat(actual, containsString(expected));
+    }
+
+    @Test
+    public void should_report_topic_rule_violation() {
+
+        var expected = "Topic Rule Violation";
+
+        var details = List.of(
+            "rule1",
+            "rule2",
+            "rule3"
+        );
+        var e = new TopicRuleException(details);
+
+        reporter.report(e);
 
         var actual = buffer.toString();
 
