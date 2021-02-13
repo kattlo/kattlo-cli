@@ -81,7 +81,7 @@ public class ConfigurationLoaderTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    public void shoul_load_double_value() throws IOException {
+    public void should_load_double_value() throws IOException {
 
         var file = new File("./src/test/resources/topics/rules/.kattlo_topic.yaml");
 
@@ -93,5 +93,21 @@ public class ConfigurationLoaderTest {
 
         var actualValue = maxMessageBytes.get(">=");
         assertThat(actualValue, Matchers.instanceOf(Double.class));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void should_load_human_readable_values() throws IOException {
+
+        var file = new File("./src/test/resources/topics/rules/.kattlo_human_readable.yaml");
+
+        var actual = ConfigurationLoader.load(file, ResourceType.TOPIC);
+
+        assertTrue(actual.isPresent());
+        var config = (Map<String, Object>)actual.get().get("config");
+        var maxMessageBytes = (Map<String, Object>)config.get("max.message.bytes");
+
+        var actualValue = maxMessageBytes.get("<=");
+        assertThat(actualValue, Matchers.instanceOf(String.class));
     }
 }
