@@ -17,7 +17,6 @@ import org.mapstruct.factory.Mappers;
 
 public class TopicRuleEnforcementTest {
 
-    private final TopicRuleEnforcement enforcement = new TopicRuleEnforcement();
     private final TopicOperationMapper mapper =
         Mappers.getMapper(TopicOperationMapper.class);
 
@@ -27,10 +26,12 @@ public class TopicRuleEnforcementTest {
         var configuration = new File("./src/test/resources/topics/rules/.kattlo_not_found.yaml");
         var migrationFile = Path.of("./src/test/resources/topics/rules/migration/v0000_partitions-1.yaml");
 
+        var enforcement = new TopicRuleEnforcement(configuration);
+
         var migration = mapper.map(Loader.load(migrationFile), migrationFile);
 
         assertThrows(LoadException.class, () ->
-            enforcement.check(migration, configuration));
+            enforcement.check(migration));
 
     }
 
@@ -39,12 +40,13 @@ public class TopicRuleEnforcementTest {
 
         var configuration = new File("./src/test/resources/topics/rules/.kattlo_topic.yaml");
         var migrationFile = Path.of("./src/test/resources/topics/rules/migration/v0000_partitions-1.yaml");
+        var enforcement = new TopicRuleEnforcement(configuration);
 
         var migration = mapper.map(Loader.load(migrationFile), migrationFile);
 
         var actual =
             assertThrows(TopicRuleException.class, () ->
-                enforcement.check(migration, configuration));
+                enforcement.check(migration));
 
         assertFalse(actual.getDetails().isEmpty());
         assertThat(actual.getDetails(), Matchers.hasItem("partitions: expected '>=3', but was '1'"));
@@ -56,12 +58,13 @@ public class TopicRuleEnforcementTest {
 
         var configuration = new File("./src/test/resources/topics/rules/.kattlo_topic.yaml");
         var migrationFile = Path.of("./src/test/resources/topics/rules/migration/v0000_replication-factor-1.yaml");
+        var enforcement = new TopicRuleEnforcement(configuration);
 
         var migration = mapper.map(Loader.load(migrationFile), migrationFile);
 
         var actual =
             assertThrows(TopicRuleException.class, () ->
-                enforcement.check(migration, configuration));
+                enforcement.check(migration));
 
         assertFalse(actual.getDetails().isEmpty());
         assertThat(actual.getDetails(), Matchers.hasItem("replicationFactor: expected '==2', but was '1'"));
@@ -72,12 +75,13 @@ public class TopicRuleEnforcementTest {
 
         var configuration = new File("./src/test/resources/topics/rules/.kattlo_topic.yaml");
         var migrationFile = Path.of("./src/test/resources/topics/rules/migration/v0000_name-pattern-upper-case.yaml");
+        var enforcement = new TopicRuleEnforcement(configuration);
 
         var migration = mapper.map(Loader.load(migrationFile), migrationFile);
 
         var actual =
             assertThrows(TopicRuleException.class, () ->
-                enforcement.check(migration, configuration));
+                enforcement.check(migration));
 
         assertFalse(actual.getDetails().isEmpty());
         assertThat(actual.getDetails(), Matchers.hasItem("Expected the topic name to match '^[a-z0-9\\-]{1,255}$', but was 'Topic-Name'"));
@@ -89,10 +93,11 @@ public class TopicRuleEnforcementTest {
 
         var configuration = new File("./src/test/resources/topics/rules/.kattlo_empty.yaml");
         var migrationFile = Path.of("./src/test/resources/topics/rules/migration/v0000_name-pattern-upper-case.yaml");
+        var enforcement = new TopicRuleEnforcement(configuration);
 
         var migration = mapper.map(Loader.load(migrationFile), migrationFile);
 
-        enforcement.check(migration, configuration);
+        enforcement.check(migration);
 
     }
 
@@ -101,12 +106,13 @@ public class TopicRuleEnforcementTest {
 
         var configuration = new File("./src/test/resources/topics/rules/.kattlo_topic.yaml");
         var migrationFile = Path.of("./src/test/resources/topics/rules/migration/v0000_config.yaml");
+        var enforcement = new TopicRuleEnforcement(configuration);
 
         var migration = mapper.map(Loader.load(migrationFile), migrationFile);
 
         var actual =
             assertThrows(TopicRuleException.class, () ->
-                enforcement.check(migration, configuration));
+                enforcement.check(migration));
 
         assertFalse(actual.getDetails().isEmpty());
         assertThat(actual.getDetails(), Matchers.hasItem("compression.type: expected 'in [lz4, snappy]', but was 'gzip'"));
@@ -120,11 +126,12 @@ public class TopicRuleEnforcementTest {
 
         var configuration = new File("./src/test/resources/topics/rules/.kattlo_topic.yaml");
         var migrationFile = Path.of("./src/test/resources/topics/rules/migration/v0000_min-cleanable-string.yaml");
+        var enforcement = new TopicRuleEnforcement(configuration);
 
         var migration = mapper.map(Loader.load(migrationFile), migrationFile);
 
         assertThrows(IllegalArgumentException.class, () ->
-            enforcement.check(migration, configuration));
+            enforcement.check(migration));
 
     }
 
@@ -133,12 +140,13 @@ public class TopicRuleEnforcementTest {
 
         var configuration = new File("./src/test/resources/topics/rules/.kattlo_compression-in-type-not-a-list.yaml");
         var migrationFile = Path.of("./src/test/resources/topics/rules/migration/v0000_compression-type-snappy.yaml");
+        var enforcement = new TopicRuleEnforcement(configuration);
 
         var migration = mapper.map(Loader.load(migrationFile), migrationFile);
 
         var actual =
             assertThrows(IllegalArgumentException.class, () ->
-                enforcement.check(migration, configuration));
+                enforcement.check(migration));
 
         assertThat(actual.getMessage(), Matchers.containsString("instance of java.util.List"));
     }
@@ -148,12 +156,13 @@ public class TopicRuleEnforcementTest {
 
         var configuration = new File("./src/test/resources/topics/rules/.kattlo_compression-notin-type-not-a-list.yaml");
         var migrationFile = Path.of("./src/test/resources/topics/rules/migration/v0000_compression-type-snappy.yaml");
+        var enforcement = new TopicRuleEnforcement(configuration);
 
         var migration = mapper.map(Loader.load(migrationFile), migrationFile);
 
         var actual =
             assertThrows(IllegalArgumentException.class, () ->
-                enforcement.check(migration, configuration));
+                enforcement.check(migration));
 
         assertThat(actual.getMessage(), Matchers.containsString("instance of java.util.List"));
     }

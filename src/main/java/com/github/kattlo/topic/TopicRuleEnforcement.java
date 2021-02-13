@@ -31,6 +31,11 @@ public class TopicRuleEnforcement {
     private static final String CONFIG_MESSAGE = "%s: expected '%s', but was '%s'";
 
     private TopicRules rules;
+    private final File configuration;
+
+    public TopicRuleEnforcement(File configuration) {
+        this.configuration = configuration;
+    }
 
     private TopicRules getRules(File configuration) throws IOException {
         if(null== rules){
@@ -57,10 +62,10 @@ public class TopicRuleEnforcement {
     /**
      * @throws TopicRuleException When the check does not pass
      */
-    public void check(TopicOperation operation, File configuration) {
+    public void check(TopicOperation operation) {
 
         try{
-            var rules = getRules(configuration);
+            var rules = getRules(this.configuration);
             log.debug("Migration to check {} against rules {}", operation, rules);
 
             var failures = new ArrayList<String>();
