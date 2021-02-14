@@ -43,6 +43,11 @@ public class Migration {
      */
     @NonNull private Original original;
 
+    /**
+     * Kattlo version
+     */
+    @NonNull private String kattlo;
+
     public Map<String, Object> asMigrationMap() {
 
         log.debug("Create map of migration {}", this);
@@ -54,7 +59,8 @@ public class Migration {
             "resourceType", resourceType.name(),
             "timestamp"   , timestamp.format(DateTimeFormatter.ISO_DATE_TIME),
             "attributes"  , attributes,
-            "original"    , original.asMap()
+            "original"    , original.asMap(),
+            "kattlo"      , kattlo
         );
     }
 
@@ -88,6 +94,7 @@ public class Migration {
             DateTimeFormatter.ISO_DATE_TIME));
         result.setAttributes(Map.copyOf((Map<String, Object>)map.get("attributes")));
         result.setOriginal(Original.from((Map<String, Object>)map.get("original")));
+        result.setKattlo(asString(map.get("kattlo")));
 
         return result;
     }

@@ -17,6 +17,7 @@ import com.github.kattlo.core.backend.Original;
 import com.github.kattlo.core.backend.ResourceType;
 import com.github.kattlo.topic.TopicCommandException;
 import com.github.kattlo.util.StringUtil;
+import com.github.kattlo.util.VersionUtil;
 
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -89,6 +90,7 @@ public class TopicOperation {
         result.setResourceType(ResourceType.TOPIC);
         result.setResourceName(getTopic());
         result.setTimestamp(LocalDateTime.now());
+        result.setKattlo(VersionUtil.appVersion());
 
         var attributes = Map.of(
             "partitions", String.valueOf(getPartitions()),

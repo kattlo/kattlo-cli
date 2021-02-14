@@ -1,5 +1,6 @@
 package com.github.kattlo.core.backend.kafka;
 
+import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -21,6 +22,7 @@ import com.github.kattlo.core.backend.OperationType;
 import com.github.kattlo.core.backend.Resource;
 import com.github.kattlo.core.backend.ResourceStatus;
 import com.github.kattlo.core.backend.ResourceType;
+import com.github.kattlo.util.VersionUtil;
 import com.github.kattlo.core.backend.Original;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -29,6 +31,7 @@ import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 import org.apache.kafka.clients.producer.MockProducer;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.TopicPartition;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -144,6 +147,7 @@ public class KafkaBackendTest {
         applied.setResourceType(ResourceType.TOPIC);
         applied.setTimestamp(LocalDateTime.now());
         applied.setVersion("v0001");
+        applied.setKattlo(VersionUtil.appVersion());
 
         try(var mocked = mockStatic(KafkaBackend.class)){
             mocked.when(() -> KafkaBackend.producer(any(), any()))
@@ -199,6 +203,7 @@ public class KafkaBackendTest {
         applied.setResourceType(ResourceType.TOPIC);
         applied.setTimestamp(LocalDateTime.now());
         applied.setVersion("v0001");
+        applied.setKattlo(VersionUtil.appVersion());
 
         try(var mocked = mockStatic(KafkaBackend.class)){
             mocked.when(() -> KafkaBackend.producer(any(), any()))
@@ -253,6 +258,7 @@ public class KafkaBackendTest {
         applied.setResourceType(ResourceType.TOPIC);
         applied.setTimestamp(LocalDateTime.now());
         applied.setVersion("v0001");
+        applied.setKattlo(VersionUtil.appVersion());
 
         try(var mocked = mockStatic(KafkaBackend.class)){
             mocked.when(() -> KafkaBackend.producer(any(), any()))
@@ -325,6 +331,7 @@ public class KafkaBackendTest {
         applied.setResourceType(ResourceType.TOPIC);
         applied.setTimestamp(LocalDateTime.now());
         applied.setVersion("v0001");
+        applied.setKattlo(VersionUtil.appVersion());
 
         try(var mocked = mockStatic(KafkaBackend.class)){
             mocked.when(() -> KafkaBackend.producer(any(), any()))
@@ -354,6 +361,66 @@ public class KafkaBackendTest {
         }
 
     }
+
+    @Test
+    public void should_commit_history_whith_kattlo_version() {
+
+        // setup
+        var topic = "topic-name-1";
+        var original = new Original();
+        original.setContentType("text/yaml");
+        original.setContent("tYmFzZTY0RmlsZUNvbnRlbnQ=");//base64FileContent
+        original.setPath("/path/to/original.yaml");
+
+        var config = Map.of("compression.type", "snappy");
+
+        var applied = new Migration();
+        applied.setAttributes(Map.of(
+            "partitions", "2",
+            "replicationFactor", "1",
+            "config", config
+        ));
+        applied.setNotes("some notes");
+        applied.setOperation(OperationType.CREATE);
+        applied.setOriginal(original);
+        applied.setResourceName(topic);
+        applied.setResourceType(ResourceType.TOPIC);
+        applied.setTimestamp(LocalDateTime.now());
+        applied.setVersion("v0001");
+        applied.setKattlo(VersionUtil.appVersion());
+
+        try(var mocked = mockStatic(KafkaBackend.class)){
+            mocked.when(() -> KafkaBackend.producer(any(), any()))
+                .thenReturn(producer);
+
+            mocked.when(() -> KafkaBackend.consumer(any(), any()))
+                .thenReturn(consumer);
+
+            when(backendConfig.topicsStateTopicName(any()))
+                .thenReturn(KafkaBackendConfig.TOPIC_T_STATE);
+
+            when(backendConfig.topicsHistoryTopicName(any()))
+                .thenReturn(KafkaBackendConfig.TOPIC_T_HISTORY);
+
+            setupConsumer(ResourceType.TOPIC, topic);
+
+            // act
+            backend.commit(applied);
+
+            // assert
+            var records = producer.history();
+            assertEquals(2, records.size());
+
+            var actual = records.get(1);
+
+            assertThat(actual.value(), Matchers.instanceOf(Migration.class));
+
+            var migration = (Migration)actual.value();
+            assertNotNull(migration.getKattlo());
+        }
+
+    }
+
     @Test
     public void should_commit_the_new_entry_to_the_topic_history() {
 
@@ -379,6 +446,7 @@ public class KafkaBackendTest {
         applied.setResourceType(ResourceType.TOPIC);
         applied.setTimestamp(LocalDateTime.now());
         applied.setVersion("v0001");
+        applied.setKattlo(VersionUtil.appVersion());
 
         try(var mocked = mockStatic(KafkaBackend.class)){
             mocked.when(() -> KafkaBackend.producer(any(), any()))
@@ -451,6 +519,7 @@ public class KafkaBackendTest {
         applied.setResourceType(ResourceType.TOPIC);
         applied.setTimestamp(LocalDateTime.now());
         applied.setVersion("v0001");
+        applied.setKattlo(VersionUtil.appVersion());
 
         try(var mocked = mockStatic(KafkaBackend.class)){
             mocked.when(() -> KafkaBackend.producer(any(), any()))
@@ -504,6 +573,7 @@ public class KafkaBackendTest {
         applied.setResourceType(ResourceType.TOPIC);
         applied.setTimestamp(LocalDateTime.now());
         applied.setVersion("v0001");
+        applied.setKattlo(VersionUtil.appVersion());
 
         try(var mocked = mockStatic(KafkaBackend.class)){
             mocked.when(() -> KafkaBackend.producer(any(), any()))
@@ -680,6 +750,7 @@ public class KafkaBackendTest {
         applied.setResourceType(ResourceType.TOPIC);
         applied.setTimestamp(LocalDateTime.now());
         applied.setVersion("v0002");
+        applied.setKattlo(VersionUtil.appVersion());
 
         try(var mocked = mockStatic(KafkaBackend.class)){
             mocked.when(() -> KafkaBackend.producer(any(), any()))
