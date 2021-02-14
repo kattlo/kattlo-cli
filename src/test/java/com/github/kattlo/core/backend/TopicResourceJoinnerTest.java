@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.github.kattlo.util.VersionUtil;
+
 import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("unchecked")
@@ -58,6 +60,7 @@ public class TopicResourceJoinnerTest {
         right.setResourceType(ResourceType.TOPIC);
         right.setTimestamp(LocalDateTime.now());
         right.setVersion("v0002");
+        right.setKattlo(VersionUtil.appVersion());
 
         // act
         var actual = joinner.join(left, right);
@@ -117,6 +120,7 @@ public class TopicResourceJoinnerTest {
         right.setResourceType(ResourceType.TOPIC);
         right.setTimestamp(LocalDateTime.now());
         right.setVersion("v0002");
+        right.setKattlo(VersionUtil.appVersion());
 
         // act
         var actual = joinner.join(left, right);
@@ -169,6 +173,7 @@ public class TopicResourceJoinnerTest {
         right.setResourceType(ResourceType.TOPIC);
         right.setTimestamp(LocalDateTime.now());
         right.setVersion("v0002");
+        right.setKattlo(VersionUtil.appVersion());
 
         // act
         var actual = joinner.join(left, right);
@@ -222,6 +227,7 @@ public class TopicResourceJoinnerTest {
         right.setResourceType(ResourceType.TOPIC);
         right.setTimestamp(LocalDateTime.now());
         right.setVersion("v0002");
+        right.setKattlo(VersionUtil.appVersion());
 
         // act
         var actual = joinner.join(left, right);
@@ -281,6 +287,7 @@ public class TopicResourceJoinnerTest {
         right.setResourceType(ResourceType.TOPIC);
         right.setTimestamp(LocalDateTime.now());
         right.setVersion("v0002");
+        right.setKattlo(VersionUtil.appVersion());
 
         // act
         var actual = joinner.join(left, right);
@@ -337,6 +344,7 @@ public class TopicResourceJoinnerTest {
         right.setResourceType(ResourceType.TOPIC);
         right.setTimestamp(LocalDateTime.now());
         right.setVersion("v0002");
+        right.setKattlo(VersionUtil.appVersion());
 
         // act
         var actual = joinner.join(left, right);
@@ -393,6 +401,7 @@ public class TopicResourceJoinnerTest {
         right.setResourceType(ResourceType.TOPIC);
         right.setTimestamp(LocalDateTime.now());
         right.setVersion("v0002");
+        right.setKattlo(VersionUtil.appVersion());
 
         // act
         var actual = joinner.join(left, right);
@@ -449,6 +458,7 @@ public class TopicResourceJoinnerTest {
         right.setResourceType(ResourceType.TOPIC);
         right.setTimestamp(LocalDateTime.now());
         right.setVersion("v0002");
+        right.setKattlo(VersionUtil.appVersion());
 
         // act
         var actual = joinner.join(left, right);
