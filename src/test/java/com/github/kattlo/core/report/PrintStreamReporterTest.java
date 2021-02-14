@@ -513,4 +513,16 @@ public class PrintStreamReporterTest {
 
         assertThat(actual, containsString(expected));
     }
+
+    @Test
+    public void should_report_initialized_path() {
+
+        var expected = "Initialized at";
+
+        reporter.initialized(Path.of("/path/some/folder"));
+
+        var actual = buffer.toString();
+
+        assertThat(actual, containsString(expected));
+    }
 }

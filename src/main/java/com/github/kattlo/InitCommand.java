@@ -3,9 +3,12 @@ package com.github.kattlo;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Properties;
 
+import com.github.kattlo.core.report.PrintStreamReporter;
+import com.github.kattlo.core.report.Reporter;
 import com.github.kattlo.util.VersionUtil;
 
 import org.apache.kafka.clients.admin.AdminClientConfig;
@@ -43,6 +46,8 @@ public class InitCommand implements Runnable {
     CommandSpec spec;
 
     private File directory;
+
+    private final Reporter reporter = new PrintStreamReporter(System.out);
 
     @Option(
         names = {
@@ -102,6 +107,8 @@ public class InitCommand implements Runnable {
                 e.getMessage(), e);
         }
         log.debug("{} written to {}", KATTLO_FILE, kattloFile);
+
+        reporter.initialized(Path.of(getDirectory().toURI()));
     }
 
 }

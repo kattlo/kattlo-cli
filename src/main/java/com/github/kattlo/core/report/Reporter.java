@@ -24,4 +24,6 @@ public interface Reporter {
 
     void uptodate();
 
+    void initialized(Path path);
+
 }
