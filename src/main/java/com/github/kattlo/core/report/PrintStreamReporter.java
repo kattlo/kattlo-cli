@@ -291,4 +291,15 @@ public class PrintStreamReporter implements Reporter {
         out.println();
         out.println();
     }
+
+    @Override
+    public void initialized(Path path) {
+
+        out.println();
+        out.print("Initialized at");
+        out.print(_1_SPACE);
+        out.print(path);
+        out.println();
+
+    }
 }
