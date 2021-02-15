@@ -92,12 +92,20 @@ public class TopicOperation {
         result.setTimestamp(LocalDateTime.now());
         result.setKattlo(VersionUtil.appVersion());
 
-        var attributes = Map.of(
-            "partitions", String.valueOf(getPartitions()),
-            "replicationFactor", String.valueOf(getReplicationFactor()),
-            "config", Map.copyOf(getConfig())
-        );
-        result.setAttributes(attributes);
+        var attributes = new HashMap<String, Object>();
+        attributes.put("config", Map.copyOf(getConfig()));
+
+        if(Objects.nonNull(getPartitions())){
+            attributes.put("partitions",
+                String.valueOf(getPartitions()));
+        }
+
+        if(Objects.nonNull(getReplicationFactor())){
+            attributes.put("replicationFactor",
+                String.valueOf(getReplicationFactor()));
+        }
+
+        result.setAttributes(Map.copyOf(attributes));
 
         var original = new Original();
         original.setPath(getFile().toString());
