@@ -1,0 +1,4 @@
+operation: create
+topic: 09_patch_config
+partitions: 2
+replicationFactor: 1
