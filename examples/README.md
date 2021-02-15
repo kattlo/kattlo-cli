@@ -83,16 +83,26 @@ kattlo \
 
 - Many topics migrations in the same directory
 
- > Do not use this approach, otherwise your migration management will become a
+> Do not use this approach, otherwise your migration management will become a
  mess
 
- ```bash
+```bash
 kattlo \
   --config-file='.kattlo.yaml' \
   --kafka-config-file='kafka.properties' \
   topic \
   --directory='topic/08_many_topics_same_dir'
- ```
+```
+
+- Patch just the config
+
+```bash
+kattlo \
+  --config-file='.kattlo.yaml' \
+  --kafka-config-file='kafka.properties' \
+  topic \
+  --directory='topic/09_patch_config'
+```
 
 ### Rules Enforcement
 
