@@ -19,7 +19,7 @@ dependencies {
     implementation 'io.quarkus:quarkus-jsonb'
     implementation 'org.apache.commons:commons-lang3:3.11'
 
-    testImplementation "org.testcontainers:kafka:1.15.1"
+    testImplementation "org.testcontainers:kafka:1.15.2"
     testImplementation 'io.quarkus:quarkus-junit5'
     testImplementation 'org.hamcrest:hamcrest-library:2.2'
     testImplementation 'io.quarkus:quarkus-junit5-mockito'
