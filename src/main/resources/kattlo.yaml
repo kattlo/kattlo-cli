@@ -1,0 +1,22 @@
+# Change at your own need, because these are just examples.
+# More examples at: https://github.com/kattlo/kattlo-cli/blob/main/examples/topic/rules/human/.kattlo.yaml
+rules:
+  topic:
+    namePattern: '^[a-z0-9\-]{1,255}$'
+    partitions:
+      '>=': 3
+    replicationFactor:
+      '>=': 2
+    config:
+      compression.type:
+        in:
+        - lz4
+        - snappy
+      max.message.bytes:
+        '<=': 900KiB
+      min.in.sync.replicas:
+        '>=': 2
+      retention.ms:
+        '<=': 14days
+      min.cleanable.dirty.ratio:
+        '>=': 50%
