@@ -419,6 +419,20 @@ public class PrintStreamReporterTest {
     }
 
     @Test
+    public void should_report_no_history_when_there_is_no_history_entries() {
+
+        var expected = linefeed("**WARNING**\n\n  There is no history to show.");
+        var format = ReportFormat.PLAIN;
+
+        // act
+        reporter.history(Stream.empty(), format);
+        var actual = buffer.toString();
+
+        // assert
+        assertThat(actual, containsString(expected));
+    }
+
+    @Test
     public void should_report_the_json_format_of_history() {
 
         // setup
@@ -466,6 +480,19 @@ public class PrintStreamReporterTest {
 
         assertEquals(topic, actual.get("TOPIC"));
         assertNotNull(actual.get("history"));
+    }
+
+    @Test
+    public void should_report_an_empty_json_when_no_history() {
+
+        var format = ReportFormat.JSON;
+
+        reporter.history(Stream.empty(), format);
+        var actualJson = buffer.toString();
+
+        // assert
+        var actual = JsonbBuilder.create().fromJson(actualJson, Map.class);
+        assertNotNull(actual);
     }
 
     @Test

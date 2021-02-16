@@ -196,46 +196,56 @@ public class PrintStreamReporter implements Reporter {
             .sorted((m1, m2) -> m2.getVersion().compareTo(m1.getVersion()))
             .collect(Collectors.toList());
 
-        var latest = sorted.iterator().next();
+        if(!sorted.isEmpty()){
+            var latest = sorted.iterator().next();
 
-        out.print(latest.getResourceType());
-        out.print(":");
-        out.print(_1_SPACE);
-        out.println(latest.getResourceName());
-        out.println();
-
-        sorted.forEach(m -> {
-            out.print(_2_SPACE);
-            out.print(m.getVersion());
+            out.print(latest.getResourceType());
+            out.print(":");
             out.print(_1_SPACE);
-            out.print("->");
-            out.print(_1_SPACE);
-            out.print(m.getOperation().name());
+            out.println(latest.getResourceName());
             out.println();
 
-            out.print(_2_SPACE);
-            out.println(m.getTimestamp());
-
-            out.print(_2_SPACE);
-            out.println(m.getNotes());
-
-            out.print(_2_SPACE);
-            out.println(m.getOriginal().getPath());
-
-            m.getAttributes().entrySet().forEach(a -> {
+            sorted.forEach(m -> {
                 out.print(_2_SPACE);
-                out.print(_2_SPACE);
-                out.print(a.getKey());
+                out.print(m.getVersion());
                 out.print(_1_SPACE);
                 out.print("->");
                 out.print(_1_SPACE);
-                out.print(a.getValue());
+                out.print(m.getOperation().name());
+                out.println();
+
+                out.print(_2_SPACE);
+                out.println(m.getTimestamp());
+
+                out.print(_2_SPACE);
+                out.println(m.getNotes());
+
+                out.print(_2_SPACE);
+                out.println(m.getOriginal().getPath());
+
+                m.getAttributes().entrySet().forEach(a -> {
+                    out.print(_2_SPACE);
+                    out.print(_2_SPACE);
+                    out.print(a.getKey());
+                    out.print(_1_SPACE);
+                    out.print("->");
+                    out.print(_1_SPACE);
+                    out.print(a.getValue());
+                    out.println();
+                });
+
+                out.println();
                 out.println();
             });
-
+        } else {
+            out.println();
+            out.print("**WARNING**");
             out.println();
             out.println();
-        });
+            out.print(_2_SPACE);
+            out.print("There is no history to show.");
+            out.println();
+        }
     }
 
     public void historyJson(Stream<Migration> migrations) {
@@ -245,14 +255,18 @@ public class PrintStreamReporter implements Reporter {
             .sorted((m1, m2) -> m2.getVersion().compareTo(m1.getVersion()))
             .collect(Collectors.toList());
 
-        var latest = sorted.iterator().next();
+        if(!sorted.isEmpty()){
+            var latest = sorted.iterator().next();
 
-        var model = Map.of(
-            latest.getResourceType().name(), latest.getResourceName(),
-            "history", sorted
-        );
+            var model = Map.of(
+                latest.getResourceType().name(), latest.getResourceName(),
+                "history", sorted
+            );
 
-        getJson().toJson(model, out);
+            getJson().toJson(model, out);
+        } else {
+            getJson().toJson(Map.of(), out);
+        }
     }
 
     @Override
