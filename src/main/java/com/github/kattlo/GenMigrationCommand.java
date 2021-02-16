@@ -115,7 +115,7 @@ public class GenMigrationCommand implements Runnable {
     private void write(String value, FileWriter out) {
         try{
             out.write(value);
-            out.write('\n');
+            out.write(System.lineSeparator());
         }catch(IOException e){
             throw new WriteException(e.getMessage(), e);
         }
