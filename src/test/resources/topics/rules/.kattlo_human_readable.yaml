@@ -23,10 +23,6 @@ rules:
         - 9223372036854775807
       flush.ms:
         in:
-        - 1minute
-        - 2hours
-        - 4hours
-        - 8hours
         - 9223372036854775807
       index.interval.bytes:
         '<=': 1MiB

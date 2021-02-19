@@ -1,0 +1,8 @@
+operation: create
+notes: For tests
+topic: topic-name
+config:
+  compression.type: gzip
+  retention.ms: 30days
+  min.cleanable.dirty.ratio: 0.0001%
+

@@ -7,6 +7,16 @@
 
 ## Topics
 
+- Migration with human readable values
+
+```bash
+kattlo \
+  --config-file='.kattlo.yaml' \
+  --kafka-config-file='kafka.properties' \
+  topic \
+  --directory='topic/10_human_readable'
+```
+
 - Create a topic
 
 ```bash

@@ -6,7 +6,11 @@ topic: topic-name
 partitions: 1 #partitions is optional
 replicationFactor: 1 #replicationFactor is optional
 config: #config is optional
-  compression.type: gzip
-  cleanup.policy  : compact
+  compression.type: snappy
+  cleanup.policy: compact
+  retention.ms: 7days
+  segment.ms: 1hour
+  min.cleanable.dirty.ratio: 10%
+  max.message.bytes: 200KiB
   # Any configuration available here:
   #   https://kafka.apache.org/documentation/#topicconfigs

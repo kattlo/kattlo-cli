@@ -42,4 +42,9 @@ public class MachineReadableSupport {
     public Object getMachineReadable() {
         return machine;
     }
+
+    @Override
+    public String toString(){
+        return machine.toString();
+    }
 }

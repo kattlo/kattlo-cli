@@ -206,8 +206,8 @@ public class KafkaBackendConfigTest {
             assertEquals(1, actual.size());
 
             var newTopic = actual.iterator().next();
-            assertEquals(backendConfig.TOPIC_T_PARTITIONS, newTopic.numPartitions());
-            assertEquals(backendConfig.TOPIC_T_STATE_CONFIG, newTopic.configs());
+            assertEquals(KafkaBackendConfig.TOPIC_T_PARTITIONS, newTopic.numPartitions());
+            assertEquals(KafkaBackendConfig.TOPIC_T_STATE_CONFIG, newTopic.configs());
         }
     }
 
@@ -230,8 +230,8 @@ public class KafkaBackendConfigTest {
             assertEquals(1, actual.size());
 
             var newTopic = actual.iterator().next();
-            assertEquals(backendConfig.TOPIC_T_PARTITIONS, newTopic.numPartitions());
-            assertEquals(backendConfig.TOPIC_T_HISTORY_CONFIG, newTopic.configs());
+            assertEquals(KafkaBackendConfig.TOPIC_T_PARTITIONS, newTopic.numPartitions());
+            assertEquals(KafkaBackendConfig.TOPIC_T_HISTORY_CONFIG, newTopic.configs());
         }
     }
 
@@ -254,7 +254,7 @@ public class KafkaBackendConfigTest {
             assertEquals(1, actual.size());
 
             var newTopic = actual.iterator().next();
-            assertEquals(backendConfig.TOPIC_T_DESIRED_REPLICATION_FACTOR, newTopic.replicationFactor());
+            assertEquals(KafkaBackendConfig.TOPIC_T_DESIRED_REPLICATION_FACTOR, newTopic.replicationFactor());
         }
     }
 }

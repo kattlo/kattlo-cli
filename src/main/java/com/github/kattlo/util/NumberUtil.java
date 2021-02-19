@@ -83,15 +83,23 @@ public class NumberUtil {
             || (value instanceof Double);
     }
 
-    public static String formatted(Object operand) {
+    public static String formatted(MachineReadableSupport mrs) {
+        if(mrs.getHumanReadable().isPresent()){
+            return mrs.getHumanReadable().get();
+        }
 
-        var type = Objects.requireNonNull(operand,
-            "provide a non-null operand argument").getClass();
+        return formatted(mrs.getMachineReadable());
+    }
+
+    public static String formatted(Object value) {
+
+        var type = Objects.requireNonNull(value,
+            "provide a non-null value argument").getClass();
 
         return (
             type.equals(Double.class) || type.equals(Float.class)
-            ? new DecimalFormat("##0.0#########", new DecimalFormatSymbols(Locale.US)).format(operand)
-            : operand.toString()
+            ? new DecimalFormat("##0.0#########", new DecimalFormatSymbols(Locale.US)).format(value)
+            : value.toString()
         );
 
     }

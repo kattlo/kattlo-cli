@@ -1,0 +1,12 @@
+operation: create
+notes: |
+  Create the topic with some custom configurations and default
+  partitions and replication factor.
+topic: 10_human_readable
+config:
+  compression.type: gzip
+  cleanup.policy  : compact
+  segment.bytes: 900MiB
+  max.compaction.lag.ms: 2days
+  delete.retention.ms: 10minutes
+  flush.ms: 12hours

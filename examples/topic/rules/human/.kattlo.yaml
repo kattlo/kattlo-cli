@@ -37,3 +37,5 @@ rules:
         '<=': 7days
       min.cleanable.dirty.ratio:
         '>=': 1%
+      flush.ms:
+        '<=': 60days
