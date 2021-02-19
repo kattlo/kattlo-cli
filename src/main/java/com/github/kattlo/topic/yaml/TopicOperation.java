@@ -1,5 +1,7 @@
 package com.github.kattlo.topic.yaml;
 
+import static java.util.AbstractMap.SimpleEntry;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,6 +11,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import com.github.kattlo.core.backend.Migration;
@@ -16,17 +19,21 @@ import com.github.kattlo.core.backend.OperationType;
 import com.github.kattlo.core.backend.Original;
 import com.github.kattlo.core.backend.ResourceType;
 import com.github.kattlo.topic.TopicCommandException;
+import com.github.kattlo.util.MachineReadableSupport;
 import com.github.kattlo.util.StringUtil;
 import com.github.kattlo.util.VersionUtil;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author fabiojose
  */
+@Slf4j
 @Getter
 @EqualsAndHashCode
 @ToString
@@ -41,7 +48,11 @@ public class TopicOperation {
     private Integer partitions;
     private Integer replicationFactor;
 
+    @Getter(value = AccessLevel.NONE)
     private Map<String, Object> config;
+
+    @Getter(value = AccessLevel.NONE)
+    private Map<String, MachineReadableSupport> configReadable;
 
     private Path file;
 
@@ -76,7 +87,16 @@ public class TopicOperation {
 
         this.partitions = partitions;
         this.replicationFactor = replicationFactor;
-        this.config = Objects.requireNonNullElse(config, new HashMap<>());
+
+        this.config = Objects.requireNonNullElse(config,
+            new HashMap<String, Object>());
+
+        this.configReadable = this.config.entrySet().stream()
+            .peek(kv -> log.debug("To machine readable: {}={}", kv.getKey(), kv.getValue()))
+            .map(kv -> new SimpleEntry<String, MachineReadableSupport>(
+                kv.getKey(),
+                MachineReadableSupport.of(kv.getValue())))
+            .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 
         this.file = Objects.requireNonNull(file);
     }
@@ -93,7 +113,16 @@ public class TopicOperation {
         result.setKattlo(VersionUtil.appVersion());
 
         var attributes = new HashMap<String, Object>();
-        attributes.put("config", Map.copyOf(getConfig()));
+
+        // set the human readable, if present
+        attributes.put("config",
+            getConfig().entrySet().stream()
+                .map(kv -> Map.entry(kv.getKey(),
+                    kv.getValue().getHumanReadable()
+                        .map(v -> (Object)v)
+                        .orElseGet(() -> kv.getValue().getMachineReadable())))
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue))
+        );
 
         if(Objects.nonNull(getPartitions())){
             attributes.put("partitions",
@@ -123,5 +152,9 @@ public class TopicOperation {
         }
 
         return result;
+    }
+
+    public Map<String, MachineReadableSupport> getConfig() {
+        return configReadable;
     }
 }

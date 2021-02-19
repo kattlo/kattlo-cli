@@ -83,10 +83,10 @@ public class TopicRuleEnforcement {
               operation.getConfig().entrySet().stream()
                 .filter(c -> rules.getConfig().containsKey(c.getKey()))
                 .filter(c -> !rules.getConfig().get(c.getKey())
-                    .execute(c.getValue()))
+                    .execute(c.getValue().getMachineReadable()))
                 .map(c -> String.format(CONFIG_MESSAGE, c.getKey(),
-                                    rules.getConfig().get(c.getKey()),
-                                    NumberUtil.formatted(c.getValue())))
+                            rules.getConfig().get(c.getKey()),
+                            NumberUtil.formatted(c.getValue())))
                 .collect(Collectors.toList())
             );
 

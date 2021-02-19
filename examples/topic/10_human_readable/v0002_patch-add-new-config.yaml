@@ -1,0 +1,8 @@
+operation: patch
+notes: Add new configurtions
+topic: 10_human_readable
+config:
+  delete.retention.ms: 0
+  max.message.bytes: 950KiB
+  retention.ms: 2days
+  message.timestamp.type: LogAppendTime

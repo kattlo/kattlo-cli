@@ -2,6 +2,7 @@ package com.github.kattlo.topic;
 
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
@@ -99,7 +100,13 @@ public class TopicImportCommand implements Runnable {
         model.setTopic(operation.getTopic());
         model.setPartitions(operation.getPartitions());
         model.setReplicationFactor(operation.getReplicationFactor());
-        model.setConfig(Map.copyOf(operation.getConfig()));
+
+        // set the machine readable values
+        model.setConfig(
+            operation.getConfig().entrySet().stream()
+                .map(kv -> Map.entry(kv.getKey(), kv.getValue().getMachineReadable()))
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue))
+        );
 
         return model;
 

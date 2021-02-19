@@ -166,4 +166,24 @@ public class TopicRuleEnforcementTest {
 
         assertThat(actual.getMessage(), Matchers.containsString("instance of java.util.List"));
     }
+
+    @Test
+    public void should_throw_with_details_when_fail_the_check_of_human_readable_config() {
+
+        var configuration = new File("./src/test/resources/topics/rules/.kattlo_human_readable.yaml");
+        var migrationFile = Path.of("./src/test/resources/topics/rules/migration/v0000_human_readable_config.yaml");
+        var enforcement = new TopicRuleEnforcement(configuration);
+
+        var migration = mapper.map(Loader.load(migrationFile), migrationFile);
+
+        var actual =
+            assertThrows(TopicRuleException.class, () ->
+                enforcement.check(migration));
+
+        assertFalse(actual.getDetails().isEmpty());
+        assertThat(actual.getDetails(), Matchers.hasItem("compression.type: expected 'in [lz4, snappy]', but was 'gzip'"));
+        assertThat(actual.getDetails(), Matchers.hasItem("retention.ms: expected '<=14days', but was '30days'"));
+        assertThat(actual.getDetails(), Matchers.hasItem("min.cleanable.dirty.ratio: expected '>=1%', but was '0.0001%'"));
+
+    }
 }
