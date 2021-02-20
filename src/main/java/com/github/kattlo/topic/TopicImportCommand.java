@@ -10,6 +10,7 @@ import javax.inject.Inject;
 
 import com.github.kattlo.core.backend.Backend;
 import com.github.kattlo.core.backend.OperationType;
+import com.github.kattlo.core.backend.ResourceType;
 import com.github.kattlo.core.kafka.Kafka;
 import com.github.kattlo.core.report.PrintStreamReporter;
 import com.github.kattlo.core.report.Reporter;
@@ -138,6 +139,14 @@ public class TopicImportCommand implements Runnable {
               TopicUtils.describe(topicName, admin)
                   .orElseThrow(() -> new CommandLine.ParameterException(
                         spec.commandLine(), "Topic not found"));
+
+            // is it already managed by Kattlo?
+            backend.current(ResourceType.TOPIC, topicName)
+                .ifPresent(r -> {
+                    log.error("can not import a topic that's already managed: {}", topicName);
+                    throw new CommandLine.ExecutionException(spec.commandLine(),
+                        "Topic already managed");
+                });
 
             var configs =
                 TopicUtils.configsOf(topicName, admin)
