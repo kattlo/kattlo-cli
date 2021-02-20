@@ -20,6 +20,7 @@ import java.util.Properties;
 import com.github.kattlo.EntryCommand;
 import com.github.kattlo.core.backend.Backend;
 import com.github.kattlo.core.backend.Migration;
+import com.github.kattlo.core.backend.Resource;
 import com.github.kattlo.core.backend.ResourceType;
 import com.github.kattlo.core.kafka.Kafka;
 
@@ -328,4 +329,61 @@ public class TopicImportCommandTest {
         }
     }
 
+    @Test
+    public void should_fail_when_topic_is_already_managed() {
+
+        // setup
+        final String topic = "topic-name-2";
+        command.setTopicName(topic);
+
+        final File directory = new File("./build/tmp/topic-name-2");
+        directory.mkdirs();
+        when(parent.getDirectory())
+            .thenReturn(directory);
+
+        mockitoWhen();
+
+        var nodes = List.of(
+            new Node(1, "localhost", 19092),
+            new Node(2, "localhost", 29092),
+            new Node(3, "localhost", 39092)
+        );
+        var leader = nodes.iterator().next();
+        var replicas = nodes.subList(0, 2);
+        var isr = replicas;
+
+        var partitions = List.of(
+            new TopicPartitionInfo(0, leader, replicas, isr),
+            new TopicPartitionInfo(1, leader, replicas, isr)
+        );
+        var description = new TopicDescription(topic, false, partitions);
+
+        var configs = List.of(
+            new ConfigEntry("compression.type", "lz4"),
+            new ConfigEntry("retention.ms", "-1")
+        );
+        var config = new Config(configs);
+
+        var resource = new Resource();
+
+        try(var mocked = mockStatic(TopicUtils.class)){
+            mocked.when(() -> TopicUtils.describe(anyString(), any()))
+                .thenReturn(Optional.of(description));
+
+            mocked.when(() -> TopicUtils.configsOf(anyString(), any()))
+                .thenReturn(Optional.of(config));
+
+            when(backend.current(any(), anyString()))
+                .thenReturn(Optional.of(resource));
+
+            when(spec.commandLine())
+                .thenReturn(new CommandLine(command));
+
+            // act
+            assertThrows(CommandLine.ExecutionException.class, () ->
+                command.run());
+
+        }
+
+    }
 }
