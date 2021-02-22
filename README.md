@@ -67,8 +67,8 @@ sudo mv kattlo /usr/local/bin/kattlo
   - [x] import existing topics
   - [x] show info and history
   - [x] generate migration example
-  - [ ] rules enforcement
-  - [ ] human readable values for configurations
+  - [x] rules enforcement
+  - [x] human readable values for configurations
 - [ ] ACL migrations
 - [ ] Schema migrations
 - [ ] Quota migrations
