@@ -97,7 +97,7 @@ rules:
 In the `--kafka-config-file` you may put the properties described at
 [official documentation](https://kafka.apache.org/documentation/#adminclientconfigs).
 
-__Example__: `kafka.properties`
+Example of `kafka.properties`:
 
 ```properties
 bootstrap.servers=localhost:19092,localhost:29092
