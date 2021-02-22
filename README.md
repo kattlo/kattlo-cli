@@ -2,6 +2,10 @@
 
 # Apache Kafka® Configuration Made Easy
 
+:tada: Checkout the brand new Kattlo Documentation site :tada:
+
+- [https://kattlo.github.io](https://kattlo.github.io)
+
 Use an approach like Database Migrations to manage your evolutionary
 configurations for:
 
@@ -19,10 +23,10 @@ configurations for:
 ## Kattlo is good for ...
 
 - enterprises that needs a stable way to change Apache Kafka® configurations
-- maintain the configuration and avoid drifts
-- helps to known when a topic was removed (when its managed by Kattlo)
-- access the history of migrations
-- your DevOps toolset to properly manages the topic within clusters
+- maintaining the configuration and avoid drifts
+- knowing when a topic was removed (when its managed by Kattlo)
+- accessing the history of migrations
+- your DevOps toolset to properly manages the topic within the clusters
 
 ## Install
 
