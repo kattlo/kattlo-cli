@@ -113,69 +113,6 @@ kattlo --config-file='.kattlo.yaml' \
        [command arguments]
 ```
 
-## Examples
-
-Set the directory with migrations using the `--directory` option:
-```bash
-kattlo \
-  --config-file='examples/.kattlo.yaml' \
-  --kafka-config-file='examples/kafka.properties' \
-  topic \
-  --directory='examples/topics/01_create_with_config'
-```
-
-Directory with migrations will be default to current, when `--directory` is
-suppressed:
-```bash
-kattlo \
-  --config-file='examples/.kattlo.yaml' \
-  --kafka-config-file='examples/kafka.properties' \
-  topic
-```
-
-The current directory contains `kafka.properties` and `.kattlo.yaml`:
-```bash
-kattlo \
-  topic \
-  --directory='examples/topics/01_create_with_config'
-```
-
-Want to use the `kafka.properties`, but in another cluster:
-```bash
-kattlo \
-  --config-file='examples/.kattlo.yaml' \
-  --kafka-config-file='examples/kafka.properties' \
-  --bootstrap-servers='my.kafka:9092' \
-  topic \
-  --directory='examples/topics/01_create_with_config'
-```
-
-The option `--bootstrap-servers` overrides the config [`bootstrap.servers`](https://kafka.apache.org/documentation/#adminclientconfigs_bootstrap.servers).
-
-Showing topic current state:
-
-> Include the option `--format=JSON` to printout json instead plain text
-
-```bash
-kattlo \
-  --config-file='examples/.kattlo.yaml' \
-  --kafka-config-file='examples/kafka.properties' \
-  info --resource=TOPIC \
-  '<topic-name>'
-```
-
-Showing topic history:
-
-> Include the option `--format=JSON` to printout json instead plain text
-
-```bash
-kattlo \
-  --config-file='examples/.kattlo.yaml' \
-  --kafka-config-file='examples/kafka.properties' \
-  info --resource=TOPIC --history \
-  '<topic-name>'
-```
-
 ### Init
 
 To init new Kattlo project you just run the following command:
