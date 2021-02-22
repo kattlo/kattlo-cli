@@ -68,8 +68,11 @@ sudo mv kattlo /usr/local/bin/kattlo
   - [x] show info and history
   - [x] generate migration example
   - [ ] rules enforcement
-- [ ] Schema migrations
+  - [ ] human readable values for configurations
 - [ ] ACL migrations
+- [ ] Schema migrations
+- [ ] Quota migrations
+- [ ] User migrations
 - [ ] Connect migrations
 - [ ] ksqlDB migrations
 - [ ] Cluster migrations
