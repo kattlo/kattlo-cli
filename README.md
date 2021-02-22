@@ -117,25 +117,6 @@ kattlo --config-file='.kattlo.yaml' \
        [command arguments]
 ```
 
-### Init
-
-To init new Kattlo project you just run the following command:
-
-```bash
-kattlo init --directory='/path/to/initialize'
-```
-
-Use the `--bootstrap-servers` to generate the Kattlo config
-with right Kafka addresses:
-
-```bash
-kattlo --bootstrap-servers='my-kafka-b1:9092,my-kafka-b2:9092' \
-  init --directory='/path/to/initialize'
-```
-
-> If you suppress the `--directory` option, the current folder will be
-initialized.
-
 ### Gen
 
 To make easy the process to write down the migrations, you may use
