@@ -203,27 +203,6 @@ kattlo gen migration --resource=TOPIC --diretory='/path/to/gen/migration'
 > If you suppress the `--directory` option, the migration example will
 be gerenated in the current directory.
 
-### Import
-
-To import existing topics to Kattlo.
-
-```bash
-kattlo \
-  --config-file='examples/.kattlo.yaml' \
-  --kafka-config-file='examples/kafka.properties' \
-  --bootstrap-servers='my.kafka:9092' \
-  topic \
-  --directory='/path/to/migrations/for/my/existing/topic' \
-  import \
-  --topic='my-existing-topic'
-```
-
-The operation above will import the existing topic, create the very first
-migration with create operation and the necessary stuff to enable that
-topic as a managed resource.
-
-- file automatically create within `--directory`: `v0001_create-topic.yaml`
-
 ## Best Practices
 
 - Always create a new migration file and never change an applied one
