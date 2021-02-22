@@ -117,6 +117,18 @@ kattlo --config-file='.kattlo.yaml' \
        [command arguments]
 ```
 
+You can call for help for any command:
+
+```bash
+kattlo -h
+
+# topic
+kattlo topic -h
+
+# init
+kattlo init -h
+```
+
 ### Gen
 
 To make easy the process to write down the migrations, you may use
