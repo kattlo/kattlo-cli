@@ -11,7 +11,8 @@ configurations for:
 - ksqlDB
 - Connect
 - Cluster
-- and more soon . . .
+- Quotas
+- Users
 
 :bulb: Check the [examples directory](./examples) :bulb:
 
