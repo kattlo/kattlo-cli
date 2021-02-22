@@ -88,10 +88,14 @@ In the `.kattlo.yaml` configuration file you may define the following
 properties:
 
 ```yaml
-# to future uses, then, will be an empty file
+rules:
+  topic:
+    namePattern: 'your pattern'
+    # more rules constraints...
 ```
 
-In the Kafka Admin client file you may put the properties described at [official documentation](https://kafka.apache.org/documentation/#adminclientconfigs).
+In the `--kafka-config-file` you may put the properties described at
+[official documentation](https://kafka.apache.org/documentation/#adminclientconfigs).
 
 __Example__: `kafka.properties`
 
