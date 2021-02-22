@@ -30,6 +30,8 @@ configurations for:
 
 ## Install
 
+- [See installation instructions for MacOS and Windows](https://kattlo.github.io/docs/installation/)
+
 ### Linux Binary
 
 ```bash
@@ -44,25 +46,6 @@ sudo mv kattlo /usr/local/sbin/kattlo
 
 The are `.deb` and `.rpm` packages available. Do a check in
 [the latest release](https://github.com/kattlo/kattlo-cli/releases/latest).
-
-### MacOS
-
-```bash
-curl 'https://github.com/kattlo/kattlo-cli/releases/download/v0.1.1/kattlo-v0.1.1-mac' \
-  -o 'kattlo'
-
-sudo chmod +x kattlo
-sudo mv kattlo /usr/local/bin/kattlo
-```
-
-### Windows
-
-- download the [latest release](https://github.com/kattlo/kattlo-cli/releases/latest) package for windows
-- unzip it
-- copy `VCRUNTIME140.dll` to `C:\Windows\System32\`
-- get the absolute path to that unzipped directory
-- add the absolute path of Kattlo to your `PATH` environment variable
-- open the prompt and type: `kattlo -V`
 
 ## Released Features
 
