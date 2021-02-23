@@ -28,6 +28,14 @@ configurations for:
 - accessing the history of migrations
 - your DevOps toolset to properly manages the topic within the clusters
 
+## Made With
+
+- [Java 11](https://adoptopenjdk.net/)
+- [Picocli](https://picocli.info/)
+- [Quarkus](https://quarkus.io/)
+- [GraalVM](https://www.graalvm.org/)
+- [and a lot of coffee ☕](https://www.buymeacoffee.com/fabiojose)
+
 ## Install
 
 - [See installation instructions for MacOS and Windows](https://kattlo.github.io/docs/installation/)
