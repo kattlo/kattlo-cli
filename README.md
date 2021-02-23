@@ -122,7 +122,9 @@ To make easy the process to write down the migrations, you may use
 then gen command to genereate migration files:
 
 ```bash
-kattlo gen migration --resource=TOPIC --diretory='/path/to/gen/migration'
+kattlo gen migration \
+  --resource=TOPIC \
+  --diretory='/path/to/gen/migration'
 ```
 
 > If you suppress the `--directory` option, the migration example will
