@@ -128,33 +128,6 @@ kattlo gen migration --resource=TOPIC --diretory='/path/to/gen/migration'
 > If you suppress the `--directory` option, the migration example will
 be gerenated in the current directory.
 
-## Best Practices
-
-- Always create a new migration file and never change an applied one
-- Create a directory for each resource that you want to manage
-  - Kattlo is able to process many distinct resources migrations within same directory,
-  but you get better organization following that practice
-
-### File Naming
-
-All migrations are defined using physical files, and they must follow
-this naming pattern:
-
-- `v[0-9]{4}_[\\w\\-]{0,246}\\.ya?ml`
-
-Simplifing:
-
-- `v0000_the-name-of-my-migration.yaml`
-- where `v0000` will be the version of resource migration, from `1` to `n`
-- when a new migration is created, increase the version
-
-### File Content
-
-Every migration file must have exatcly one resource migration.
-
-Never mix `create`, `patch` or `remove` in the same file or same operations
-for distinct resources.
-
 ## Migrations
 
 Kattlo provide a way to declare what we want using yaml notation. Based
