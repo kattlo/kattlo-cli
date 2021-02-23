@@ -28,7 +28,7 @@ configurations for:
 - accessing the history of migrations
 - your DevOps toolset to properly manages the topic within the clusters
 
-## Made With
+## :construction_worker: Made With
 
 - [Java 11](https://adoptopenjdk.net/)
 - [Picocli](https://picocli.info/)
@@ -62,8 +62,8 @@ The are `.deb` and `.rpm` packages available. Do a check in
   - [x] import existing topics
   - [x] show info and history
   - [x] generate migration example
-  - [x] rules enforcement
-  - [x] human readable values for configurations
+  - [x] rules enforcement :sparkles:
+  - [x] human readable values for configurations :sparkles:
 - [ ] ACL migrations
 - [ ] Schema migrations
 - [ ] Quota migrations
