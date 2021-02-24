@@ -38,7 +38,7 @@ import picocli.CommandLine.Model.CommandSpec;
 @Slf4j
 public class EntryCommand {
 
-    private static final String DEFAULT_CONFIG_FILE = ".kattlo.yml";
+    private static final String DEFAULT_CONFIG_FILE = ".kattlo.yaml";
 
     private File configuration;
 
