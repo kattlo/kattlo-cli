@@ -20,6 +20,10 @@ configurations for:
 
 :bulb: Check the [examples directory](./examples) :bulb:
 
+## See Kattlo in action
+
+![Getting started screencast](./artwork/screencast/getting-started.gif)
+
 ## Kattlo is good for ...
 
 - enterprises that needs a stable way to change Apache Kafka® configurations
