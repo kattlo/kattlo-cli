@@ -2,6 +2,8 @@ package com.github.kattlo.topic.yaml;
 
 import java.nio.file.Path;
 
+import com.github.kattlo.core.yaml.MigrationLoader;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -20,9 +22,9 @@ public interface TopicOperationMapper {
 
     @Named("versionOf")
     default String versionOf(Path file) {
-        Loader.matches(file);
+        MigrationLoader.matches(file);
 
-        return Loader
+        return MigrationLoader
             .versionOf(file)
             .orElse(NO_VERSION);
     }

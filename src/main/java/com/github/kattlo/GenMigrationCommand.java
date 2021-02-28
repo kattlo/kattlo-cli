@@ -13,7 +13,7 @@ import com.github.kattlo.core.backend.ResourceType;
 import com.github.kattlo.core.exception.WriteException;
 import com.github.kattlo.core.report.PrintStreamReporter;
 import com.github.kattlo.core.report.Reporter;
-import com.github.kattlo.topic.yaml.Loader;
+import com.github.kattlo.core.yaml.MigrationLoader;
 
 import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
@@ -96,13 +96,13 @@ public class GenMigrationCommand implements Runnable {
 
     String nextVersion() throws IOException {
 
-        return Loader.list(directory)
+        return MigrationLoader.list(directory)
             .sorted((m1, m2) -> m2.compareTo(m1))
             .findFirst()
-            .map(Loader::versionOf)
+            .map(MigrationLoader::versionOf)
             .filter(Optional::isPresent)
             .map(Optional::get)
-            .map(Loader::versionNumberOf)
+            .map(MigrationLoader::versionNumberOf)
             .filter(Optional::isPresent)
             .map(Optional::get)
             .map(Integer::parseInt)
