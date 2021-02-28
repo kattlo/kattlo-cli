@@ -16,6 +16,7 @@ import com.github.kattlo.core.backend.ResourceType;
 import com.github.kattlo.core.kafka.Kafka;
 import com.github.kattlo.core.report.PrintStreamReporter;
 import com.github.kattlo.core.report.Reporter;
+import com.github.kattlo.core.yaml.MigrationLoader;
 import com.github.kattlo.topic.migration.Strategy;
 import com.github.kattlo.topic.yaml.Loader;
 import com.github.kattlo.topic.yaml.TopicOperation;
@@ -119,7 +120,7 @@ public class TopicCommand implements Runnable {
         try(final var admin = kafka.adminFor(parent.getKafkaConfiguration())) {
 
             final var migrationFiles =
-                Loader.list(directory)
+                MigrationLoader.list(directory)
                     .collect(Collectors.toList());
 
             backend.init(parent.getKafkaConfiguration());

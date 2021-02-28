@@ -19,38 +19,6 @@ import org.yaml.snakeyaml.error.YAMLException;
 
 public class LoaderTest {
 
-    @Test
-    public void should_result_false_when_file_name_does_not_match() {
-
-        final String fileName = "v001_my-migration.yaml";
-
-        assertFalse(Loader.FILE_NAME_PATTERN.matcher(fileName).matches());
-    }
-
-    @Test
-    public void should_result_true_when_file_name_matches() {
-
-        final String fileName = "v0001_my-awnsome-apache-kafka-topic-migration.yaml";
-
-        assertTrue(Loader.FILE_NAME_PATTERN.matcher(fileName).matches());
-    }
-
-
-    @Test
-    public void should_result_true_when_extension_is_yml() {
-
-        final String fileName = "v0001_my-awnsome-apache-kafka-topic-migration.yml";
-
-        assertTrue(Loader.FILE_NAME_PATTERN.matcher(fileName).matches());
-    }
-
-    @Test
-    public void should_result_true_when_file_has_maximum_chars() {
-
-        final String fileName = "v0001_my-really-big-long-large-exaustive-apache-kafka-topic-migration-using-kottla-qqqqqqwwwwwweeeeeeeerrrrrrrrrrttttttttttttttttttttyyyyyyyyyyyyyyy-aaaaaaaaaaaaaaaaaaaaapppppppppppppppppppppaaaaaaaaaaaaaaaaaaaacccccccccccccccccccccccchhhhhhhhhhh0000.yaml";
-
-        assertTrue(Loader.FILE_NAME_PATTERN.matcher(fileName).matches());
-    }
 
     @Test
     public void should_throw_when_migration_file_not_found() {
@@ -146,19 +114,6 @@ public class LoaderTest {
     }
 
     @Test
-    public void should_list_all_yaml_directory() throws Exception {
-
-        final Path directory = Path.of("./src/test/resources/topics/many_migrations_0/");
-
-        var actual =
-            Loader.list(directory)
-                .count();
-
-        assertEquals(5, actual);
-
-    }
-
-    @Test
     public void should_result_empty_when_thereis_no_next_version() throws Exception {
 
         final Path directory = Path.of("./src/test/resources/topics/many_migrations_0/");
@@ -231,26 +186,6 @@ public class LoaderTest {
 
         assertFalse(actual.isEmpty());
         assertEquals(expected, actual.get().getVersion());
-    }
-
-    @Test
-    public void should_result_true_when_file_version_is_greater() {
-
-        final Path file = Path.of("v0003_my-migration.yml");
-
-        boolean actual = Loader.greater(file, "v0002");
-
-        assertTrue(actual);
-    }
-
-    @Test
-    public void should_result_false_when_file_version_is_not_greater() {
-
-        final Path file = Path.of("v0002_my-migration.yml");
-
-        boolean actual = Loader.greater(file, "v0002");
-
-        assertFalse(actual);
     }
 
     @Test
