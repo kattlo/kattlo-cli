@@ -18,7 +18,6 @@ import org.json.JSONTokener;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import lombok.experimental.UtilityClass;
 
 /**
  * @author fabiojose
