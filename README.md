@@ -193,7 +193,7 @@ This topic has the following configurations:
 ```bash
 ./gradlew clean build -Dquarkus.package.type=native \
  -Dquarkus.native.container-build=true \
- -Dquarkus.native.additional-build-args=--report-unsupported-elements-at-runtime,--allow-incomplete-classpath,-H:IncludeResources='.*yaml$',-H:Log=registerResource:
+ -Dquarkus.native.additional-build-args=--report-unsupported-elements-at-runtime,--allow-incomplete-classpath,-H:IncludeResources='.*yaml$',-H:IncludeResources='.*json$',-H:Log=registerResource:
 ```
 
 You can then execute your native executable with: `./build/kattlo-1.0-SNAPSHOT-runner`

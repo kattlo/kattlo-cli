@@ -1,0 +1,22 @@
+remove:
+  notes: |
+    Remove accesses by declaration. The adhoc approach to remove
+    what was allowed and/or denied.
+
+  declaration:
+    to:
+      principal: 'User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown'
+
+    allow:
+      permission:
+        - Read
+      origin:
+        - 192.168.0.1
+
+    deny:
+      permission:
+        - Write
+      origin:
+        - 192.168.0.20
+
+    inthe: {}

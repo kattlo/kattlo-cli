@@ -1,0 +1,23 @@
+patch:
+  notes: |
+    Notes about this ACL patch
+  to:
+    principal: 'User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown'
+  inthe:
+    topic:
+      name: my-topic-name
+      allow:
+        - Read
+        - Write
+        - Describe
+    group:
+      id: my-group.id
+      allow:
+        - Read
+    cluster:
+      deny:
+        - All
+    transactional:
+      id: my-transactional.id
+      deny:
+        - All

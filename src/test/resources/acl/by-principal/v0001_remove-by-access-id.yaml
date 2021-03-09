@@ -1,0 +1,6 @@
+remove:
+  notes: |
+    Remove an access using the id generated to create and patches, deleting
+    exactly what was allowed and/or denied
+
+  accessId: 96ed5bfc-0ee6-45ca-a50c-3baa7214de57

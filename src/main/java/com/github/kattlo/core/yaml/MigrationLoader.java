@@ -4,17 +4,27 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import com.google.gson.GsonBuilder;
+
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import lombok.experimental.UtilityClass;
 
 /**
  * @author fabiojose
  */
 @UtilityClass
+@Slf4j
 public class MigrationLoader {
 
     public static final Pattern VERSION_PATTERN =
@@ -79,5 +89,21 @@ public class MigrationLoader {
 
     public static Stream<Path> list(final File directory) throws IOException {
         return list(Path.of(directory.getAbsolutePath()));
+    }
+
+    public static String toStringifiedJSON(Map<String, Object> yaml) {
+        log.debug("Map to write as JSON: {}", yaml);
+
+        var serializer = new GsonBuilder().create();
+        var result = serializer.toJson(yaml);
+        log.debug("Map as JSON {}", result);
+
+        return result;
+    }
+
+    public static JSONObject parseJson(String json) {
+
+        return new JSONObject(new JSONTokener(json));
+
     }
 }

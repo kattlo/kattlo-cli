@@ -1,0 +1,424 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/kattlo/kattlo-cli",
+  "title": "ACLByPrincipal",
+  "description": "Apache Kafka® ACL declared by Principal",
+  "type": "object",
+  "definitions": {
+    "operation": {
+      "title": "Operation",
+      "description": "The operation over resources",
+      "type": "string",
+      "minLength": 1
+    },
+    "access": {
+      "title": "Access",
+      "description": "The list of operations",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/operation"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "ip": {
+      "title": "IP",
+      "description": "Array of IP addresses",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "origin": {
+      "title": "Origin",
+      "description": "Origin addresses to allow or deny network connections",
+      "type": "object",
+      "properties": {
+        "allow": {
+          "$ref": "#/definitions/ip"
+        },
+        "deny": {
+          "$ref": "#/definitions/ip"
+        }
+      },
+      "anyOf": [
+        {
+          "required": ["allow"]
+        },
+        {
+          "required": ["deny"]
+        }
+      ],
+      "additionalProperties": false
+    },
+    "notes": {
+      "title": "Notes",
+      "description": "Notes about the operation",
+      "type": "string",
+      "minLength": 1
+    },
+    "to": {
+      "title": "To",
+      "description": "Principal to apply the access",
+      "type": "object",
+      "properties": {
+        "principal": {
+          "description": "The name of user principal",
+          "type": "string"
+        }
+      },
+      "required": ["principal"],
+      "additionalProperties": false
+    },
+    "inthe": {
+      "title": "Inthe",
+      "description": "The resources to allow or deny actions over it",
+      "type": "object",
+      "properties": {
+        "topic": {
+          "title": "TopicName",
+          "type": "object",
+          "properties": {
+            "name": {
+              "title": "Name",
+              "description": "The name of topic",
+              "type": "string"
+            },
+            "allow": {
+              "$ref": "#/definitions/access"
+            },
+            "deny": {
+              "$ref": "#/definitions/access"
+            }
+          },
+          "required": ["name"],
+          "anyOf": [
+            {
+              "required": ["allow"]
+            },
+            {
+              "required": ["deny"]
+            }
+          ],
+          "additionalProperties": false
+        },
+        "group": {
+          "title": "GroupId",
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "The value of group.id, application.id, connect work group",
+              "type": "string"
+            },
+            "allow": {
+              "$ref": "#/definitions/access"
+            },
+            "deny": {
+              "$ref": "#/definitions/access"
+            }
+          },
+          "required": ["id"],
+          "anyOf": [
+            {
+              "required": ["allow"]
+            },
+            {
+              "required": ["deny"]
+            }
+          ],
+          "additionalProperties": false
+        },
+        "cluster": {
+          "title": "Cluster",
+          "description": "Allow or deny cluster operations",
+          "type": "object",
+          "properties": {
+            "allow": {
+              "$ref": "#/definitions/access"
+            },
+            "deny": {
+              "$ref": "#/definitions/access"
+            }
+          },
+          "anyOf": [
+            {
+              "required": ["allow"]
+            },
+            {
+              "required": ["deny"]
+            }
+          ],
+          "additionalProperties": false
+        },
+        "transactional": {
+          "title": "TransactionId",
+          "description": "Allow or deny producers to start transactional context",
+          "type": "object",
+          "properties": {
+            "id": {
+              "description": "The value of transactional.id",
+              "type": "string"
+            },
+            "allow": {
+              "$ref": "#/definitions/access"
+            },
+            "deny": {
+              "$ref": "#/definitions/access"
+            }
+          },
+          "required": ["id"],
+          "anyOf": [
+            {
+              "required": ["allow"]
+            },
+            {
+              "required": ["deny"]
+            }
+          ],
+          "additionalProperties": false
+        }
+      },
+      "anyOf": [
+        {
+          "required": ["topic"]
+        },
+        {
+          "required": ["group"]
+        },
+        {
+          "required": ["cluster"]
+        },
+        {
+          "required": ["transactional"]
+        }
+      ]
+    },
+
+    "create": {
+      "title": "Create",
+      "description": "To create ACL",
+      "type": "object",
+      "properties": {
+        "notes": {
+          "$ref": "#/definitions/notes"
+        },
+        "to": {
+          "$ref": "#/definitions/to"
+        },
+        "origin": {
+          "$ref": "#/definitions/origin"
+        },
+        "inthe": {
+          "$ref": "#/definitions/inthe"
+        }
+      },
+      "required": ["to", "inthe"],
+      "additionalProperties": false
+    },
+
+    "patch": {
+      "title": "Patch",
+      "description": "To change ACL",
+      "type": "object",
+      "properties": {
+        "notes": {
+          "$ref": "#/definitions/notes"
+        },
+        "to": {
+          "$ref": "#/definitions/to"
+        },
+        "origin": {
+          "$ref": "#/definitions/origin"
+        },
+        "inthe": {
+          "$ref": "#/definitions/inthe"
+        }
+      },
+      "required": ["to"],
+      "anyOf": [
+        {
+          "required": ["from"]
+        },
+        {
+          "required": ["inthe"]
+        }
+      ],
+      "additionalProperties": false
+    },
+
+    "accessId":{
+      "title": "AccessId",
+      "description": "To remove ACL by identity of create or patch",
+      "type":"string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+
+    "remove":{
+      "title": "Remove",
+      "type":"object",
+      "properties": {
+        "notes": {
+          "$ref": "#/definitions/notes"
+        },
+        "accessId":{
+          "$ref": "#/definitions/accessId"
+        },
+
+        "declaration": {
+          "title": "Declaration",
+          "description": "Adhoc ACL removal",
+          "type": "object",
+          "properties": {
+            "to": {
+              "$ref": "#/definitions/to"
+            },
+            "allow": {
+              "type": "object",
+              "properties": {
+                "permission": {
+                  "$ref": "#/definitions/access"
+                },
+                "origin": {
+                  "$ref": "#/definitions/ip"
+                }
+              },
+              "anyOf": [
+                {
+                  "required": ["permission"]
+                },
+                {
+                  "required": ["origin"]
+                }
+              ],
+              "additionalProperties": false
+            },
+            "deny": {
+              "type": "object",
+              "properties": {
+                "permission": {
+                  "$ref": "#/definitions/access"
+                },
+                "origin": {
+                  "$ref": "#/definitions/ip"
+                }
+              },
+              "anyOf": [
+                {
+                  "required": ["permission"]
+                },
+                {
+                  "required": ["origin"]
+                }
+              ],
+              "additionalProperties": false
+            },
+            "inthe":{
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "description": "List of topics",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
+                },
+                "group": {
+                  "description": "List of group.id, application.id or connect work group",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
+                },
+                "cluster":{
+                  "description": "The cluster it self",
+                  "type":["object", "null"],
+                  "additionalProperties": false
+                },
+                "transactional": {
+                  "description": "List of transactional.id",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
+                }
+              },
+              "anyOf": [
+                {
+                  "required": ["topic"]
+                },
+                {
+                  "required": ["group"]
+                },
+                {
+                  "required": ["cluster"]
+                },
+                {
+                  "required": ["transactional"]
+                }
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "to",
+            "inthe"
+          ],
+          "anyOf": [
+            {
+              "required": ["allow"]
+            },
+            {
+              "required": ["deny"]
+            }
+          ],
+          "additionalProperties": false
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "accessId"
+          ]
+        },
+        {
+          "required": [
+            "declaration"
+          ]
+        }
+      ],
+      "additionalProperties": false
+    }
+  },
+
+  "properties": {
+    "create": {
+      "$ref": "#/definitions/create"
+    },
+    "patch": {
+      "$ref": "#/definitions/patch"
+    },
+    "remove": {
+      "$ref": "#/definitions/remove"
+    }
+  },
+  "anyOf": [
+    {
+      "required": ["create"]
+    },
+    {
+      "required": ["patch"]
+    },
+    {
+      "required": ["remove"]
+    }
+  ],
+  "additionalProperties": false
+}

@@ -5,8 +5,11 @@ plugins {
 }
 
 repositories {
-     mavenLocal()
-     mavenCentral()
+    mavenLocal()
+    mavenCentral()
+    maven {
+        url 'https://jitpack.io'
+    }
 }
 
 dependencies {
@@ -17,10 +20,13 @@ dependencies {
     implementation "io.quarkus:quarkus-kafka-client:${quarkusPlatformVersion}"
     implementation 'io.quarkus:quarkus-jsonb'
     implementation 'org.apache.commons:commons-lang3:3.11'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.github.everit-org.json-schema:org.everit.json.schema:1.12.2'
 
-    testImplementation "org.testcontainers:kafka:1.15.2"
+    testImplementation 'org.testcontainers:kafka:1.15.2'
     testImplementation 'io.quarkus:quarkus-junit5'
     testImplementation 'org.hamcrest:hamcrest-library:2.2'
+    testImplementation 'com.jayway.jsonpath:json-path-assert:2.5.0'
     testImplementation 'io.quarkus:quarkus-junit5-mockito'
     testImplementation 'org.mockito:mockito-inline:3.7.7'
     testImplementation 'org.mockito:mockito-junit-jupiter:3.7.7'
