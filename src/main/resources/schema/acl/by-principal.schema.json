@@ -11,8 +11,8 @@
       "type": "string",
       "minLength": 1
     },
-    "access": {
-      "title": "Access",
+    "operations": {
+      "title": "Operations",
       "description": "The list of operations",
       "type": "array",
       "items": {
@@ -26,31 +26,22 @@
       "description": "Array of IP addresses",
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "minLength": 1
       },
       "minItems": 1,
       "uniqueItems": true
     },
-    "origin": {
-      "title": "Origin",
+    "connection": {
+      "title": "Connection",
       "description": "Origin addresses to allow or deny network connections",
       "type": "object",
       "properties": {
-        "allow": {
-          "$ref": "#/definitions/ip"
-        },
-        "deny": {
+        "from": {
           "$ref": "#/definitions/ip"
         }
       },
-      "anyOf": [
-        {
-          "required": ["allow"]
-        },
-        {
-          "required": ["deny"]
-        }
-      ],
+      "required": ["from"],
       "additionalProperties": false
     },
     "notes": {
@@ -66,121 +57,179 @@
       "properties": {
         "principal": {
           "description": "The name of user principal",
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         }
       },
       "required": ["principal"],
       "additionalProperties": false
     },
-    "inthe": {
-      "title": "Inthe",
-      "description": "The resources to allow or deny actions over it",
+    "topic": {
+      "title": "Topic",
+      "type": "object",
+      "properties": {
+        "name": {
+          "title": "Name",
+          "description": "The topic name",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["name"],
+      "additionalProperties": true
+    },
+    "TopicAccess":{
+      "allOf": [
+        { "$ref": "#/definitions/topic" },
+        {
+          "properties": {
+            "operations": {
+              "$ref": "#/definitions/operations"
+            }
+          }
+        }
+      ]
+    },
+    "group": {
+      "title": "Group",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The value of group.id, application.id, connect work group",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["id"],
+      "additionalProperties": true
+    },
+    "GroupAccess": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/group"
+        },
+        {
+          "properties": {
+            "operations": {
+              "$ref": "#/definitions/operations"
+            }
+          }
+        }
+      ]
+    },
+    "cluster": {
+      "title": "Cluster",
+      "description": "Allow or deny cluster operations",
+      "type": "object",
+      "properties": {
+        "operations": {
+          "$ref": "#/definitions/operations"
+        }
+      },
+      "required": ["operations"],
+      "additionalProperties": false
+    },
+    "transactional": {
+      "title": "Transactional",
+      "description": "Allow or deny producers to start transactional context",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The value of transactional.id",
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": ["id"],
+      "additionalProperties": true
+    },
+    "TransactionalAccess": {
+      "allOf": [
+        {"$ref": "#/definitions/transactional"},
+        {
+          "properties": {
+            "operations": {
+              "$ref": "#/definitions/operations"
+            }
+          }
+        }
+      ]
+    },
+    "consumer": {
+      "title": "Consumer",
+      "description": "To define accesses for topic consuming and group association",
       "type": "object",
       "properties": {
         "topic": {
-          "title": "TopicName",
-          "type": "object",
-          "properties": {
-            "name": {
-              "title": "Name",
-              "description": "The name of topic",
-              "type": "string"
-            },
-            "allow": {
-              "$ref": "#/definitions/access"
-            },
-            "deny": {
-              "$ref": "#/definitions/access"
-            }
-          },
-          "required": ["name"],
-          "anyOf": [
-            {
-              "required": ["allow"]
-            },
-            {
-              "required": ["deny"]
-            }
-          ],
-          "additionalProperties": false
+          "$ref": "#/definitions/topic"
         },
         "group": {
-          "title": "GroupId",
-          "type": "object",
-          "properties": {
-            "id": {
-              "description": "The value of group.id, application.id, connect work group",
-              "type": "string"
-            },
-            "allow": {
-              "$ref": "#/definitions/access"
-            },
-            "deny": {
-              "$ref": "#/definitions/access"
-            }
-          },
-          "required": ["id"],
-          "anyOf": [
-            {
-              "required": ["allow"]
-            },
-            {
-              "required": ["deny"]
-            }
-          ],
-          "additionalProperties": false
+          "$ref": "#/definitions/group"
+        }
+      },
+      "required": ["topic", "group"],
+      "additionalProperties": false
+    },
+    "producer": {
+      "title": "Producer",
+      "description": "To define access for topic producing, idempotence and transacional",
+      "type": "object",
+      "properties": {
+        "topic": {
+          "$ref": "#/definitions/topic"
         },
-        "cluster": {
-          "title": "Cluster",
-          "description": "Allow or deny cluster operations",
-          "type": "object",
-          "properties": {
-            "allow": {
-              "$ref": "#/definitions/access"
-            },
-            "deny": {
-              "$ref": "#/definitions/access"
-            }
-          },
-          "anyOf": [
-            {
-              "required": ["allow"]
-            },
-            {
-              "required": ["deny"]
-            }
-          ],
-          "additionalProperties": false
+        "idempotent":{
+          "type": "boolean"
+        },
+        "transactional":{
+          "$ref": "#/definitions/transactional"
+        }
+      },
+      "required": ["topic"],
+      "oneOf": [
+        {
+          "required": ["idempotent"]
+        },
+        {
+          "required": ["transactional"]
+        }
+      ],
+      "additionalProperties": false
+    },
+    "allow": {
+      "title": "Allow",
+      "description": "Allow directive",
+      "type": "object",
+      "properties": {
+        "producer": {
+          "$ref": "#/definitions/producer"
+        },
+        "consumer":{
+          "$ref": "#/definitions/consumer"
+        },
+        "topic":{
+          "$ref": "#/definitions/TopicAccess"
+        },
+        "group":{
+          "$ref": "#/definitions/GroupAccess"
+        },
+        "cluster":{
+          "$ref": "#/definitions/cluster"
         },
         "transactional": {
-          "title": "TransactionId",
-          "description": "Allow or deny producers to start transactional context",
-          "type": "object",
-          "properties": {
-            "id": {
-              "description": "The value of transactional.id",
-              "type": "string"
-            },
-            "allow": {
-              "$ref": "#/definitions/access"
-            },
-            "deny": {
-              "$ref": "#/definitions/access"
-            }
-          },
-          "required": ["id"],
-          "anyOf": [
-            {
-              "required": ["allow"]
-            },
-            {
-              "required": ["deny"]
-            }
-          ],
-          "additionalProperties": false
+          "$ref": "#/definitions/TransactionalAccess"
+        },
+        "connection":{
+          "$ref": "#/definitions/connection"
         }
       },
       "anyOf": [
+        {
+          "required": ["producer"]
+        },
+        {
+          "required": ["consumer"]
+        },
         {
           "required": ["topic"]
         },
@@ -192,6 +241,60 @@
         },
         {
           "required": ["transactional"]
+        },
+        {
+          "required": ["connection"]
+        }
+      ]
+    },
+    "deny": {
+      "title": "Deny",
+      "description": "Deny directive",
+      "type": "object",
+      "properties": {
+        "producer": {
+          "$ref": "#/definitions/producer"
+        },
+        "consumer": {
+          "$ref": "#/definitions/consumer"
+        },
+        "topic":{
+          "$ref": "#/definitions/TopicAccess"
+        },
+        "group":{
+          "$ref": "#/definitions/GroupAccess"
+        },
+        "cluster":{
+          "$ref": "#/definitions/cluster"
+        },
+        "transactional": {
+          "$ref": "#/definitions/TransactionalAccess"
+        },
+        "connection":{
+          "$ref": "#/definitions/connection"
+        }
+      },
+      "anyOf": [
+        {
+          "required": ["producer"]
+        },
+        {
+          "required": ["consumer"]
+        },
+        {
+          "required": ["topic"]
+        },
+        {
+          "required": ["group"]
+        },
+        {
+          "required": ["cluster"]
+        },
+        {
+          "required": ["transactional"]
+        },
+        {
+          "required": ["connection"]
         }
       ]
     },
@@ -207,20 +310,28 @@
         "to": {
           "$ref": "#/definitions/to"
         },
-        "origin": {
-          "$ref": "#/definitions/origin"
+        "allow": {
+          "$ref": "#/definitions/allow"
         },
-        "inthe": {
-          "$ref": "#/definitions/inthe"
+        "deny": {
+          "$ref": "#/definitions/deny"
         }
       },
-      "required": ["to", "inthe"],
+      "required": ["to"],
+      "anyOf": [
+        {
+          "required": ["allow"]
+        },
+        {
+          "required": ["deny"]
+        }
+      ],
       "additionalProperties": false
     },
 
     "patch": {
       "title": "Patch",
-      "description": "To change ACL",
+      "description": "To change an ACL",
       "type": "object",
       "properties": {
         "notes": {
@@ -229,20 +340,20 @@
         "to": {
           "$ref": "#/definitions/to"
         },
-        "origin": {
-          "$ref": "#/definitions/origin"
+        "allow": {
+          "$ref": "#/definitions/allow"
         },
-        "inthe": {
-          "$ref": "#/definitions/inthe"
+        "deny": {
+          "$ref": "#/definitions/deny"
         }
       },
       "required": ["to"],
       "anyOf": [
         {
-          "required": ["from"]
+          "required": ["allow"]
         },
         {
-          "required": ["inthe"]
+          "required": ["deny"]
         }
       ],
       "additionalProperties": false
@@ -250,7 +361,7 @@
 
     "accessId":{
       "title": "AccessId",
-      "description": "To remove ACL by identity of create or patch",
+      "description": "To remove ACL by identity generated by create or patch",
       "type":"string",
       "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
     },
@@ -278,7 +389,7 @@
               "type": "object",
               "properties": {
                 "permission": {
-                  "$ref": "#/definitions/access"
+                  "$ref": "#/definitions/operations"
                 },
                 "origin": {
                   "$ref": "#/definitions/ip"
@@ -298,7 +409,7 @@
               "type": "object",
               "properties": {
                 "permission": {
-                  "$ref": "#/definitions/access"
+                  "$ref": "#/definitions/operations"
                 },
                 "origin": {
                   "$ref": "#/definitions/ip"
