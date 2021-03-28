@@ -10,17 +10,8 @@ create:
       operations:
         - Read
         - Write
-        - Describe
-    group:
-      id: my-group.id
-      operations:
-        - Read
 
-  deny:
-    cluster:
-      operations:
-        - All
-    transactional:
-      id: my-transactional.id
-      operations:
-        - All
+    connection:
+      from:
+        - 192.168.0.20
+        - 192.168.0.22

@@ -8,19 +8,16 @@ create:
     topic:
       name: my-topic-name
       operations:
-        - Read
         - Write
-        - Describe
-    group:
-      id: my-group.id
-      operations:
-        - Read
 
   deny:
-    cluster:
+    topic:
+      name: my-topic-name
       operations:
-        - All
-    transactional:
-      id: my-transactional.id
-      operations:
-        - All
+        - Read
+        - Describe
+
+    connection:
+      from:
+        - 172.16.0.3
+        - 192.168.0.22

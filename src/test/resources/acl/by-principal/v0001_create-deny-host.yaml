@@ -1,0 +1,9 @@
+create:
+  notes: |
+    Deny connections to Alice from host 172.16.0.100
+  to:
+    principal: 'User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown'
+
+  deny:
+    connection:
+      - 172.16.0.100

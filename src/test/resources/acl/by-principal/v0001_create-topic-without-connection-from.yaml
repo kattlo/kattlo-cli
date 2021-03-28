@@ -8,19 +8,12 @@ create:
     topic:
       name: my-topic-name
       operations:
-        - Read
         - Write
-        - Describe
-    group:
-      id: my-group.id
-      operations:
-        - Read
+        - Alter
 
   deny:
-    cluster:
+    topic:
+      name: my-topic-name
       operations:
-        - All
-    transactional:
-      id: my-transactional.id
-      operations:
-        - All
+        - Read
+        - Describe

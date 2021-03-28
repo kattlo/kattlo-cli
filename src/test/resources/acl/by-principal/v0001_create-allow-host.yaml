@@ -1,0 +1,12 @@
+create:
+  notes: |
+    Allow connections to Alice from host 172.16.0.102
+  to:
+    principal: 'User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown'
+
+  allow:
+    connection:
+      - 172.16.0.102
+
+      # to deny connection from any host, wich means, Alice can not connect at all
+      #- '*'
