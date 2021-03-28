@@ -75,15 +75,16 @@ public class LoaderTest {
 
         assertThat(actual, hasJsonPath("$.create.notes", equalTo("Notes about this ACL creation by Principal\n")));
         assertThat(actual, hasJsonPath("$.create.to.principal", equalTo("User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown")));
-        assertThat(actual, hasJsonPath("$.create.origin.allow[0]", equalTo("192.168.0.20")));
-        assertThat(actual, hasJsonPath("$.create.origin.deny[0]", equalTo("172.16.0.3")));
-        assertThat(actual, hasJsonPath("$.create.inthe.topic.name", equalTo("my-topic-name")));
+        assertThat(actual, hasJsonPath("$.create.allow.connection.from[0]", equalTo("172.16.0.100")));
+        assertThat(actual, hasJsonPath("$.create.allow.topic.name", equalTo("my-topic-name")));
+        assertThat(actual, hasJsonPath("$.create.allow.group.id", equalTo("my-group.id")));
+        assertThat(actual, hasJsonPath("$.create.allow.cluster"));
+        assertThat(actual, hasJsonPath("$.create.allow.transactional.id", equalTo("my-transactional.id")));
 
-        assertThat(actual, hasJsonPath("$.create.inthe.group.id", equalTo("my-group.id")));
-
-        assertThat(actual, hasJsonPath("$.create.inthe.cluster"));
-
-        assertThat(actual, hasJsonPath("$.create.inthe.transactional.id", equalTo("my-transactional.id")));
+        assertThat(actual, hasJsonPath("$.create.deny.connection.from[0]", equalTo("192.168.0.100")));
+        assertThat(actual, hasJsonPath("$.create.deny.topic.name", equalTo("another-topic-name")));
+        assertThat(actual, hasJsonPath("$.create.deny.group.id", equalTo("another-group.id")));
+        assertThat(actual, hasJsonPath("$.create.deny.transactional.id", equalTo("another-transactional.id")));
     }
 
     @Test
@@ -97,15 +98,14 @@ public class LoaderTest {
 
         assertThat(actual, hasJsonPath("$.patch.notes", equalTo("Notes about this ACL patch\n")));
         assertThat(actual, hasJsonPath("$.patch.to.principal", equalTo("User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown")));
-        assertThat(actual, hasJsonPath("$.patch.origin.allow[0]", equalTo("192.168.0.20")));
-        assertThat(actual, hasJsonPath("$.patch.origin.deny[0]", equalTo("172.16.0.3")));
-        assertThat(actual, hasJsonPath("$.patch.inthe.topic.name", equalTo("my-topic-name")));
 
-        assertThat(actual, hasJsonPath("$.patch.inthe.group.id", equalTo("my-group.id")));
+        assertThat(actual, hasJsonPath("$.patch.allow.connection.from[0]", equalTo("192.168.0.20")));
+        assertThat(actual, hasJsonPath("$.patch.allow.topic.name", equalTo("my-topic-name")));
+        assertThat(actual, hasJsonPath("$.patch.allow.group.id", equalTo("my-group.id")));
 
-        assertThat(actual, hasJsonPath("$.patch.inthe.cluster"));
-
-        assertThat(actual, hasJsonPath("$.patch.inthe.transactional.id", equalTo("my-transactional.id")));
+        assertThat(actual, hasJsonPath("$.patch.deny.connection.from[0]", equalTo("172.16.0.3")));
+        assertThat(actual, hasJsonPath("$.patch.deny.cluster"));
+        assertThat(actual, hasJsonPath("$.patch.deny.transactional.id", equalTo("my-transactional.id")));
     }
 
     @Test
@@ -157,19 +157,18 @@ public class LoaderTest {
         var actual = actualJson.getJSONObject("create");
 
         assertEquals("Notes about this ACL creation by Principal\n", actual.getString("notes"));
-
         assertEquals("User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown", actual.getJSONObject("to").getString("principal"));
 
-        assertEquals("192.168.0.20", actual.getJSONObject("origin").getJSONArray("allow").getString(0));
-        assertEquals("172.16.0.3", actual.getJSONObject("origin").getJSONArray("deny").getString(0));
+        assertEquals("172.16.0.100", actual.getJSONObject("allow").getJSONObject("connection").getJSONArray("from").getString(0));
+        assertEquals("my-topic-name", actual.getJSONObject("allow").getJSONObject("topic").getString("name"));
+        assertEquals("my-group.id", actual.getJSONObject("allow").getJSONObject("group").getString("id"));
+        assertNotNull(actual.getJSONObject("allow").getJSONObject("cluster"));
+        assertEquals("my-transactional.id", actual.getJSONObject("allow").getJSONObject("transactional").getString("id"));
 
-        assertEquals("my-topic-name", actual.getJSONObject("inthe").getJSONObject("topic").getString("name"));
-
-        assertEquals("my-group.id", actual.getJSONObject("inthe").getJSONObject("group").getString("id"));
-
-        assertNotNull(actual.getJSONObject("inthe").getJSONObject("cluster"));
-
-        assertEquals("my-transactional.id", actual.getJSONObject("inthe").getJSONObject("transactional").getString("id"));
+        assertEquals("192.168.0.100", actual.getJSONObject("deny").getJSONObject("connection").getJSONArray("from").getString(0));
+        assertEquals("another-topic-name", actual.getJSONObject("deny").getJSONObject("topic").getString("name"));
+        assertEquals("another-group.id", actual.getJSONObject("deny").getJSONObject("group").getString("id"));
+        assertEquals("another-transactional.id", actual.getJSONObject("deny").getJSONObject("transactional").getString("id"));
     }
 
     @Test
@@ -186,16 +185,14 @@ public class LoaderTest {
 
         assertEquals("User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown", actual.getJSONObject("to").getString("principal"));
 
-        assertEquals("192.168.0.20", actual.getJSONObject("origin").getJSONArray("allow").getString(0));
-        assertEquals("172.16.0.3", actual.getJSONObject("origin").getJSONArray("deny").getString(0));
+        assertEquals("192.168.0.20", actual.getJSONObject("allow").getJSONObject("connection").getJSONArray("from").getString(0));
+        assertEquals("my-topic-name", actual.getJSONObject("allow").getJSONObject("topic").getString("name"));
+        assertEquals("my-group.id", actual.getJSONObject("allow").getJSONObject("group").getString("id"));
 
-        assertEquals("my-topic-name", actual.getJSONObject("inthe").getJSONObject("topic").getString("name"));
+        assertEquals("172.16.0.3", actual.getJSONObject("deny").getJSONObject("connection").getJSONArray("from").getString(0));
+        assertNotNull(actual.getJSONObject("deny").getJSONObject("cluster"));
+        assertEquals("my-transactional.id", actual.getJSONObject("deny").getJSONObject("transactional").getString("id"));
 
-        assertEquals("my-group.id", actual.getJSONObject("inthe").getJSONObject("group").getString("id"));
-
-        assertNotNull(actual.getJSONObject("inthe").getJSONObject("cluster"));
-
-        assertEquals("my-transactional.id", actual.getJSONObject("inthe").getJSONObject("transactional").getString("id"));
     }
 
     @Test
@@ -316,32 +313,6 @@ public class LoaderTest {
     public void should_remove_by_declaration_fail_through_validation_when_no_required_to() {
 
         var yaml = Path.of("./src/test/resources/acl/by-principal/v0001_remove-by-declaration-without-to.yaml");
-        var map = Loader.loadAsMap(yaml);
-        var json = MigrationLoader.toStringifiedJSON(map);
-
-        var actual = MigrationLoader.parseJson(json);
-
-        assertThrows(ValidationException.class, ()->
-            Loader.validade(actual));
-    }
-
-    @Test
-    public void should_create_fail_through_validation_when_empty_inthe() {
-
-        var yaml = Path.of("./src/test/resources/acl/by-principal/v0001_create-empty-inthe.yaml");
-        var map = Loader.loadAsMap(yaml);
-        var json = MigrationLoader.toStringifiedJSON(map);
-
-        var actual = MigrationLoader.parseJson(json);
-
-        assertThrows(ValidationException.class, ()->
-            Loader.validade(actual));
-    }
-
-    @Test
-    public void should_patch_fail_through_validation_when_empty_inthe() {
-
-        var yaml = Path.of("./src/test/resources/acl/by-principal/v0001_patch-empty-inthe.yaml");
         var map = Loader.loadAsMap(yaml);
         var json = MigrationLoader.toStringifiedJSON(map);
 
