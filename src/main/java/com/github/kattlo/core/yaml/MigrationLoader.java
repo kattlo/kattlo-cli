@@ -105,4 +105,10 @@ public class MigrationLoader {
         return new JSONObject(new JSONTokener(json));
 
     }
+
+    public static JSONObject parseJson(Map<String, Object> map) {
+
+        return parseJson(toStringifiedJSON(map));
+
+    }
 }
