@@ -15,8 +15,9 @@ public interface Strategy {
     static Strategy of(JSONObject migration) {
         Objects.requireNonNull(migration);
 
-        if(null!= migration.getJSONObject("create")){
+        if(null!= migration.getJSONObject(CreateStrategy.CREATE_ATT)){
             return new CreateStrategy(migration);
+
         } else {
             throw new IllegalArgumentException("Unknown migration");
         }

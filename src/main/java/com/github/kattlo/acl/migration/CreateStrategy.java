@@ -37,6 +37,9 @@ public class CreateStrategy implements Strategy {
     private static final Pattern NAME_PATTERN = Pattern.compile("x^[\\w\\.\\-]*\\*$");
     private static final String ALL_PATTERN = "*";
 
+    static final String CREATE_ATT = "create";
+    static final String PRINCIPAL_ABS_POINTER = "/create/to/principal";
+
     private final JSONObject migration;
 
     CreateStrategy(JSONObject migration){
@@ -238,7 +241,7 @@ public class CreateStrategy implements Strategy {
         log.debug("Creating ACL based on {}", migration);
         log.debug("Creating ACL using AdminClient {}", admin);
 
-        var principal = JSONPointer.asString(migration, "/create/to/principal").get();
+        var principal = JSONPointer.asString(migration, PRINCIPAL_ABS_POINTER).get();
 
         try {
             aclByTopic(principal, admin);
