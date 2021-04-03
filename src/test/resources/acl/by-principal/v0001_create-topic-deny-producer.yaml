@@ -8,6 +8,6 @@ create:
     producer:
       topic:
         name: topic-deny-producer
-      idempotent: {}
-      transactional:
-        id: my-transactional.id
+      #idempotent: {}
+      #transactional:
+      #  id: my-transactional.id
