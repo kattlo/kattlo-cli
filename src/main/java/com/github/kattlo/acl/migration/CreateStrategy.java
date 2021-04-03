@@ -34,11 +34,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CreateStrategy implements Strategy {
 
-    private static final Pattern NAME_PATTERN = Pattern.compile("x^[\\w\\.\\-]*\\*$");
+    private static final Pattern NAME_PATTERN = Pattern.compile("^[\\w\\.\\-]*\\*$");
     private static final String ALL_PATTERN = "*";
 
     static final String CREATE_ATT = "create";
     static final String PRINCIPAL_ABS_POINTER = "/create/to/principal";
+
+    static final String ALLOW_ABSOLUTE_POINTER = "/create/allow";
+    static final String DENY_ABSOLUTE_POINTER = "/create/deny";
 
     private final JSONObject migration;
 
@@ -46,19 +49,21 @@ public class CreateStrategy implements Strategy {
         this.migration = Objects.requireNonNull(migration);
     }
 
-    private PatternType patternOf(String name) {
-        PatternType result = PatternType.LITERAL;
+    private ResourcePattern patternOf(String name, ResourceType resource) {
+        PatternType type = PatternType.LITERAL;
+        String actualName = name;
 
         if(NAME_PATTERN.matcher(name).matches()){
-            result = PatternType.PREFIXED;
+            type = PatternType.PREFIXED;
+            actualName = name.substring(0, name.indexOf(ALL_PATTERN));
 
         } else if(name.equals(ALL_PATTERN)){
-            result = PatternType.MATCH;
+            type = PatternType.MATCH;
         }
 
-        log.debug("The pattern of {} is {}", name, result);
+        log.info("The pattern of {} is {}", name, type);
 
-        return result;
+        return new ResourcePattern(resource, actualName, type);
     }
 
     private static class AclBindingWrapper {
@@ -100,7 +105,7 @@ public class CreateStrategy implements Strategy {
     /**
      * allow and deny should not has the same operations
      */
-    private void verify(List<AclBinding> acl) {
+    private void scanForRepeatedOperationInAllowDeny(List<AclBinding> acl) {
         log.info("ACLs *not* distincted by operation {}", acl);
 
         var distincted = acl.stream()
@@ -125,7 +130,7 @@ public class CreateStrategy implements Strategy {
         }
     }
 
-    private void verifyIPs(List<String> allow, List<String> deny) {
+    private void scanForRepeatedIP(List<String> allow, List<String> deny) {
 
         var repeated =
             allow.stream()
@@ -162,7 +167,7 @@ public class CreateStrategy implements Strategy {
         var operationsJson = JSONPointer.asArray(topic, "#/operations");
         log.info("Operations to {}: {}", permission, operationsJson);
 
-        var pattern = new ResourcePattern(ResourceType.TOPIC, topicName, patternOf(topicName));
+        var pattern = patternOf(topicName, ResourceType.TOPIC);
         log.info("Topic ResourcePattern {}", pattern);
 
         List<AclOperation> operations;
@@ -208,8 +213,7 @@ public class CreateStrategy implements Strategy {
         log.debug("IPs to allow {}", ipsToAllow);
         log.debug("IPs to deny {}", ipsToDeny);
 
-        // check repeated IP
-        verifyIPs(ipsToAllow, ipsToDeny);
+        scanForRepeatedIP(ipsToAllow, ipsToDeny);
 
         var toAllow = allow
             .map(a -> topicBindingsFor(principal, a, AclPermissionType.ALLOW))
@@ -226,13 +230,13 @@ public class CreateStrategy implements Strategy {
         acl.addAll(toAllow);
         acl.addAll(toDeny);
 
-        // check repeated operation
-        verify(acl);
+        scanForRepeatedOperationInAllowDeny(acl);
 
         var result = admin.createAcls(acl);
         var future = result.all();
         future.get();
     }
+
 
     @Override
     public void execute(AdminClient admin) {
@@ -242,9 +246,24 @@ public class CreateStrategy implements Strategy {
         log.debug("Creating ACL using AdminClient {}", admin);
 
         var principal = JSONPointer.asString(migration, PRINCIPAL_ABS_POINTER).get();
+        log.debug("Creating ACL for Principal {}", principal);
+
+        var allow = JSONPointer.asObject(migration, ALLOW_ABSOLUTE_POINTER);
+        var deny = JSONPointer.asObject(migration, DENY_ABSOLUTE_POINTER);
 
         try {
-            aclByTopic(principal, admin);
+            if(JSONPointer.hasRelativeObjectPointer(allow, deny, CreateByTopic.RELATIVE_POINTER)){
+                log.debug("Creating ACL by Topic");
+
+                // TODO move code to CreateByTopic
+                aclByTopic(principal, admin);
+            }
+
+            if(JSONPointer.hasRelativeObjectPointer(allow, deny, CreateByProducer.RELATIVE_POINTER)){
+                log.debug("Creating ACL by Producer");
+
+                new CreateByProducer(migration).execute(admin);
+            }
 
         }catch(InterruptedException | ExecutionException e) {
             throw new AclCreateException(e.getMessage(), e);
