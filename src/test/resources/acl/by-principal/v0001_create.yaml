@@ -5,6 +5,19 @@ create:
     principal: 'User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown'
 
   allow:
+    producer:
+      topic:
+        name: topic-as-producer
+      transactional:
+        id: transactional.id-as-producer
+      #idempotent: yes WHEN just idempotent
+
+    consumer:
+      topic:
+        name: topic-as-consumer
+      group:
+        id: group.id-as-consumer
+
     topic:
       name: my-topic-name
       operations:
