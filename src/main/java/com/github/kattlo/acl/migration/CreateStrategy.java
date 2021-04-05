@@ -1,25 +1,20 @@
 package com.github.kattlo.acl.migration;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import com.github.kattlo.util.JSONPointer;
-import com.github.kattlo.util.JSONUtil;
 
 import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.common.acl.AccessControlEntry;
 import org.apache.kafka.common.acl.AclBinding;
 import org.apache.kafka.common.acl.AclOperation;
-import org.apache.kafka.common.acl.AclPermissionType;
 import org.apache.kafka.common.resource.PatternType;
 import org.apache.kafka.common.resource.ResourcePattern;
 import org.apache.kafka.common.resource.ResourceType;
@@ -38,7 +33,7 @@ public class CreateStrategy implements Strategy {
     private static final String ALL_PATTERN = "*";
 
     static final String CREATE_ATT = "create";
-    static final String PRINCIPAL_ABS_POINTER = "/create/to/principal";
+    static final String PRINCIPAL_ABSOLUTE_POINTER = "/create/to/principal";
 
     static final String ALLOW_ABSOLUTE_POINTER = "/create/allow";
     static final String DENY_ABSOLUTE_POINTER = "/create/deny";
@@ -49,7 +44,7 @@ public class CreateStrategy implements Strategy {
         this.migration = Objects.requireNonNull(migration);
     }
 
-    private ResourcePattern patternOf(String name, ResourceType resource) {
+    static ResourcePattern patternOf(String name, ResourceType resource) {
         PatternType type = PatternType.LITERAL;
         String actualName = name;
 
@@ -105,7 +100,7 @@ public class CreateStrategy implements Strategy {
     /**
      * allow and deny should not has the same operations
      */
-    private void scanForRepeatedOperationInAllowDeny(List<AclBinding> acl) {
+    static void scanForRepeatedOperationInAllowDeny(List<AclBinding> acl) {
         log.info("ACLs *not* distincted by operation {}", acl);
 
         var distincted = acl.stream()
@@ -130,7 +125,7 @@ public class CreateStrategy implements Strategy {
         }
     }
 
-    private void scanForRepeatedIP(List<String> allow, List<String> deny) {
+    static void scanForRepeatedIP(List<String> allow, List<String> deny) {
 
         var repeated =
             allow.stream()
@@ -143,7 +138,7 @@ public class CreateStrategy implements Strategy {
         }
     }
 
-    private List<AclOperation> parseOperation(Optional<JSONArray> operations) {
+    static List<AclOperation> parseOperation(Optional<JSONArray> operations) {
         return operations
             .map(JSONArray::iterator)
             .map(i -> Spliterators.spliteratorUnknownSize(i, Spliterator.NONNULL))
@@ -158,86 +153,6 @@ public class CreateStrategy implements Strategy {
             .orElse(List.of());
     }
 
-    private List<AclBinding> topicBindingsFor(String principal, JSONObject access,
-            AclPermissionType permission){
-
-        var topic = JSONPointer.asObject(access, "#/topic").get();
-        var topicName = topic.getString("name");
-
-        var operationsJson = JSONPointer.asArray(topic, "#/operations");
-        log.info("Operations to {}: {}", permission, operationsJson);
-
-        var pattern = patternOf(topicName, ResourceType.TOPIC);
-        log.info("Topic ResourcePattern {}", pattern);
-
-        List<AclOperation> operations;
-        try {
-            operations = parseOperation(operationsJson);
-            log.info("Parsed operations to {}: {}", permission, operations);
-
-        }catch(IllegalArgumentException e){
-            throw new AclCreateException("Some accesses to " + permission + " are invalid", e);
-        }
-
-        var ips = JSONPointer.asArray(access, "#/connection/from")
-            .map(JSONUtil::asString)
-            .orElseGet(() -> List.of(ALL_PATTERN));
-        log.info("List of IPs to {}: {}", permission, ips);
-
-        return operations.stream()
-            .flatMap(operation ->
-                ips.stream()
-                    .map(ip -> new AccessControlEntry(principal, ip, operation, permission))
-            )
-            .map(entry -> new AclBinding(pattern, entry))
-            .collect(Collectors.toList());
-
-    }
-
-    private void aclByTopic(String principal, AdminClient admin)
-            throws InterruptedException, ExecutionException {
-
-        var allow = JSONPointer.asObject(migration, "/create/allow");
-        var deny = JSONPointer.asObject(migration, "/create/deny");
-
-        var ipsToAllow = allow
-            .flatMap(a-> JSONPointer.asArray(a, "#/connection/from"))
-            .map(JSONUtil::asString)
-            .orElseGet(() -> List.of());
-
-        var ipsToDeny = deny
-            .flatMap(d -> JSONPointer.asArray(d, "#/connection/from"))
-            .map(JSONUtil::asString)
-            .orElseGet(() -> List.of());
-
-        log.debug("IPs to allow {}", ipsToAllow);
-        log.debug("IPs to deny {}", ipsToDeny);
-
-        scanForRepeatedIP(ipsToAllow, ipsToDeny);
-
-        var toAllow = allow
-            .map(a -> topicBindingsFor(principal, a, AclPermissionType.ALLOW))
-            .orElseGet(() -> List.of());
-
-        var toDeny = deny
-            .map(d -> topicBindingsFor(principal, d, AclPermissionType.DENY))
-            .orElseGet(() -> List.of());
-
-        log.info("ACL Bindings to allow {}", toAllow);
-        log.info("ACL Bindings to deny {}", toDeny);
-
-        var acl = new ArrayList<AclBinding>();
-        acl.addAll(toAllow);
-        acl.addAll(toDeny);
-
-        scanForRepeatedOperationInAllowDeny(acl);
-
-        var result = admin.createAcls(acl);
-        var future = result.all();
-        future.get();
-    }
-
-
     @Override
     public void execute(AdminClient admin) {
         Objects.requireNonNull(admin);
@@ -245,29 +160,23 @@ public class CreateStrategy implements Strategy {
         log.debug("Creating ACL based on {}", migration);
         log.debug("Creating ACL using AdminClient {}", admin);
 
-        var principal = JSONPointer.asString(migration, PRINCIPAL_ABS_POINTER).get();
+        var principal = JSONPointer.asString(migration, PRINCIPAL_ABSOLUTE_POINTER).get();
         log.debug("Creating ACL for Principal {}", principal);
 
         var allow = JSONPointer.asObject(migration, ALLOW_ABSOLUTE_POINTER);
         var deny = JSONPointer.asObject(migration, DENY_ABSOLUTE_POINTER);
 
-        try {
-            if(JSONPointer.hasRelativeObjectPointer(allow, deny, CreateByTopic.RELATIVE_POINTER)){
-                log.debug("Creating ACL by Topic");
-
-                // TODO move code to CreateByTopic
-                aclByTopic(principal, admin);
-            }
-
-            if(JSONPointer.hasRelativeObjectPointer(allow, deny, CreateByProducer.RELATIVE_POINTER)){
-                log.debug("Creating ACL by Producer");
-
-                new CreateByProducer(migration).execute(admin);
-            }
-
-        }catch(InterruptedException | ExecutionException e) {
-            throw new AclCreateException(e.getMessage(), e);
+        if(JSONPointer.hasRelativeObjectPointer(allow, deny, CreateByTopic.RELATIVE_POINTER)){
+            log.debug("Creating ACL by Topic");
+            new CreateByTopic(migration).execute(admin);
         }
+
+        if(JSONPointer.hasRelativeObjectPointer(allow, deny, CreateByProducer.RELATIVE_POINTER)){
+            log.debug("Creating ACL by Producer");
+
+            new CreateByProducer(migration).execute(admin);
+        }
+
     }
 
 }
