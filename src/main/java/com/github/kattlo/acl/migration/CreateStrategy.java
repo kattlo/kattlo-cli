@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import com.github.kattlo.util.JSONPointer;
+import com.github.kattlo.util.JSONUtil;
+import com.github.kattlo.util.LazyLogging;
 
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.common.acl.AclBinding;
@@ -38,6 +40,10 @@ public class CreateStrategy implements Strategy {
     static final String ALLOW_ABSOLUTE_POINTER = "/create/allow";
     static final String DENY_ABSOLUTE_POINTER = "/create/deny";
 
+    static final String CONNECTION_RELATIVE_POINTER = "#/connection/from";
+
+    static final String OPERATIONS_RELATIVE_POINTER = "#/operations";
+
     private final JSONObject migration;
 
     CreateStrategy(JSONObject migration){
@@ -56,7 +62,7 @@ public class CreateStrategy implements Strategy {
             type = PatternType.MATCH;
         }
 
-        log.info("The pattern of {} is {}", name, type);
+        log.debug("The pattern of {} is {}", name, type);
 
         return new ResourcePattern(resource, actualName, type);
     }
@@ -101,7 +107,7 @@ public class CreateStrategy implements Strategy {
      * allow and deny should not has the same operations
      */
     static void scanForRepeatedOperationInAllowDeny(List<AclBinding> acl) {
-        log.info("ACLs *not* distincted by operation {}", acl);
+        log.debug("ACLs *not* distincted by operation {}", acl);
 
         var distincted = acl.stream()
             .map(AclBindingWrapper::new)
@@ -109,7 +115,7 @@ public class CreateStrategy implements Strategy {
             .map(AclBindingWrapper::unwrap)
             .collect(Collectors.toList());
 
-        log.info("ACLs distincted by operation {}", distincted);
+        log.debug("ACLs distincted by operation {}", distincted);
 
         var byOperation = distincted.stream()
             .collect(Collectors.groupingBy(v -> v.entry().operation()));
@@ -153,6 +159,13 @@ public class CreateStrategy implements Strategy {
             .orElse(List.of());
     }
 
+    static List<String> connectionIPs(Optional<JSONObject> o) {
+
+        return o.flatMap(d -> JSONPointer.asArray(d, CONNECTION_RELATIVE_POINTER))
+            .map(JSONUtil::asString)
+            .orElseGet(() -> List.of());
+    }
+
     @Override
     public void execute(AdminClient admin) {
         Objects.requireNonNull(admin);
@@ -166,14 +179,20 @@ public class CreateStrategy implements Strategy {
         var allow = JSONPointer.asObject(migration, ALLOW_ABSOLUTE_POINTER);
         var deny = JSONPointer.asObject(migration, DENY_ABSOLUTE_POINTER);
 
-        if(JSONPointer.hasRelativeObjectPointer(allow, deny, CreateByTopic.RELATIVE_POINTER)){
+        log.debug("IPs to allow {}", LazyLogging.of(() -> connectionIPs(allow)));
+        log.debug("IPs to deny {}", LazyLogging.of(() -> connectionIPs(deny)));
+
+        if(JSONPointer.hasRelativeObjectPointer(allow, deny,
+                CreateByTopic.RELATIVE_POINTER)){
+
             log.debug("Creating ACL by Topic");
             new CreateByTopic(migration).execute(admin);
         }
 
-        if(JSONPointer.hasRelativeObjectPointer(allow, deny, CreateByProducer.RELATIVE_POINTER)){
-            log.debug("Creating ACL by Producer");
+        if(JSONPointer.hasRelativeObjectPointer(allow, deny,
+                CreateByProducer.RELATIVE_POINTER)){
 
+            log.debug("Creating ACL by Producer");
             new CreateByProducer(migration).execute(admin);
         }
 

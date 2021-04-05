@@ -1,5 +1,7 @@
 package com.github.kattlo.acl.migration;
 
+import static com.github.kattlo.acl.migration.CreateStrategy.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -40,25 +42,25 @@ public class CreateByTopic implements Strategy {
         var topic = JSONPointer.asObject(access, RELATIVE_POINTER).get();
         var topicName = topic.getString("name");
 
-        var operationsJson = JSONPointer.asArray(topic, "#/operations");
-        log.info("Operations to {}: {}", permission, operationsJson);
+        var operationsJson = JSONPointer.asArray(topic, OPERATIONS_RELATIVE_POINTER);
+        log.debug("Operations to {}: {}", permission, operationsJson);
 
-        var pattern = CreateStrategy.patternOf(topicName, ResourceType.TOPIC);
-        log.info("Topic ResourcePattern {}", pattern);
+        var pattern = patternOf(topicName, ResourceType.TOPIC);
+        log.debug("Topic ResourcePattern {}", pattern);
 
         List<AclOperation> operations;
         try {
-            operations = CreateStrategy.parseOperation(operationsJson);
-            log.info("Parsed operations to {}: {}", permission, operations);
+            operations = parseOperation(operationsJson);
+            log.debug("Parsed operations to {}: {}", permission, operations);
 
         }catch(IllegalArgumentException e){
             throw new AclCreateException("Some accesses to " + permission + " are invalid", e);
         }
 
-        var ips = JSONPointer.asArray(access, "#/connection/from")
+        var ips = JSONPointer.asArray(access, CONNECTION_RELATIVE_POINTER)
             .map(JSONUtil::asString)
             .orElseGet(() -> List.of(WILDCARD_ALL));
-        log.info("List of IPs to {}: {}", permission, ips);
+        log.debug("List of IPs to {}: {}", permission, ips);
 
         return operations.stream()
             .flatMap(operation ->
@@ -73,26 +75,16 @@ public class CreateByTopic implements Strategy {
     @Override
     public void execute(AdminClient admin) {
 
-        var principal = JSONPointer.asString(migration, CreateStrategy.PRINCIPAL_ABSOLUTE_POINTER).get();
-        log.debug("Creating ACL for Principal {}", principal);
+        var principal = JSONPointer.asString(migration,
+            PRINCIPAL_ABSOLUTE_POINTER).get();
 
-        var allow = JSONPointer.asObject(migration, CreateStrategy.ALLOW_ABSOLUTE_POINTER);
-        var deny = JSONPointer.asObject(migration, CreateStrategy.DENY_ABSOLUTE_POINTER);
+        var allow = JSONPointer.asObject(migration, ALLOW_ABSOLUTE_POINTER);
+        var deny = JSONPointer.asObject(migration, DENY_ABSOLUTE_POINTER);
 
-        var ipsToAllow = allow
-            .flatMap(a-> JSONPointer.asArray(a, "#/connection/from"))
-            .map(JSONUtil::asString)
-            .orElseGet(() -> List.of());
+        var ipsToAllow = connectionIPs(allow);
+        var ipsToDeny = connectionIPs(deny);
 
-        var ipsToDeny = deny
-            .flatMap(d -> JSONPointer.asArray(d, "#/connection/from"))
-            .map(JSONUtil::asString)
-            .orElseGet(() -> List.of());
-
-        log.debug("IPs to allow {}", ipsToAllow);
-        log.debug("IPs to deny {}", ipsToDeny);
-
-        CreateStrategy.scanForRepeatedIP(ipsToAllow, ipsToDeny);
+        scanForRepeatedIP(ipsToAllow, ipsToDeny);
 
         var toAllow = allow
             .map(a -> topicBindingsFor(principal, a, AclPermissionType.ALLOW))
@@ -102,14 +94,14 @@ public class CreateByTopic implements Strategy {
             .map(d -> topicBindingsFor(principal, d, AclPermissionType.DENY))
             .orElseGet(() -> List.of());
 
-        log.info("ACL Bindings to allow {}", toAllow);
-        log.info("ACL Bindings to deny {}", toDeny);
+        log.debug("ACL Bindings to allow {}", toAllow);
+        log.debug("ACL Bindings to deny {}", toDeny);
 
         var acl = new ArrayList<AclBinding>();
         acl.addAll(toAllow);
         acl.addAll(toDeny);
 
-        CreateStrategy.scanForRepeatedOperationInAllowDeny(acl);
+        scanForRepeatedOperationInAllowDeny(acl);
 
         var result = admin.createAcls(acl);
         var future = result.all();
