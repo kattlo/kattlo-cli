@@ -60,7 +60,7 @@ public class CreateByProducerTest {
     @Test
     public void should_create_topic_with_allow_producer() throws Exception {
 
-        var yaml = Path.of("./src/test/resources/acl/by-principal/v0001_create-topic-allow-producer.yaml");
+        var yaml = Path.of("./src/test/resources/acl/by-principal/v0001_create-producer-allow.yaml");
         var map = Loader.loadAsMap(yaml);
 
         var migration = MigrationLoader.parseJson(map);
@@ -117,7 +117,7 @@ public class CreateByProducerTest {
     @Test
     public void should_create_topic_with_allow_idempotent_producer() throws Exception {
 
-        var yaml = Path.of("./src/test/resources/acl/by-principal/v0001_create-topic-allow-producer-idempotent.yaml");
+        var yaml = Path.of("./src/test/resources/acl/by-principal/v0001_create-producer-allow-idempotent.yaml");
         var map = Loader.loadAsMap(yaml);
 
         var migration = MigrationLoader.parseJson(map);
@@ -183,7 +183,7 @@ public class CreateByProducerTest {
     @Test
     public void should_create_topic_with_allow_transactional_producer() throws Exception {
 
-        var yaml = Path.of("./src/test/resources/acl/by-principal/v0001_create-topic-allow-producer-transactional.yaml");
+        var yaml = Path.of("./src/test/resources/acl/by-principal/v0001_create-producer-allow-transactional.yaml");
         var map = Loader.loadAsMap(yaml);
 
         var migration = MigrationLoader.parseJson(map);
@@ -269,7 +269,7 @@ public class CreateByProducerTest {
     @Test
     public void should_create_topic_with_deny_producer() throws Exception {
 
-        var yaml = Path.of("./src/test/resources/acl/by-principal/v0001_create-topic-deny-producer.yaml");
+        var yaml = Path.of("./src/test/resources/acl/by-principal/v0001_create-producer-deny.yaml");
         var map = Loader.loadAsMap(yaml);
 
         var migration = MigrationLoader.parseJson(map);
