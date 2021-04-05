@@ -539,15 +539,6 @@ public class CreateByTopicTest {
     @Test
     public void should_throw_when_topic_does_not_exists() {
 
-    }
-
-    @Test
-    public void should_not_throw_when_ips_are_all_pattern() {
-
-    }
-
-    @Test
-    public void should_create_topic_with_wildcard_all() {
-
+        // TODO Throw when topic its not managed by kattlo?
     }
 }
