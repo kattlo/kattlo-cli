@@ -25,6 +25,10 @@ public class JSONPointer {
         return Optional.ofNullable((String)object.optQuery(query));
     }
 
+    public static Optional<Boolean> asBoolean(JSONObject object, String query) {
+        return Optional.ofNullable((Boolean)object.optQuery(query));
+    }
+
     public static boolean hasRelativeObjectPointer(Optional<JSONObject> v1,
         Optional<JSONObject> v2, String relativeQuery) {
 
