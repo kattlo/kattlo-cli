@@ -34,6 +34,8 @@ public class CreateStrategy implements Strategy {
     private static final Pattern NAME_PATTERN = Pattern.compile("^[\\w\\.\\-]*\\*$");
     private static final String ALL_PATTERN = "*";
 
+    static final String WILDCARD_ALL = "*";
+
     static final String CREATE_ATT = "create";
     static final String PRINCIPAL_ABSOLUTE_POINTER = "/create/to/principal";
 

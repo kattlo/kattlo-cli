@@ -27,8 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CreateByTopic implements Strategy {
 
-    private static final String WILDCARD_ALL = "*";
-
     static final String RELATIVE_POINTER = "#/topic";
 
     private final JSONObject migration;
