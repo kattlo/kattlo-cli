@@ -1,11 +1,13 @@
 package com.github.kattlo.acl.migration;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -166,6 +168,27 @@ public class CreateStrategy implements Strategy {
         return o.flatMap(d -> JSONPointer.asArray(d, CONNECTION_RELATIVE_POINTER))
             .map(JSONUtil::asString)
             .orElseGet(() -> List.of());
+    }
+
+    static void apply(List<AclBinding> allow, List<AclBinding> deny, AdminClient admin) {
+
+        log.debug("ACL Bindings to allow {}", allow);
+        log.debug("ACL Bindings to deny {}", deny);
+
+        var acl = new ArrayList<AclBinding>();
+        acl.addAll(allow);
+        acl.addAll(deny);
+
+        scanForRepeatedOperationInAllowDeny(acl);
+
+        var result = admin.createAcls(acl);
+        var future = result.all();
+
+        try {
+            future.get();
+        }catch(InterruptedException | ExecutionException e){
+            throw new AclCreateException(e.getMessage(), e);
+        }
     }
 
     @Override

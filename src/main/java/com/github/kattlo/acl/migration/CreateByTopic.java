@@ -2,10 +2,8 @@ package com.github.kattlo.acl.migration;
 
 import static com.github.kattlo.acl.migration.CreateStrategy.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import com.github.kattlo.util.JSONPointer;
@@ -92,23 +90,25 @@ public class CreateByTopic implements Strategy {
             .map(d -> topicBindingsFor(principal, d, AclPermissionType.DENY))
             .orElseGet(() -> List.of());
 
-        log.debug("ACL Bindings to allow {}", toAllow);
-        log.debug("ACL Bindings to deny {}", toDeny);
+        apply(toAllow, toDeny, admin);
 
-        var acl = new ArrayList<AclBinding>();
-        acl.addAll(toAllow);
-        acl.addAll(toDeny);
+        //log.debug("ACL Bindings to allow {}", toAllow);
+        //log.debug("ACL Bindings to deny {}", toDeny);
 
-        scanForRepeatedOperationInAllowDeny(acl);
+        //var acl = new ArrayList<AclBinding>();
+        //acl.addAll(toAllow);
+        //acl.addAll(toDeny);
 
-        var result = admin.createAcls(acl);
-        var future = result.all();
+        //scanForRepeatedOperationInAllowDeny(acl);
 
-        try {
-            future.get();
-        }catch(InterruptedException | ExecutionException e){
-            throw new AclCreateException(e.getMessage(), e);
-        }
+        //var result = admin.createAcls(acl);
+        //var future = result.all();
+
+        //try {
+        //    future.get();
+        //}catch(InterruptedException | ExecutionException e){
+        //    throw new AclCreateException(e.getMessage(), e);
+        //}
     }
 
 }
