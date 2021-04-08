@@ -3,10 +3,12 @@ package com.github.kattlo.acl.migration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -121,13 +123,20 @@ public class CreateStrategy implements Strategy {
 
         log.debug("ACLs distincted by operation {}", distincted);
 
-        var byOperation = distincted.stream()
-            .collect(Collectors.groupingBy(v -> v.entry().operation()));
-
-        var repeated = byOperation.entrySet().stream()
-            .filter(kv -> kv.getValue().size() > 1)
-            .map(kv -> kv.getValue().iterator().next())
-            .map(a -> a.entry().operation())
+        var repeated = distincted.stream()
+            .collect(
+                Collectors.groupingBy(v -> v.pattern().name(),
+                    Collectors.groupingBy(v -> v.entry().operation())))
+            .entrySet().stream()
+            .map(kv ->
+                Map.entry(kv.getKey(),
+                    kv.getValue().entrySet().stream()
+                        .filter(m -> m.getValue().size() > 1)
+                        .collect(Collectors.toMap(Entry::getKey, Entry::getValue))
+                )
+            )
+            .filter(kv -> !kv.getValue().isEmpty())
+            .map(kv -> kv.getKey() + ": " + kv.getValue().keySet().iterator().next())
             .collect(Collectors.toList());
 
         if(!repeated.isEmpty()){
