@@ -4,11 +4,13 @@ import static com.github.kattlo.acl.migration.CreateStrategy.*;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.github.kattlo.util.JSONPointer;
 import com.github.kattlo.util.JSONUtil;
+import com.github.kattlo.util.StringUtil;
 
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.common.acl.AccessControlEntry;
@@ -107,6 +109,44 @@ public class CreateByProducer implements Strategy {
         return result;
     }
 
+    private void scanForRepeatedTopic(Optional<JSONObject> operation) {
+
+        var producerTopic = operation
+            .flatMap(o -> JSONPointer.asObject(o, RELATIVE_POINTER))
+            .flatMap(o -> JSONPointer.asObject(o, CreateByTopic.RELATIVE_POINTER))
+            .map(t -> t.getString(CreateByTopic.NAME_ATTRIBUTE));
+
+        var topic = operation
+            .flatMap(o -> JSONPointer.asObject(o, CreateByTopic.RELATIVE_POINTER))
+            .map(t -> t.getString(CreateByTopic.NAME_ATTRIBUTE))
+            .orElseGet(() -> StringUtil.NO_VALUE);
+
+        if(producerTopic
+            .filter(t -> t.equals(topic))
+            .isPresent()){
+            throw new AclCreateException("producer topic and top level topic has the same name: " + producerTopic);
+        }
+    }
+
+    private void scanForRepeatedTransactional(Optional<JSONObject> operation) {
+
+        var producerTx = operation
+            .flatMap(o -> JSONPointer.asObject(o, RELATIVE_POINTER))
+            .flatMap(o -> JSONPointer.asObject(o, TRANSACTIONAL_RELATIVE_POINTER))
+            .map(t -> t.getString("id"));
+
+        var tx = operation
+            .flatMap(o -> JSONPointer.asObject(o, TRANSACTIONAL_RELATIVE_POINTER))
+            .map(t -> t.getString("id"))
+            .orElseGet(() -> StringUtil.NO_VALUE);
+
+        if(producerTx
+            .filter(t -> t.equals(tx))
+            .isPresent()){
+            throw new AclCreateException("producer transactional and top level on has the same id: " + producerTx);
+        }
+    }
+
     @Override
     public void execute(AdminClient admin) {
 
@@ -115,6 +155,12 @@ public class CreateByProducer implements Strategy {
 
         var allow = JSONPointer.asObject(migration, ALLOW_ABSOLUTE_POINTER);
         var deny = JSONPointer.asObject(migration, DENY_ABSOLUTE_POINTER);
+
+        scanForRepeatedTopic(allow);
+        scanForRepeatedTopic(deny);
+
+        scanForRepeatedTransactional(allow);
+        scanForRepeatedTransactional(deny);
 
         var ipsToAllow = connectionIPs(allow);
         var ipsToDeny = connectionIPs(deny);

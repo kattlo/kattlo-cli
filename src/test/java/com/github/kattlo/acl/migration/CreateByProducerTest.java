@@ -2,10 +2,12 @@ package com.github.kattlo.acl.migration;
 
 import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.core.StringContains.containsString;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -256,13 +258,45 @@ public class CreateByProducerTest {
     }
 
     @Test
-    public void should_throw_when_allow_producer_and_top_level_topic_has_same_value() {
+    public void should_throw_when_allow_producer_and_top_level_topic_has_same_value() throws Exception {
+
+        var yaml = Path.of("./src/test/resources/acl/by-principal/v0001_create-producer-allow-same-topic.yaml");
+        var map = Loader.loadAsMap(yaml);
+
+        var migration = MigrationLoader.parseJson(map);
+
+        var strategy = Strategy.of(migration);
+
+        // for create by topic strategy
+        mockitoWhen();
+
+        //assert
+        var actual = assertThrows(AclCreateException.class, () ->
+            // act
+            strategy.execute(admin));
+
+        assertThat(actual.getMessage(),
+            containsString("producer topic and top level topic has the same name"));
 
     }
 
     @Test
     public void should_throw_when_allow_producer_and_top_level_transactional_has_same_value() {
 
+        var yaml = Path.of("./src/test/resources/acl/by-principal/v0001_create-producer-allow-same-transactional.yaml");
+        var map = Loader.loadAsMap(yaml);
+
+        var migration = MigrationLoader.parseJson(map);
+
+        var strategy = Strategy.of(migration);
+
+        //assert
+        var actual = assertThrows(AclCreateException.class, () ->
+            // act
+            strategy.execute(admin));
+
+        assertThat(actual.getMessage(),
+            containsString("producer transactional and top level on has the same id"));
     }
 
     @SuppressWarnings("unchecked")
@@ -321,13 +355,4 @@ public class CreateByProducerTest {
         assertEquals("topic-deny-producer", acl2.pattern().name());
     }
 
-    @Test
-    public void should_throw_when_deny_producer_and_top_level_topic_has_same_value() {
-
-    }
-
-    @Test
-    public void should_throw_when_deny_producer_and_top_level_transactional_has_same_value() {
-
-    }
 }
