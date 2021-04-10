@@ -1,0 +1,17 @@
+create:
+  notes: |
+    Notes about this ACL creation by Principal
+  to:
+    principal: 'User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown'
+
+  allow:
+    producer:
+      topic:
+        name: topic-to-allow
+      #idempotent: {}
+      transactional:
+        id: my-transactional.id
+
+    transactional:
+      id: my-transactional.id
+
