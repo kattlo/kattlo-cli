@@ -10,6 +10,8 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class StringUtil {
 
+    public static final String NO_VALUE = "$__no_value__$";
+
     public static String requireNonBlank(String s){
         if(StringUtils.isNotBlank(s)){
             return s;
