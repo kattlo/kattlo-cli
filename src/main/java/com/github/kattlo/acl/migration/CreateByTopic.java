@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 public class CreateByTopic implements Strategy {
 
     static final String RELATIVE_POINTER = "#/topic";
+    static final String NAME_ATTRIBUTE = "name";
 
     private final JSONObject migration;
     CreateByTopic(JSONObject migration){
@@ -36,7 +37,7 @@ public class CreateByTopic implements Strategy {
             AclPermissionType permission){
 
         var topic = JSONPointer.asObject(access, RELATIVE_POINTER).get();
-        var topicName = topic.getString("name");
+        var topicName = topic.getString(NAME_ATTRIBUTE);
 
         var operationsJson = JSONPointer.asArray(topic, OPERATIONS_RELATIVE_POINTER);
         log.debug("Operations to {}: {}", permission, operationsJson);
