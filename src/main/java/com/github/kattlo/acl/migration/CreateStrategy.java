@@ -10,6 +10,7 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -17,6 +18,7 @@ import java.util.stream.StreamSupport;
 import com.github.kattlo.util.JSONPointer;
 import com.github.kattlo.util.JSONUtil;
 import com.github.kattlo.util.LazyLogging;
+import com.github.kattlo.util.StringUtil;
 
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.common.acl.AclBinding;
@@ -155,6 +157,23 @@ public class CreateStrategy implements Strategy {
         if(!repeated.isEmpty()){
             throw new AclCreateException("repeated IPs in allow and deny " + repeated);
         }
+    }
+
+    static Optional<String> scanForRepeatedTopic(Optional<JSONObject> operation,
+        String relativePointer) {
+
+        var producerTopic = operation
+            .flatMap(o -> JSONPointer.asObject(o, relativePointer))
+            .flatMap(o -> JSONPointer.asObject(o, CreateByTopic.RELATIVE_POINTER))
+            .map(t -> t.getString(CreateByTopic.NAME_ATTRIBUTE));
+
+        var topic = operation
+            .flatMap(o -> JSONPointer.asObject(o, CreateByTopic.RELATIVE_POINTER))
+            .map(t -> t.getString(CreateByTopic.NAME_ATTRIBUTE))
+            .orElseGet(() -> StringUtil.NO_VALUE);
+
+        return producerTopic
+            .filter(t -> t.equals(topic));
     }
 
     static List<AclOperation> parseOperation(Optional<JSONArray> operations) {

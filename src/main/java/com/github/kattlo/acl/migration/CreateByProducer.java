@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CreateByProducer implements Strategy {
 
+    static final String THROW_MSG_TOPIC = "producer topic and top level topic has the same name %s";
     static final String RELATIVE_POINTER = "#/producer";
     static final String IDEMPOTENT_RELATIVE_POINTER = "#/idempotent";
     static final String TRANSACTIONAL_RELATIVE_POINTER = "#/transactional";
@@ -109,25 +110,6 @@ public class CreateByProducer implements Strategy {
         return result;
     }
 
-    private void scanForRepeatedTopic(Optional<JSONObject> operation) {
-
-        var producerTopic = operation
-            .flatMap(o -> JSONPointer.asObject(o, RELATIVE_POINTER))
-            .flatMap(o -> JSONPointer.asObject(o, CreateByTopic.RELATIVE_POINTER))
-            .map(t -> t.getString(CreateByTopic.NAME_ATTRIBUTE));
-
-        var topic = operation
-            .flatMap(o -> JSONPointer.asObject(o, CreateByTopic.RELATIVE_POINTER))
-            .map(t -> t.getString(CreateByTopic.NAME_ATTRIBUTE))
-            .orElseGet(() -> StringUtil.NO_VALUE);
-
-        if(producerTopic
-            .filter(t -> t.equals(topic))
-            .isPresent()){
-            throw new AclCreateException("producer topic and top level topic has the same name: " + producerTopic);
-        }
-    }
-
     private void scanForRepeatedTransactional(Optional<JSONObject> operation) {
 
         var producerTx = operation
@@ -156,8 +138,13 @@ public class CreateByProducer implements Strategy {
         var allow = JSONPointer.asObject(migration, ALLOW_ABSOLUTE_POINTER);
         var deny = JSONPointer.asObject(migration, DENY_ABSOLUTE_POINTER);
 
-        scanForRepeatedTopic(allow);
-        scanForRepeatedTopic(deny);
+        scanForRepeatedTopic(allow, RELATIVE_POINTER).ifPresent(t -> {
+            throw new AclCreateException(String.format(THROW_MSG_TOPIC, t));
+        });
+
+        scanForRepeatedTopic(deny, RELATIVE_POINTER).ifPresent(t -> {
+            throw new AclCreateException(String.format(THROW_MSG_TOPIC, t));
+        });
 
         scanForRepeatedTransactional(allow);
         scanForRepeatedTransactional(deny);
