@@ -10,7 +10,6 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -162,18 +161,18 @@ public class CreateStrategy implements Strategy {
     static Optional<String> scanForRepeatedTopic(Optional<JSONObject> operation,
         String relativePointer) {
 
-        var producerTopic = operation
+        var topic = operation
             .flatMap(o -> JSONPointer.asObject(o, relativePointer))
             .flatMap(o -> JSONPointer.asObject(o, CreateByTopic.RELATIVE_POINTER))
             .map(t -> t.getString(CreateByTopic.NAME_ATTRIBUTE));
 
-        var topic = operation
+        var toplevelTopic = operation
             .flatMap(o -> JSONPointer.asObject(o, CreateByTopic.RELATIVE_POINTER))
             .map(t -> t.getString(CreateByTopic.NAME_ATTRIBUTE))
             .orElseGet(() -> StringUtil.NO_VALUE);
 
-        return producerTopic
-            .filter(t -> t.equals(topic));
+        return topic
+            .filter(t -> t.equals(toplevelTopic));
     }
 
     static List<AclOperation> parseOperation(Optional<JSONArray> operations) {
@@ -247,6 +246,13 @@ public class CreateStrategy implements Strategy {
 
             log.debug("Creating ACL by Producer");
             new CreateByProducer(migration).execute(admin);
+        }
+
+        if(JSONPointer.hasRelativeObjectPointer(allow, deny,
+            CreateByConsumer.RELATIVE_POINTER)){
+
+            log.debug("Creating ACL by Consumer");
+            new CreateByConsumer(migration).execute(admin);
         }
 
     }
