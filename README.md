@@ -47,7 +47,7 @@ configurations for:
 ### Linux Binary
 
 ```bash
-curl 'https://github.com/kattlo/kattlo-cli/releases/download/v0.2.1/kattlo-v0.2.1-linux' \
+curl 'https://github.com/kattlo/kattlo-cli/releases/download/v0.2.2/kattlo-v0.2.2-linux' \
   -o 'kattlo'
 
 sudo chmod +x kattlo
