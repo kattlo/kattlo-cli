@@ -255,6 +255,13 @@ public class CreateStrategy implements Strategy {
             new CreateByConsumer(migration).execute(admin);
         }
 
+        if(JSONPointer.hasRelativeObjectPointer(allow, deny,
+            CreateByGroup.RELATIVE_POINTER)) {
+
+            log.debug("Creating ACL by Group");
+            new CreateByGroup(migration).execute(admin);
+        }
+
     }
 
 }
