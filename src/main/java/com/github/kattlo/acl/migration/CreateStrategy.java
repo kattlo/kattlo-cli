@@ -1,6 +1,5 @@
 package com.github.kattlo.acl.migration;
 
-import java.lang.StackWalker.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
