@@ -93,23 +93,6 @@ public class CreateByTopic implements Strategy {
 
         apply(toAllow, toDeny, admin);
 
-        //log.debug("ACL Bindings to allow {}", toAllow);
-        //log.debug("ACL Bindings to deny {}", toDeny);
-
-        //var acl = new ArrayList<AclBinding>();
-        //acl.addAll(toAllow);
-        //acl.addAll(toDeny);
-
-        //scanForRepeatedOperationInAllowDeny(acl);
-
-        //var result = admin.createAcls(acl);
-        //var future = result.all();
-
-        //try {
-        //    future.get();
-        //}catch(InterruptedException | ExecutionException e){
-        //    throw new AclCreateException(e.getMessage(), e);
-        //}
     }
 
 }
