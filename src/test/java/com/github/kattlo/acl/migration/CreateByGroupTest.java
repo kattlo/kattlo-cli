@@ -188,7 +188,7 @@ public class CreateByGroupTest extends AclCreateTestBase {
         var acls = actual.iterator();
         var acl0 = acls.next();
         assertEquals(AclPermissionType.ALLOW, acl0.entry().permissionType());
-        assertEquals(AclOperation.DESCRIBE, acl0.entry().operation());
+        assertEquals(AclOperation.READ, acl0.entry().operation());
         assertEquals("172.16.0.100", acl0.entry().host());
         assertEquals("User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown",
             acl0.entry().principal());
@@ -209,7 +209,7 @@ public class CreateByGroupTest extends AclCreateTestBase {
         var acl2 = acls.next();
         assertEquals(AclPermissionType.DENY, acl2.entry().permissionType());
         assertEquals(AclOperation.DESCRIBE, acl2.entry().operation());
-        assertEquals("172.16.0.100", acl2.entry().host());
+        assertEquals("172.16.0.150", acl2.entry().host());
         assertEquals("User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown",
             acl2.entry().principal());
         assertEquals(ResourceType.GROUP, acl2.pattern().resourceType());
