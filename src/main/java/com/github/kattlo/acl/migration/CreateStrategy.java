@@ -1,5 +1,6 @@
 package com.github.kattlo.acl.migration;
 
+import java.lang.StackWalker.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -157,6 +158,18 @@ public class CreateStrategy implements Strategy {
             throw new AclCreateException("repeated IPs in allow and deny " + repeated);
         }
     }
+
+    //TODO complex IP scan
+   // static void scanForRepeatedIP(Optional<JSONObject> allow, Optional<JSONObject> deny) {
+
+   //     if(allow.isPresent() && deny.isPresent()) {
+   //         // per resource: topic, group, producer, consumer, cluster and transacional
+
+   //         // group by ip,
+
+   //         // operation, if resources are the same
+   //     }
+   // }
 
     static Optional<String> scanForRepeatedTopic(Optional<JSONObject> operation,
         String relativePointer) {
