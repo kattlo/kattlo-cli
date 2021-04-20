@@ -1,0 +1,17 @@
+create:
+  notes: |
+    Notes about this ACL creation by Principal
+  to:
+    principal: 'User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown'
+
+  allow:
+    transactional:
+      id: my-transactional.id
+      operations:
+        - Read
+
+  deny:
+    transactional:
+      id: another-transactional.id
+      operations:
+        - Change

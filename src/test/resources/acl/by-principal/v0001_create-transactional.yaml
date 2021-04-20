@@ -1,0 +1,26 @@
+create:
+  notes: |
+    Notes about this ACL creation by Principal
+  to:
+    principal: 'User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown'
+
+  allow:
+    transactional:
+      id: my-transactional.id
+      operations:
+        - Write
+
+    connection:
+      from:
+        - 172.16.0.100
+
+  deny:
+    transactional:
+      id: my-transactional.id-2
+      operations:
+        - Describe
+
+    connection:
+      from:
+        - 192.168.0.100
+        - 172.16.0.200
