@@ -159,7 +159,7 @@ public class CreateStrategy implements Strategy {
     }
 
     //TODO complex IP scan
-   // static void scanForRepeatedIP(Optional<JSONObject> allow, Optional<JSONObject> deny) {
+   // static void scanForRepeatedIPInAllowAndDeny(Optional<JSONObject> allow, Optional<JSONObject> deny) {
 
    //     if(allow.isPresent() && deny.isPresent()) {
    //         // per resource: topic, group, producer, consumer, cluster and transacional
@@ -272,6 +272,13 @@ public class CreateStrategy implements Strategy {
 
             log.debug("Creating ACL by Group");
             new CreateByGroup(migration).execute(admin);
+        }
+
+        if(JSONPointer.hasRelativeObjectPointer(allow, deny,
+            CreateByTransactional.RELATIVE_POINTER)){
+
+            log.debug("Creating ACL by Transactional");
+            new CreateByTransactional(migration).execute(admin);
         }
 
     }
