@@ -3,13 +3,11 @@ package com.github.kattlo.acl.migration;
 import static com.github.kattlo.acl.migration.CreateStrategy.*;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.github.kattlo.util.JSONPointer;
 import com.github.kattlo.util.JSONUtil;
 
-import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.common.acl.AccessControlEntry;
 import org.apache.kafka.common.acl.AclBinding;
 import org.apache.kafka.common.acl.AclOperation;
@@ -23,17 +21,17 @@ import lombok.extern.slf4j.Slf4j;
  * @author fabiojose
  */
 @Slf4j
-public class CreateByGroup implements Strategy {
+public class CreateByGroup extends AbstractCreate {
 
     static final String RELATIVE_POINTER = "#/group";
-    static final String ID_ATTRIBUTE = "id";
+    private static final String ID_ATTRIBUTE = "id";
 
-    private final JSONObject migration;
     CreateByGroup(JSONObject migration) {
-        this.migration = Objects.requireNonNull(migration);
+        super(migration);
     }
 
-    private List<AclBinding> topicBindingsFor(String principal, JSONObject access,
+    @Override
+    protected List<AclBinding> bindingsFor(String principal, JSONObject access,
             AclPermissionType permission){
 
         var group = JSONPointer.asObject(access, RELATIVE_POINTER).get();
@@ -69,28 +67,7 @@ public class CreateByGroup implements Strategy {
     }
 
     @Override
-    public void execute(AdminClient admin) {
-
-        var principal = JSONPointer.asString(migration,
-            PRINCIPAL_ABSOLUTE_POINTER).get();
-
-        var allow = JSONPointer.asObject(migration, ALLOW_ABSOLUTE_POINTER);
-        var deny = JSONPointer.asObject(migration, DENY_ABSOLUTE_POINTER);
-
-        var ipsToAllow = connectionIPs(allow);
-        var ipsToDeny = connectionIPs(deny);
-
-        scanForRepeatedIP(ipsToAllow, ipsToDeny);
-
-        var toAllow = allow
-            .map(a -> topicBindingsFor(principal, a, AclPermissionType.ALLOW))
-            .orElseGet(() -> List.of());
-
-        var toDeny = deny
-            .map(d -> topicBindingsFor(principal, d, AclPermissionType.DENY))
-            .orElseGet(() -> List.of());
-
-        apply(toAllow, toDeny, admin);
-
+    protected String deed() {
+        return "create";
     }
 }
