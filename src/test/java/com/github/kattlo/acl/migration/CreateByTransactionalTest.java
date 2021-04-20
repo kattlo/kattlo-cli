@@ -152,7 +152,7 @@ public class CreateByTransactionalTest extends AclCreateTestBase {
         var acls = actual.iterator();
         var acl0 = acls.next();
         assertEquals(AclPermissionType.DENY, acl0.entry().permissionType());
-        assertEquals(AclOperation.WRITE, acl0.entry().operation());
+        assertEquals(AclOperation.DESCRIBE, acl0.entry().operation());
         assertEquals("172.16.0.100", acl0.entry().host());
         assertEquals("User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown",
             acl0.entry().principal());

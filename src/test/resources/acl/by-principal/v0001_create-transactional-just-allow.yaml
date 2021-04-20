@@ -8,7 +8,7 @@ create:
     transactional:
       id: my-transactional.id
       operations:
-        - Read
+        - Write
 
     connection:
       from:
