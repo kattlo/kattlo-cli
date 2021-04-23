@@ -7,7 +7,7 @@ create:
   deny:
     cluster:
       operations:
-        - AlterConfigs
+        - Alter_Configs
 
     connection:
       from:
