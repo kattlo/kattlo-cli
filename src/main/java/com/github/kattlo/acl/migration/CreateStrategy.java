@@ -281,6 +281,12 @@ public class CreateStrategy implements Strategy {
             new CreateByTransactional(migration).execute(admin);
         }
 
+        if(JSONPointer.hasRelativeObjectPointer(allow, deny,
+            CreateByCluster.RELATIVE_POINTER)){
+
+            log.debug("Creating ACL in the Cluster");
+            new CreateByCluster(migration).execute(admin);
+        }
     }
 
 }
