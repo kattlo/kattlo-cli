@@ -99,13 +99,13 @@ public class CreateByClusterTest extends AclCreateTestBase {
         var acls = actual.iterator();
         var acl0 = acls.next();
         assertEquals(AclPermissionType.ALLOW, acl0.entry().permissionType());
-        assertEquals(AclOperation.READ, acl0.entry().operation());
+        assertEquals(AclOperation.DESCRIBE, acl0.entry().operation());
         assertEquals("172.16.0.100", acl0.entry().host());
         assertEquals("User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown",
             acl0.entry().principal());
-        assertEquals(ResourceType.GROUP, acl0.pattern().resourceType());
-        assertEquals(PatternType.LITERAL, acl0.pattern().patternType());
-        assertEquals("my-group.id", acl0.pattern().name());
+        assertEquals(ResourceType.CLUSTER, acl0.pattern().resourceType());
+        assertEquals(PatternType.PREFIXED, acl0.pattern().patternType());
+        assertEquals("*", acl0.pattern().name());
 
     }
 
@@ -136,13 +136,13 @@ public class CreateByClusterTest extends AclCreateTestBase {
         var acls = actual.iterator();
         var acl0 = acls.next();
         assertEquals(AclPermissionType.DENY, acl0.entry().permissionType());
-        assertEquals(AclOperation.DESCRIBE, acl0.entry().operation());
+        assertEquals(AclOperation.ALTER_CONFIGS, acl0.entry().operation());
         assertEquals("172.16.0.100", acl0.entry().host());
         assertEquals("User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown",
             acl0.entry().principal());
-        assertEquals(ResourceType.GROUP, acl0.pattern().resourceType());
-        assertEquals(PatternType.LITERAL, acl0.pattern().patternType());
-        assertEquals("my-group.id", acl0.pattern().name());
+        assertEquals(ResourceType.CLUSTER, acl0.pattern().resourceType());
+        assertEquals(PatternType.PREFIXED, acl0.pattern().patternType());
+        assertEquals("*", acl0.pattern().name());
     }
 
     @SuppressWarnings("unchecked")
@@ -166,19 +166,19 @@ public class CreateByClusterTest extends AclCreateTestBase {
         var actual = newACLCaptor.getValue();
 
         assertThat(actual, allOf(
-            hasSize(3)
+            hasSize(2)
         ));
 
         var acls = actual.iterator();
         var acl0 = acls.next();
         assertEquals(AclPermissionType.ALLOW, acl0.entry().permissionType());
-        assertEquals(AclOperation.READ, acl0.entry().operation());
+        assertEquals(AclOperation.ALTER, acl0.entry().operation());
         assertEquals("172.16.0.100", acl0.entry().host());
         assertEquals("User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown",
             acl0.entry().principal());
-        assertEquals(ResourceType.GROUP, acl0.pattern().resourceType());
-        assertEquals(PatternType.LITERAL, acl0.pattern().patternType());
-        assertEquals("my-group.id", acl0.pattern().name());
+        assertEquals(ResourceType.CLUSTER, acl0.pattern().resourceType());
+        assertEquals(PatternType.PREFIXED, acl0.pattern().patternType());
+        assertEquals("*", acl0.pattern().name());
 
         var acl1 = acls.next();
         assertEquals(AclPermissionType.DENY, acl1.entry().permissionType());
@@ -186,18 +186,9 @@ public class CreateByClusterTest extends AclCreateTestBase {
         assertEquals("192.168.0.100", acl1.entry().host());
         assertEquals("User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown",
             acl1.entry().principal());
-        assertEquals(ResourceType.GROUP, acl1.pattern().resourceType());
-        assertEquals(PatternType.LITERAL, acl1.pattern().patternType());
-        assertEquals("my-group.id", acl1.pattern().name());
+        assertEquals(ResourceType.CLUSTER, acl1.pattern().resourceType());
+        assertEquals(PatternType.PREFIXED, acl1.pattern().patternType());
+        assertEquals("*", acl1.pattern().name());
 
-        var acl2 = acls.next();
-        assertEquals(AclPermissionType.DENY, acl2.entry().permissionType());
-        assertEquals(AclOperation.DESCRIBE, acl2.entry().operation());
-        assertEquals("172.16.0.150", acl2.entry().host());
-        assertEquals("User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown",
-            acl2.entry().principal());
-        assertEquals(ResourceType.GROUP, acl2.pattern().resourceType());
-        assertEquals(PatternType.LITERAL, acl2.pattern().patternType());
-        assertEquals("my-group.id", acl2.pattern().name());
     }
 }
