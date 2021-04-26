@@ -1,0 +1,14 @@
+create:
+  notes: |
+    Allow all operations over resources to Alice from host 172.16.0.102
+    and deny from 192.168.0.100
+  to:
+    principal: 'User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown'
+
+  allow:
+    connection:
+      - 172.16.0.102
+
+  deny:
+    connection:
+      - 192.168.0.100

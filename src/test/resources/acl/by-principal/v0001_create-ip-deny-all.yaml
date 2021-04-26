@@ -1,0 +1,9 @@
+create:
+  notes: |
+    Deny connections to Alice from host any host
+  to:
+    principal: 'User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown'
+
+  deny:
+    connection:
+      - '*'
