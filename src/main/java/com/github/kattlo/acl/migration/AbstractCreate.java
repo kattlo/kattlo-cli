@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.github.kattlo.util.JSONPointer;
@@ -26,20 +25,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractCreate implements Strategy {
 
-    private static final Pattern NAME_PATTERN = Pattern.compile("^[\\w\\.\\-]*\\*$");
     private static final String ALL_PATTERN = "*";
 
-    private static final String WILDCARD_ALL = "*";
-
-    private static final String CREATE_ATT = "create";
     private static final String PRINCIPAL_ABSOLUTE_POINTER = "/create/to/principal";
 
     private static final String ALLOW_ABSOLUTE_POINTER = "/create/allow";
     private static final String DENY_ABSOLUTE_POINTER = "/create/deny";
 
     private static final String CONNECTION_RELATIVE_POINTER = "#/connection/from";
-
-    private static final String OPERATIONS_RELATIVE_POINTER = "#/operations";
 
     protected abstract List<AclBinding> bindingsFor(String principal, JSONObject access,
             AclPermissionType permission);
