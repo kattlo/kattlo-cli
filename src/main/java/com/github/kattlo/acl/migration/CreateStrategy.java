@@ -287,6 +287,11 @@ public class CreateStrategy implements Strategy {
             log.debug("Creating ACL in the Cluster");
             new CreateByCluster(migration).execute(admin);
         }
+
+        if(CreateByHost.hasOnlyConnectionFrom(allow, deny)){
+            log.debug("Creating ACL only by host ip");
+            new CreateByHost(migration).execute(admin);
+        }
     }
 
 }
