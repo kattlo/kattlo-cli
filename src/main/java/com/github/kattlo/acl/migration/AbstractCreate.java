@@ -94,7 +94,8 @@ public abstract class AbstractCreate implements Strategy {
 
                 return binding.pattern().name().equals(other.pattern().name())
                     && binding.entry().permissionType().equals(other.entry().permissionType())
-                    && binding.entry().operation().equals(other.entry().operation());
+                    && binding.entry().operation().equals(other.entry().operation())
+                    && binding.entry().host().equals(other.entry().host());
             }
 
             return false;
@@ -107,6 +108,7 @@ public abstract class AbstractCreate implements Strategy {
             hash = 31 * hash + binding.pattern().name().hashCode();
             hash = 31 * hash + binding.entry().permissionType().hashCode();
             hash = 31 * hash + binding.entry().operation().hashCode();
+            hash = 31 * hash + binding.entry().host().hashCode();
 
             return hash;
         }
@@ -114,32 +116,49 @@ public abstract class AbstractCreate implements Strategy {
 
     /**
      * allow and deny should not has the same operations
+     * connecting from the same host ip
      */
     static void scanForRepeatedOperationInAllowDeny(List<AclBinding> acl) {
-        log.debug("ACLs *not* distincted by operation {}", acl);
+        log.info("ACLs *not* distincted by operation {}", acl);
 
+        // distinct by: resource name, permission, operation and host ip
         var distincted = acl.stream()
             .map(AclBindingWrapper::new)
             .distinct()
             .map(AclBindingWrapper::unwrap)
             .collect(Collectors.toList());
 
-        log.debug("ACLs distincted by operation {}", distincted);
+        log.info("ACLs distincted by operation and host ip {}", distincted);
 
-        var repeated = distincted.stream()
-            .collect(
-                Collectors.groupingBy(v -> v.pattern().name(),
-                    Collectors.groupingBy(v -> v.entry().operation())))
-            .entrySet().stream()
-            .map(kv ->
-                Map.entry(kv.getKey(),
-                    kv.getValue().entrySet().stream()
-                        .filter(m -> m.getValue().size() > 1)
-                        .collect(Collectors.toMap(Entry::getKey, Entry::getValue))
+        // Group by host ip
+        var byHostIp = distincted.stream()
+            .collect(Collectors.groupingBy(v -> v.entry().host()));
+
+        // scanfor repeated within each host ip group
+        var repeated = byHostIp.entrySet().stream()
+            .map(ips ->
+                Map.entry(ips.getKey(),
+                    ips.getValue().stream()
+                        .collect(
+                            Collectors.groupingBy(v -> v.pattern().name(),
+                                Collectors.groupingBy(v -> v.entry().operation())
+                            )
+                        )
+                        .entrySet().stream()
+                        .map(kv ->
+                            Map.entry(kv.getKey(),
+                                kv.getValue().entrySet().stream()
+                                    .filter(m -> m.getValue().size() > 1)
+                                    .collect(Collectors.toMap(Entry::getKey, Entry::getValue))
+                            )
+                        )
+                        .filter(kv -> !kv.getValue().isEmpty())
+                        .map(kv -> kv.getKey() + ": " + kv.getValue().keySet().iterator().next())
+                        .collect(Collectors.toList())
                 )
             )
             .filter(kv -> !kv.getValue().isEmpty())
-            .map(kv -> kv.getKey() + ": " + kv.getValue().keySet().iterator().next())
+            .map(kv -> kv.getKey() + "-> " + kv.getValue().toString())
             .collect(Collectors.toList());
 
         if(!repeated.isEmpty()){
