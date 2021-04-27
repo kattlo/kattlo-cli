@@ -7,8 +7,10 @@ create:
 
   allow:
     connection:
-      - 172.16.0.102
+      from:
+        - 172.16.0.102
 
   deny:
     connection:
-      - 192.168.0.100
+      from:
+        - 192.168.0.100

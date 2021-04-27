@@ -6,4 +6,5 @@ create:
 
   deny:
     connection:
-      - '*'
+      from:
+        - '*'

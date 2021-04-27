@@ -6,4 +6,5 @@ create:
 
   deny:
     connection:
-      - 172.16.0.102
+      from:
+        - 172.16.0.102
