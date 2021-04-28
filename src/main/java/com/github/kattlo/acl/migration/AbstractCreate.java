@@ -61,7 +61,7 @@ public abstract class AbstractCreate implements Strategy {
    // static void scanForRepeatedIPInAllowAndDeny(Optional<JSONObject> allow, Optional<JSONObject> deny) {
 
    //     if(allow.isPresent() && deny.isPresent()) {
-   //         // per resource: topic, group, producer, consumer, cluster and transacional
+   //         // per resource: topic, group, producer, consumer, cluster and transactional
 
    //         // group by ip,
 
