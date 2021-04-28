@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import com.github.kattlo.util.JSONPointer;
 import com.github.kattlo.util.JSONUtil;
 
+import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.common.acl.AccessControlEntry;
 import org.apache.kafka.common.acl.AclBinding;
 import org.apache.kafka.common.acl.AclOperation;
@@ -30,6 +31,8 @@ public class CreateByHost extends AbstractCreate {
 
     static final String RELATIVE_POINTER = "#/connection";
     private static final String KEY = "connection";
+    private static final String ALL_PATTERN = "*";
+    private static final String CONNECTION_RELATIVE_POINTER = "#/connection/from";
 
     public CreateByHost(JSONObject migration) {
         super(migration);
@@ -48,6 +51,26 @@ public class CreateByHost extends AbstractCreate {
             .map(Objects::nonNull)
             .orElseGet(() -> false);
 
+    }
+
+    static void scanForRepeatedIP(List<String> allow, List<String> deny) {
+
+        var repeated =
+            allow.stream()
+                .filter(ip -> !(ip.equals(ALL_PATTERN)))
+                .filter(deny::contains)
+                .collect(Collectors.toList());
+
+        if(!repeated.isEmpty()){
+            throw new AclCreateException("repeated IPs in allow and deny " + repeated);
+        }
+    }
+
+    static List<String> connectionIPs(Optional<JSONObject> o) {
+
+        return o.flatMap(d -> JSONPointer.asArray(d, CONNECTION_RELATIVE_POINTER))
+            .map(JSONUtil::asString)
+            .orElseGet(() -> List.of());
     }
 
     private AclBinding bindingFor(String principal, String ip, ResourcePattern pattern,
@@ -99,4 +122,16 @@ public class CreateByHost extends AbstractCreate {
         return "create";
     }
 
+    public void execute(AdminClient admin){
+
+        var allow = JSONPointer.asObject(migration, ALLOW_ABSOLUTE_POINTER);
+        var deny = JSONPointer.asObject(migration, DENY_ABSOLUTE_POINTER);
+
+        var ipsToAllow = connectionIPs(allow);
+        var ipsToDeny = connectionIPs(deny);
+
+        scanForRepeatedIP(ipsToAllow, ipsToDeny);
+
+        super.execute(admin);
+    }
 }

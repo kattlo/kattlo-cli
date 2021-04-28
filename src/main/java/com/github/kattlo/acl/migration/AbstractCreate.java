@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import com.github.kattlo.util.JSONPointer;
-import com.github.kattlo.util.JSONUtil;
 
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.common.acl.AclBinding;
@@ -25,49 +23,20 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractCreate implements Strategy {
 
-    private static final String ALL_PATTERN = "*";
-
     private static final String PRINCIPAL_ABSOLUTE_POINTER = "/create/to/principal";
 
     private static final String ALLOW_ABSOLUTE_POINTER = "/create/allow";
     private static final String DENY_ABSOLUTE_POINTER = "/create/deny";
-
-    private static final String CONNECTION_RELATIVE_POINTER = "#/connection/from";
 
     protected abstract List<AclBinding> bindingsFor(String principal, JSONObject access,
             AclPermissionType permission);
 
     protected abstract String deed();
 
-    private final JSONObject migration;
+    protected final JSONObject migration;
     public AbstractCreate(JSONObject migration){
         this.migration = Objects.requireNonNull(migration);
     }
-
-    static void scanForRepeatedIP(List<String> allow, List<String> deny) {
-
-        var repeated =
-            allow.stream()
-                .filter(ip -> !(ip.equals(ALL_PATTERN)))
-                .filter(deny::contains)
-                .collect(Collectors.toList());
-
-        if(!repeated.isEmpty()){
-            throw new AclCreateException("repeated IPs in allow and deny " + repeated);
-        }
-    }
-
-    //TODO complex IP scan
-   // static void scanForRepeatedIPInAllowAndDeny(Optional<JSONObject> allow, Optional<JSONObject> deny) {
-
-   //     if(allow.isPresent() && deny.isPresent()) {
-   //         // per resource: topic, group, producer, consumer, cluster and transactional
-
-   //         // group by ip,
-
-   //         // operation, if resources are the same
-   //     }
-   // }
 
     private static class AclBindingWrapper {
 
@@ -180,13 +149,6 @@ public abstract class AbstractCreate implements Strategy {
         }
     }
 
-    static List<String> connectionIPs(Optional<JSONObject> o) {
-
-        return o.flatMap(d -> JSONPointer.asArray(d, CONNECTION_RELATIVE_POINTER))
-            .map(JSONUtil::asString)
-            .orElseGet(() -> List.of());
-    }
-
     @Override
     public void execute(AdminClient admin) {
 
@@ -195,11 +157,6 @@ public abstract class AbstractCreate implements Strategy {
 
         var allow = JSONPointer.asObject(migration, ALLOW_ABSOLUTE_POINTER);
         var deny = JSONPointer.asObject(migration, DENY_ABSOLUTE_POINTER);
-
-        var ipsToAllow = connectionIPs(allow);
-        var ipsToDeny = connectionIPs(deny);
-
-        scanForRepeatedIP(ipsToAllow, ipsToDeny);
 
         var toAllow = allow
             .map(a -> bindingsFor(principal, a, AclPermissionType.ALLOW))
