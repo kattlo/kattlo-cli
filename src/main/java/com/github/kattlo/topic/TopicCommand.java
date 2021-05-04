@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 import com.github.kattlo.EntryCommand;
+import com.github.kattlo.Shared;
 import com.github.kattlo.core.backend.Backend;
 import com.github.kattlo.core.backend.BackendException;
 import com.github.kattlo.core.backend.Resource;
@@ -27,6 +28,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParentCommand;
 import picocli.CommandLine.Spec;
@@ -65,6 +67,9 @@ public class TopicCommand implements Runnable {
     @Inject
     Kafka kafka;
 
+    @Mixin
+    Shared shared;
+
     private final Reporter reporter = new PrintStreamReporter(System.out);
 
     private File directory;
@@ -100,7 +105,7 @@ public class TopicCommand implements Runnable {
     }
 
     void validateOptions() {
-        parent.validateOptions();
+        Shared.validateOptions();
 
         if(!directory.canRead()){
             throw new CommandLine.
@@ -117,13 +122,13 @@ public class TopicCommand implements Runnable {
     public void run() {
         validateOptions();
 
-        try(final var admin = kafka.adminFor(parent.getKafkaConfiguration())) {
+        try(final var admin = kafka.adminFor(Shared.getKafkaConfiguration())) {
 
             final var migrationFiles =
                 MigrationLoader.list(directory)
                     .collect(Collectors.toList());
 
-            backend.init(parent.getKafkaConfiguration());
+            backend.init(Shared.getKafkaConfiguration());
 
             var iterator = migrationFiles.iterator();
             while(iterator.hasNext()){

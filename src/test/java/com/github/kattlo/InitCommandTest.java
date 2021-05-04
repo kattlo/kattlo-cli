@@ -3,6 +3,7 @@ package com.github.kattlo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -127,19 +128,21 @@ public class InitCommandTest {
 
         command.setDirectory(directory);
 
-        when(parent.getBootstrapServers())
-            .thenReturn(expected);
+        try(var mocked = mockStatic(Shared.class)){
+            mocked.when(() -> Shared.getBootstrapServers())
+                .thenReturn(expected);
 
-        // act
-        command.run();
+            // act
+            command.run();
 
-        // assert
-        assertTrue(file.exists());
+            // assert
+            assertTrue(file.exists());
 
-        var actual = new Properties();
-        actual.load(new FileInputStream(file));
+            var actual = new Properties();
+            actual.load(new FileInputStream(file));
 
-        assertEquals(expected,
-            actual.getProperty(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG));
+            assertEquals(expected,
+                actual.getProperty(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG));
+        }
     }
 }

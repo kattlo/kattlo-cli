@@ -72,8 +72,7 @@ public class EntryCommandTest {
         command.execute(args);
 
         //assert
-        EntryCommand actualCommand = command.getCommand();
-        var actualProperties = actualCommand.getKafkaConfiguration();
+        var actualProperties = Shared.getKafkaConfiguration();
         var actual = actualProperties.getProperty(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG);
 
         assertEquals(expected, actual);

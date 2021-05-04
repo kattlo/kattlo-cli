@@ -20,6 +20,7 @@ import org.apache.kafka.clients.admin.AdminClientConfig;
 import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParentCommand;
 import picocli.CommandLine.Spec;
@@ -50,6 +51,9 @@ public class InitCommand implements Runnable {
 
     @Spec
     CommandSpec spec;
+
+    @Mixin
+    Shared shared;
 
     private File directory;
 
@@ -97,8 +101,8 @@ public class InitCommand implements Runnable {
         var kafkaProperties = new Properties();
 
         var servers = "configure-me:9092";
-        if(Objects.nonNull(parent.getBootstrapServers())){
-            servers = parent.getBootstrapServers();
+        if(Objects.nonNull(Shared.getBootstrapServers())){
+            servers = Shared.getBootstrapServers();
         }
         kafkaProperties.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG,
             servers);

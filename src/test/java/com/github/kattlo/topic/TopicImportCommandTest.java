@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.Properties;
 
 import com.github.kattlo.EntryCommand;
+import com.github.kattlo.Shared;
 import com.github.kattlo.core.backend.Backend;
 import com.github.kattlo.core.backend.Migration;
 import com.github.kattlo.core.backend.Resource;
@@ -30,12 +31,14 @@ import org.apache.kafka.clients.admin.ConfigEntry;
 import org.apache.kafka.clients.admin.TopicDescription;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.TopicPartitionInfo;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -71,6 +74,8 @@ public class TopicImportCommandTest {
     @Captor
     private ArgumentCaptor<Migration> migrationCaptor;
 
+    private MockedStatic<Shared> mockedShared;
+
     private void mockitoWhen() {
 
         when(kafka.adminFor(any()))
@@ -79,9 +84,17 @@ public class TopicImportCommandTest {
         when(parent.getParent())
             .thenReturn(parentParent);
 
-        when(parentParent.getKafkaConfiguration())
+        mockedShared = mockStatic(Shared.class);
+        mockedShared.when(() -> Shared.getKafkaConfiguration())
             .thenReturn(new Properties());
 
+    }
+
+    @AfterEach
+    public void afterEach() {
+        if(null!= mockedShared && !mockedShared.isClosed()){
+            mockedShared.close();
+        }
     }
 
     @Test

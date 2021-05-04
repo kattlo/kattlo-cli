@@ -12,6 +12,7 @@ import com.github.kattlo.core.report.Reporter;
 import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.ParentCommand;
@@ -46,6 +47,9 @@ public class InfoCommand implements Runnable {
 
     @Inject
     Kafka kafka;
+
+    @Mixin
+    Shared shared;
 
     private Reporter reporter = new PrintStreamReporter(System.out);
 
@@ -91,7 +95,7 @@ public class InfoCommand implements Runnable {
     }
 
     private void validateOptions() {
-        parent.validateOptions();
+        Shared.validateOptions();
     }
 
     @Override
@@ -100,10 +104,10 @@ public class InfoCommand implements Runnable {
 
         log.debug("Showing the info of resource {} {}", resource, name);
 
-        try(var admin = kafka.adminFor(parent
+        try(var admin = kafka.adminFor(Shared
                 .getKafkaConfiguration())){
 
-            backend.init(parent.getKafkaConfiguration());
+            backend.init(Shared.getKafkaConfiguration());
 
             if(!history){
                 var current = backend.current(resource, name);
