@@ -42,7 +42,7 @@ dependencies {
 }
 
 group 'com.github.kattlo'
-version '0.2.2'
+version '0.3.0'
 
 compileJava {
     options.encoding = 'UTF-8'
