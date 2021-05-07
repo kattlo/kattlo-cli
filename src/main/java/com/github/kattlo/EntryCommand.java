@@ -10,7 +10,6 @@ import com.github.kattlo.util.VersionUtil;
 import io.quarkus.picocli.runtime.annotations.TopCommand;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Spec;
 import picocli.CommandLine.Model.CommandSpec;
@@ -40,9 +39,6 @@ public class EntryCommand {
     @Spec
     private CommandSpec spec;
 
-    @Mixin
-    Shared shared;
-
     @Option(
         names = {
             "--config-file"
@@ -68,5 +64,28 @@ public class EntryCommand {
                     configuration.getAbsolutePath() + " not found");
         }
 
+    }
+
+    @Option(
+        names = {
+            "--bootstrap-servers"
+        },
+        description = "host/port pairs to connect the Apache Kafka®",
+        required = false
+    )
+    public void setBootstrapServers(String bootstrapServers) {
+        SharedOptionValues.setBootstrapServers(bootstrapServers);
+    }
+
+    @Option(
+        names = {
+            "--kafka-config-file"
+        },
+        description = "Properties file for Apache Kafka® clients",
+        required = true,
+        defaultValue = "kafka.properties"
+    )
+    public void setKafkaConfiguration(File kafkaConfiguration) {
+        SharedOptionValues.setKafkaConfiguration(kafkaConfiguration);
     }
 }

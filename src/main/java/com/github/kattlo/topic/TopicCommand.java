@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 import com.github.kattlo.EntryCommand;
-import com.github.kattlo.Shared;
+import com.github.kattlo.SharedOptionValues;
 import com.github.kattlo.core.backend.Backend;
 import com.github.kattlo.core.backend.BackendException;
 import com.github.kattlo.core.backend.Resource;
@@ -28,7 +28,6 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParentCommand;
 import picocli.CommandLine.Spec;
@@ -67,9 +66,6 @@ public class TopicCommand implements Runnable {
     @Inject
     Kafka kafka;
 
-    @Mixin
-    Shared shared;
-
     private final Reporter reporter = new PrintStreamReporter(System.out);
 
     private File directory;
@@ -105,7 +101,14 @@ public class TopicCommand implements Runnable {
     }
 
     void validateOptions() {
-        Shared.validateOptions();
+
+        try {
+            SharedOptionValues.validateOptions();
+        }catch(IllegalStateException e) {
+            log.error(e.getMessage(), e);
+            throw new CommandLine.ParameterException(spec.commandLine(),
+                e.getMessage());
+        }
 
         if(!directory.canRead()){
             throw new CommandLine.
@@ -122,13 +125,13 @@ public class TopicCommand implements Runnable {
     public void run() {
         validateOptions();
 
-        try(final var admin = kafka.adminFor(Shared.getKafkaConfiguration())) {
+        try(final var admin = kafka.adminFor(SharedOptionValues.getKafkaConfiguration())) {
 
             final var migrationFiles =
                 MigrationLoader.list(directory)
                     .collect(Collectors.toList());
 
-            backend.init(Shared.getKafkaConfiguration());
+            backend.init(SharedOptionValues.getKafkaConfiguration());
 
             var iterator = migrationFiles.iterator();
             while(iterator.hasNext()){

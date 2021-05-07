@@ -128,8 +128,8 @@ public class InitCommandTest {
 
         command.setDirectory(directory);
 
-        try(var mocked = mockStatic(Shared.class)){
-            mocked.when(() -> Shared.getBootstrapServers())
+        try(var mocked = mockStatic(SharedOptionValues.class)){
+            mocked.when(() -> SharedOptionValues.getBootstrapServers())
                 .thenReturn(expected);
 
             // act

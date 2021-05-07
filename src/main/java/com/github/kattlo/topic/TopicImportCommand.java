@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import com.github.kattlo.Shared;
+import com.github.kattlo.SharedOptionValues;
 import com.github.kattlo.core.backend.Backend;
 import com.github.kattlo.core.backend.OperationType;
 import com.github.kattlo.core.backend.ResourceType;
@@ -26,7 +26,6 @@ import org.apache.kafka.clients.admin.TopicDescription;
 import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParentCommand;
 import picocli.CommandLine.Spec;
@@ -55,9 +54,6 @@ public class TopicImportCommand implements Runnable {
 
     @Inject
     Kafka kafka;
-
-    @Mixin
-    Shared shared;
 
     private final Reporter reporter = new PrintStreamReporter(System.out);
 
@@ -134,9 +130,9 @@ public class TopicImportCommand implements Runnable {
     public void run() {
         validateOptions();
 
-        try(var admin = kafka.adminFor(Shared.getKafkaConfiguration())){
+        try(var admin = kafka.adminFor(SharedOptionValues.getKafkaConfiguration())){
 
-            backend.init(Shared.getKafkaConfiguration());
+            backend.init(SharedOptionValues.getKafkaConfiguration());
 
             // describe topic
             var description =

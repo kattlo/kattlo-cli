@@ -61,8 +61,8 @@ public class EntryCommandTest {
         var expected = "configure-me:9092";
         String[] args = {
             "--config-file=./src/test/resources/.kattlo.yaml",
-            "--kafka-config-file=./src/test/resources/kafka.properties",
             "--bootstrap-servers=" + expected,
+            "--kafka-config-file=./src/test/resources/kafka.properties",
             "topic",
             "--directory=."
         };
@@ -72,7 +72,7 @@ public class EntryCommandTest {
         command.execute(args);
 
         //assert
-        var actualProperties = Shared.getKafkaConfiguration();
+        var actualProperties = SharedOptionValues.getKafkaConfiguration();
         var actual = actualProperties.getProperty(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG);
 
         assertEquals(expected, actual);

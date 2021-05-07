@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.Properties;
 
 import com.github.kattlo.EntryCommand;
-import com.github.kattlo.Shared;
+import com.github.kattlo.SharedOptionValues;
 import com.github.kattlo.core.backend.Backend;
 import com.github.kattlo.core.backend.Migration;
 import com.github.kattlo.core.backend.Resource;
@@ -74,7 +74,7 @@ public class TopicImportCommandTest {
     @Captor
     private ArgumentCaptor<Migration> migrationCaptor;
 
-    private MockedStatic<Shared> mockedShared;
+    private MockedStatic<SharedOptionValues> mockedShared;
 
     private void mockitoWhen() {
 
@@ -84,8 +84,8 @@ public class TopicImportCommandTest {
         when(parent.getParent())
             .thenReturn(parentParent);
 
-        mockedShared = mockStatic(Shared.class);
-        mockedShared.when(() -> Shared.getKafkaConfiguration())
+        mockedShared = mockStatic(SharedOptionValues.class);
+        mockedShared.when(() -> SharedOptionValues.getKafkaConfiguration())
             .thenReturn(new Properties());
 
     }

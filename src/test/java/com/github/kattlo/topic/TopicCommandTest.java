@@ -17,8 +17,10 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.Properties;
 
 import com.github.kattlo.EntryCommand;
+import com.github.kattlo.SharedOptionValues;
 import com.github.kattlo.core.backend.Backend;
 import com.github.kattlo.core.backend.Resource;
 import com.github.kattlo.core.kafka.Kafka;
@@ -27,6 +29,7 @@ import com.github.kattlo.topic.yaml.TopicOperation;
 import com.github.kattlo.topic.yaml.TopicOperationMapper;
 
 import org.apache.kafka.clients.admin.AdminClient;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +38,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -84,6 +88,8 @@ public class TopicCommandTest {
     @Captor
     private ArgumentCaptor<TopicOperation> topicOperationCaptor;
 
+    private MockedStatic<SharedOptionValues> mockedShared;
+
     private Path path(String path) {
         return Path.of(path);
     }
@@ -109,6 +115,15 @@ public class TopicCommandTest {
         cli = new CommandLine(entry);
         cli.setOut(new PrintWriter(out));
         cli.setErr(new PrintWriter(err));
+
+        mockedShared = mockStatic(SharedOptionValues.class);
+        mockedShared.when(() -> SharedOptionValues.getKafkaConfiguration())
+            .thenReturn(new Properties());
+    }
+
+    @AfterEach
+    public void afterEach() {
+        mockedShared.close();
     }
 
     @Test
