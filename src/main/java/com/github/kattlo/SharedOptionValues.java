@@ -9,41 +9,27 @@ import java.util.Properties;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 
 import lombok.extern.slf4j.Slf4j;
-import picocli.CommandLine.Option;
 
+/**
+ * @author fabiojose
+ */
 @Slf4j
-public class Shared {
+public class SharedOptionValues {
 
     private static Properties kafkaConfigurationValues;
     private static File kafkaConfiguration;
     private static String bootstrapServers;
 
-    @Option(
-        names = {
-            "--bootstrap-servers"
-        },
-        description = "host/port pairs to connect the Apache Kafka®",
-        required = false
-    )
-    public static void setBootstrapServers(String bootstrapServers) {
-        Shared.bootstrapServers = bootstrapServers;
+    static void setBootstrapServers(String bootstrapServers) {
+        SharedOptionValues.bootstrapServers = Objects.requireNonNull(bootstrapServers);
     }
     public static String getBootstrapServers() {
         return bootstrapServers;
     }
 
-    @Option(
-        names = {
-            "--kafka-config-file"
-        },
-        description = "Properties file for Apache Kafka® clients",
-        required = true,
-        defaultValue = "kafka.properties"
-    )
-    public static void setKafkaConfiguration(File kafkaConfiguration) {
-        Shared.kafkaConfiguration = Objects.requireNonNull(kafkaConfiguration);
+    static void setKafkaConfiguration(File kafkaConfiguration) {
+        SharedOptionValues.kafkaConfiguration = Objects.requireNonNull(kafkaConfiguration);
     }
-
     public static Properties getKafkaConfiguration() {
         if(null== kafkaConfigurationValues){
             kafkaConfigurationValues = new Properties();
@@ -64,9 +50,6 @@ public class Shared {
             }catch(IOException e){
                 throw new IllegalStateException(
                     kafkaConfiguration.getAbsolutePath() + " can't be read");
-               // throw new CommandLine
-               //     .ParameterException(spec.commandLine(),
-               //         kafkaConfiguration.getAbsolutePath() + " can't be read");
             }
         }
         return kafkaConfigurationValues;
@@ -78,9 +61,6 @@ public class Shared {
         if(!kafkaConfiguration.exists()){
             throw new IllegalStateException(
                 kafkaConfiguration.getAbsolutePath() + " not found");
-            //throw new CommandLine.
-            //    ParameterException(spec.commandLine(),
-            //        kafkaConfiguration.getAbsolutePath() + " not found");
         }
     }
 }
