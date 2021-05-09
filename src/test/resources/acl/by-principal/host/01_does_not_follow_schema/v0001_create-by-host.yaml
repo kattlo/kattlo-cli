@@ -1,0 +1,9 @@
+create:
+  to:
+    principal: 'User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown'
+
+  allow:
+    connection:
+      #wrong! must be from
+      ip:
+        - 172.16.0.102

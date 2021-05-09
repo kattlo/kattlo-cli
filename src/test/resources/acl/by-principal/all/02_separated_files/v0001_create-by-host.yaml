@@ -1,0 +1,8 @@
+create:
+  to:
+    principal: 'User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown'
+
+  allow:
+    connection:
+      from:
+        - 172.16.0.102

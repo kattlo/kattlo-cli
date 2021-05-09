@@ -1,0 +1,77 @@
+create:
+  notes: |
+    Notes about this ACL creation by Principal
+  to:
+    principal: 'User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown'
+
+  allow:
+    producer:
+      topic:
+        name: topic-as-producer
+      transactional:
+        id: transactional.id-as-producer
+      #idempotent: yes WHEN just idempotent
+
+    consumer:
+      topic:
+        name: topic-as-consumer
+      group:
+        id: group.id-as-consumer
+
+    topic:
+      name: my-topic-name
+      operations:
+        - Read
+        - Write
+        - Describe
+
+    group:
+      id: my-group.id
+      operations:
+        - Read
+
+    cluster:
+      operations:
+        - All
+
+    transactional:
+      id: my-transactional.id
+      operations:
+        - All
+
+    connection:
+      from:
+        - 172.16.0.100
+
+  deny:
+    producer:
+      topic:
+        name: topic-as-producer2
+      transactional:
+        id: transactional.id-as-producer2
+      #idempotent: yes WHEN just idempotent
+
+    consumer:
+      topic:
+        name: topic-as-consumer2
+      group:
+        id: group.id-as-consumer2
+
+    topic:
+      name: another-topic-name
+      operations:
+        - Describe
+
+    group:
+      id: another-group.id
+      operations:
+        - Read
+
+    transactional:
+      id: another-transactional.id
+      operations:
+        - All
+
+    connection:
+      from:
+        - 192.168.0.100
