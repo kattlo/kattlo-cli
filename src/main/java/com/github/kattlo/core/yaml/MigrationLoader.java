@@ -26,6 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MigrationLoader {
 
+    public static final String DEFAULT_CONTENT_TYPE = "text/yaml";
+
     public static final Pattern VERSION_PATTERN =
         Pattern.compile("(v[0-9]{4})");
 

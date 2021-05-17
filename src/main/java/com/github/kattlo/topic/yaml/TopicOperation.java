@@ -18,6 +18,7 @@ import com.github.kattlo.core.backend.Migration;
 import com.github.kattlo.core.backend.OperationType;
 import com.github.kattlo.core.backend.Original;
 import com.github.kattlo.core.backend.ResourceType;
+import com.github.kattlo.core.yaml.MigrationLoader;
 import com.github.kattlo.topic.TopicCommandException;
 import com.github.kattlo.util.MachineReadableSupport;
 import com.github.kattlo.util.StringUtil;
@@ -33,13 +34,12 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * @author fabiojose
  */
+// TODO rename to TopicMigration
 @Slf4j
 @Getter
 @EqualsAndHashCode
 @ToString
 public class TopicOperation {
-
-    private static final String DEFAULT_CONTENT_TYPE = "text/yaml";
 
     private String version;
     private String operation;
@@ -138,7 +138,7 @@ public class TopicOperation {
 
         var original = new Original();
         original.setPath(getFile().toString());
-        original.setContentType(DEFAULT_CONTENT_TYPE);
+        original.setContentType(MigrationLoader.DEFAULT_CONTENT_TYPE);
 
         try {
             var contentBytes = Files.readAllBytes(getFile());

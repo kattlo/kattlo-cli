@@ -11,6 +11,7 @@ import org.mapstruct.Named;
 /**
  * @author fabiojose
  */
+//TODO rename to TopicMigrationMapper
 @Mapper(componentModel = "cdi")
 public interface TopicOperationMapper {
 
