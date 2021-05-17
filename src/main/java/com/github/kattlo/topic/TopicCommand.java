@@ -131,6 +131,7 @@ public class TopicCommand implements Runnable {
                 MigrationLoader.list(directory)
                     .collect(Collectors.toList());
 
+
             backend.init(SharedOptionValues.getKafkaConfiguration());
 
             var iterator = migrationFiles.iterator();
@@ -158,6 +159,9 @@ public class TopicCommand implements Runnable {
                         .orElse(NO_VERSION);
 
                 // Remove all migrations related to migrationModel.getTopic()
+                // because the corrent topic's migrations will be loaded by
+                // Loader.newer() method.
+                // in the migrationFiles will remain just migrations of another topics
                 Loader.all(migrationModel.getTopic(),
                         Path.of(directory.getAbsolutePath()))
                     .forEach(to -> {
