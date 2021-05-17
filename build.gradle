@@ -22,6 +22,7 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.11'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.github.everit-org.json-schema:org.everit.json.schema:1.12.2'
+    implementation 'com.jayway.jsonpath:json-path:2.5.0'
 
     testImplementation 'org.testcontainers:kafka:1.15.2'
     testImplementation 'io.quarkus:quarkus-junit5'
