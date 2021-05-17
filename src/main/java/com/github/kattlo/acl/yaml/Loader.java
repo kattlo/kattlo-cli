@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import com.github.kattlo.core.exception.LoadException;
 import com.github.kattlo.core.yaml.MigrationLoader;
@@ -85,6 +86,15 @@ public class Loader {
         var schema = getSchema();
         schema.validate(json);
 
+    }
+
+    public static Stream<ACLMigration> allByPrincipal(String principal, Path directory)
+            throws IOException {
+
+        return MigrationLoader.list(directory)
+            .map(file -> new ACLMigration(
+                MigrationLoader.parseJson(Loader.loadAsMap(file)), file))
+            .filter(m -> principal.equals(m.getPrincipal()));
     }
 
 }
