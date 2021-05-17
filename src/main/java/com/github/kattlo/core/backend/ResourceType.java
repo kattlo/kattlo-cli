@@ -8,8 +8,8 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 @RegisterForReflection
 public enum ResourceType {
 
-    TOPIC;
-    //ACL,
+    TOPIC,
+    ACL;
     //SCHEMA,
     //CONNECT,
     //KSQL,
