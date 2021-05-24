@@ -53,8 +53,15 @@ public class ACLMigration {
     }
 
     public String getOperation() {
+        if(null!= json.opt("create")){
+            return "create";
+        } else if(null!= json.opt("patch")){
+            return "patch";
+        } else if(null!= json.opt("remove")){
+            return "remove";
+        }
 
-        return "create";
+        throw new IllegalStateException("unknow operation");
     }
 
     public Optional<String> getNotes() {
