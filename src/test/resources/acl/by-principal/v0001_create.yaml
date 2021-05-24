@@ -24,13 +24,16 @@ create:
         - Read
         - Write
         - Describe
+
     group:
       id: my-group.id
       operations:
         - Read
+
     cluster:
       operations:
         - All
+
     transactional:
       id: my-transactional.id
       operations:
@@ -41,14 +44,29 @@ create:
         - 172.16.0.100
 
   deny:
+    producer:
+      topic:
+        name: deny-topic-as-producer
+      transactional:
+        id: deny-transactional.id-as-producer
+      #idempotent: yes WHEN just idempotent
+
+    consumer:
+      topic:
+        name: deny-topic-as-consumer
+      group:
+        id: deny-group.id-as-consumer
+
     topic:
       name: another-topic-name
       operations:
         - Describe
+
     group:
       id: another-group.id
       operations:
         - Read
+
     transactional:
       id: another-transactional.id
       operations:
