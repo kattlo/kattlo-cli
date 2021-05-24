@@ -12,6 +12,7 @@ import com.github.kattlo.core.exception.LoadException;
 import com.github.kattlo.core.yaml.MigrationLoader;
 
 import org.everit.json.schema.Schema;
+import org.everit.json.schema.ValidationException;
 import org.everit.json.schema.loader.SchemaLoader;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -79,7 +80,21 @@ public class Loader {
     }
 
     /**
-     * @throws LoadException When any problem happens during the json validation
+     * @throws LoadException When any problem happens to load the yaml
+     * @throws IllegalArgumentException When the yaml name does not follow the pattern
+     * {@link MigrationLoader#FILE_NAME_PATTERN}
+     * @throws ValidationException When any problem happens during the json validation
+     */
+    public static JSONObject loadAsJSONAndValidade(Path yaml) {
+
+        var json = MigrationLoader.parseJson(loadAsMap(yaml));
+        validade(json);
+
+        return json;
+    }
+
+    /**
+     * @throws ValidationException When any problem happens during the json validation
      */
     public static void validade(JSONObject json) {
 
