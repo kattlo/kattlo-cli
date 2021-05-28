@@ -7,7 +7,6 @@ import java.util.Optional;
 import com.github.kattlo.topic.TopicCommand;
 import com.github.kattlo.util.VersionUtil;
 
-import io.quarkus.picocli.runtime.annotations.TopCommand;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -17,7 +16,6 @@ import picocli.CommandLine.Model.CommandSpec;
 /**
  * @author fabiojose
  */
-@TopCommand
 @Command(
     name = "kattlo",
     versionProvider = VersionUtil.QuarkusVersionProvider.class,
@@ -30,7 +28,7 @@ import picocli.CommandLine.Model.CommandSpec;
         InitCommand.class
     }
 )
-public class EntryCommand {
+public class EntryCommand implements Runnable {
 
     private static final String DEFAULT_CONFIG_FILE = ".kattlo.yaml";
 
@@ -87,5 +85,11 @@ public class EntryCommand {
     )
     public void setKafkaConfiguration(File kafkaConfiguration) {
         SharedOptionValues.setKafkaConfiguration(kafkaConfiguration);
+    }
+
+    @Override
+    public void run() {
+        // TODO Auto-generated method stub
+
     }
 }
