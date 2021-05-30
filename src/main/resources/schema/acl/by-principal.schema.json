@@ -86,7 +86,8 @@
             "operations": {
               "$ref": "#/definitions/operations"
             }
-          }
+          },
+          "required": ["operations"]
         }
       ]
     },
@@ -113,7 +114,8 @@
             "operations": {
               "$ref": "#/definitions/operations"
             }
-          }
+          },
+          "required": ["operations"]
         }
       ]
     },
@@ -151,7 +153,8 @@
             "operations": {
               "$ref": "#/definitions/operations"
             }
-          }
+          },
+          "required": ["operations"]
         }
       ]
     },
