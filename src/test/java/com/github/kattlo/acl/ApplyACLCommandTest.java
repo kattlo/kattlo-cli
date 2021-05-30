@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.hamcrest.Matchers.*;
@@ -18,7 +17,8 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Properties;
 
-import com.github.kattlo.EntryCommand;
+import javax.inject.Inject;
+
 import com.github.kattlo.SharedOptionValues;
 import com.github.kattlo.acl.migration.Strategy;
 import com.github.kattlo.core.backend.Backend;
@@ -37,16 +37,20 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.mockito.InjectMock;
 import picocli.CommandLine;
 import picocli.CommandLine.Model.CommandSpec;
 
 @ExtendWith(MockitoExtension.class)
+@QuarkusTest
 public class ApplyACLCommandTest {
 
-    private EntryCommand entry = new EntryCommand();
+    @Inject
+    CommandLine cli;
+
     private StringWriter out;
     private StringWriter err;
-    private CommandLine cli;
 
     @Mock
     private CommandSpec spec;
@@ -55,6 +59,7 @@ public class ApplyACLCommandTest {
     private Backend backend;
 
     @Mock
+    @InjectMock
     private Kafka kafka;
 
     @Mock
@@ -93,7 +98,6 @@ public class ApplyACLCommandTest {
         out = new StringWriter();
         err = new StringWriter();
 
-        cli = new CommandLine(entry);
         cli.setOut(new PrintWriter(out));
         cli.setErr(new PrintWriter(err));
     }
@@ -123,7 +127,7 @@ public class ApplyACLCommandTest {
     }
 
     @Test
-    void should_exit_code_2_when_create_by_cluster_does_not_follow_the_schema() {
+    void should_exit_code_1_when_create_by_cluster_does_not_follow_the_schema() {
 
         String[] args = {
             "--config-file=./src/test/resources/.kattlo.yaml",
@@ -135,12 +139,12 @@ public class ApplyACLCommandTest {
 
         int actual = cli.execute(args);
 
-        assertEquals(2, actual);
+        assertEquals(1, actual);
         assertThat(err.toString(), containsString("Does not follow the schema"));
     }
 
     @Test
-    void should_exit_code_2_when_create_by_consumer_does_not_follow_the_schema() {
+    void should_exit_code_1_when_create_by_consumer_does_not_follow_the_schema() {
 
         String[] args = {
             "--config-file=./src/test/resources/.kattlo.yaml",
@@ -152,12 +156,12 @@ public class ApplyACLCommandTest {
 
         int actual = cli.execute(args);
 
-        assertEquals(2, actual);
+        assertEquals(1, actual);
         assertThat(err.toString(), containsString("Does not follow the schema"));
     }
 
     @Test
-    void should_exit_code_2_when_create_by_group_does_not_follow_the_schema() {
+    void should_exit_code_1_when_create_by_group_does_not_follow_the_schema() {
 
         String[] args = {
             "--config-file=./src/test/resources/.kattlo.yaml",
@@ -169,12 +173,12 @@ public class ApplyACLCommandTest {
 
         int actual = cli.execute(args);
 
-        assertEquals(2, actual);
+        assertEquals(1, actual);
         assertThat(err.toString(), containsString("Does not follow the schema"));
     }
 
     @Test
-    void should_exit_code_2_when_create_by_host_does_not_follow_the_schema() {
+    void should_exit_code_1_when_create_by_host_does_not_follow_the_schema() {
 
         String[] args = {
             "--config-file=./src/test/resources/.kattlo.yaml",
@@ -186,12 +190,12 @@ public class ApplyACLCommandTest {
 
         int actual = cli.execute(args);
 
-        assertEquals(2, actual);
+        assertEquals(1, actual);
         assertThat(err.toString(), containsString("Does not follow the schema"));
     }
 
     @Test
-    void should_exit_code_2_when_create_by_producer_does_not_follow_the_schema() {
+    void should_exit_code_1_when_create_by_producer_does_not_follow_the_schema() {
 
         String[] args = {
             "--config-file=./src/test/resources/.kattlo.yaml",
@@ -203,12 +207,12 @@ public class ApplyACLCommandTest {
 
         int actual = cli.execute(args);
 
-        assertEquals(2, actual);
+        assertEquals(1, actual);
         assertThat(err.toString(), containsString("Does not follow the schema"));
     }
 
     @Test
-    void should_exit_code_2_when_create_by_topic_does_not_follow_the_schema() {
+    void should_exit_code_1_when_create_by_topic_does_not_follow_the_schema() {
 
         String[] args = {
             "--config-file=./src/test/resources/.kattlo.yaml",
@@ -220,12 +224,12 @@ public class ApplyACLCommandTest {
 
         int actual = cli.execute(args);
 
-        assertEquals(2, actual);
+        assertEquals(1, actual);
         assertThat(err.toString(), containsString("Does not follow the schema"));
     }
 
     @Test
-    void should_exit_code_2_when_create_by_transactional_does_not_follow_the_schema() {
+    void should_exit_code_1_when_create_by_transactional_does_not_follow_the_schema() {
 
         String[] args = {
             "--config-file=./src/test/resources/.kattlo.yaml",
@@ -237,7 +241,7 @@ public class ApplyACLCommandTest {
 
         int actual = cli.execute(args);
 
-        assertEquals(2, actual);
+        assertEquals(1, actual);
         assertThat(err.toString(), containsString("Does not follow the schema"));
     }
 
@@ -263,7 +267,7 @@ public class ApplyACLCommandTest {
             // assert
             assertEquals(1, actual.size());
 
-            var json = actual.iterator().next();
+            var json = actual.iterator().next().toString();
             assertThat(json, hasJsonPath("$.create.deny.cluster.operations[0]", equalTo("Deny")));
         }
     }
@@ -290,7 +294,7 @@ public class ApplyACLCommandTest {
             // assert
             assertEquals(1, actual.size());
 
-            var json = actual.iterator().next();
+            var json = actual.iterator().next().toString();
             assertThat(json, hasJsonPath("$.create.allow.consumer.topic.name", equalTo("topic-as-consumer")));
             assertThat(json, hasJsonPath("$.create.allow.consumer.group.id", equalTo("group.id-as-consumer")));
         }
@@ -318,11 +322,11 @@ public class ApplyACLCommandTest {
             // assert
             assertEquals(1, actual.size());
 
-            var json = actual.iterator().next();
-            assertThat(json, hasJsonPath("$.create.allow.group.id", equalTo("my-group")));
+            var json = actual.iterator().next().toString();
+            assertThat(json, hasJsonPath("$.create.allow.group.id", equalTo("my-group.id")));
             assertThat(json, hasJsonPath("$.create.allow.group.operations[0]", equalTo("Read")));
 
-            assertThat(json, hasJsonPath("$.create.deny.group.id", equalTo("my-group")));
+            assertThat(json, hasJsonPath("$.create.deny.group.id", equalTo("my-group.id")));
             assertThat(json, hasJsonPath("$.create.deny.group.operations[0]", equalTo("Describe")));
         }
     }
@@ -349,7 +353,7 @@ public class ApplyACLCommandTest {
             // assert
             assertEquals(1, actual.size());
 
-            var json = actual.iterator().next();
+            var json = actual.iterator().next().toString();
             assertThat(json, hasJsonPath("$.create.allow.connection.from[0]", equalTo("172.16.0.102")));
         }
     }
@@ -376,7 +380,7 @@ public class ApplyACLCommandTest {
             // assert
             assertEquals(1, actual.size());
 
-            var json = actual.iterator().next();
+            var json = actual.iterator().next().toString();
             assertThat(json, hasJsonPath("$.create.allow.producer.topic.name", equalTo("topic-to-allow")));
             assertThat(json, hasJsonPath("$.create.allow.producer.transactional.id", equalTo("my-transactional.id")));
         }
@@ -404,7 +408,7 @@ public class ApplyACLCommandTest {
             // assert
             assertEquals(1, actual.size());
 
-            var json = actual.iterator().next();
+            var json = actual.iterator().next().toString();
             assertThat(json, hasJsonPath("$.create.allow.topic.name", equalTo("topic-just-allow")));
             assertThat(json, hasJsonPath("$.create.allow.topic.operations[0]", equalTo("Write")));
         }
@@ -432,7 +436,7 @@ public class ApplyACLCommandTest {
             // assert
             assertEquals(1, actual.size());
 
-            var json = actual.iterator().next();
+            var json = actual.iterator().next().toString();
             assertThat(json, hasJsonPath("$.create.allow.transactional.id", equalTo("my-transactional.id")));
             assertThat(json, hasJsonPath("$.create.allow.transactional.operations[0]", equalTo("Write")));
         }
@@ -460,7 +464,8 @@ public class ApplyACLCommandTest {
             // assert
             assertEquals(1, actual.size());
 
-            var json = actual.iterator().next();
+            var json = actual.iterator().next().toString();
+
             assertThat(json, hasJsonPath("$.create.allow.producer"));
             assertThat(json, hasJsonPath("$.create.allow.consumer"));
             assertThat(json, hasJsonPath("$.create.allow.topic"));
