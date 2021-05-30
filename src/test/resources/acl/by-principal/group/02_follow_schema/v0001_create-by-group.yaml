@@ -21,6 +21,6 @@ create:
         - Describe
 
     connection:
-      ip:
+      from:
         - 192.168.0.100
         - 172.16.0.150
