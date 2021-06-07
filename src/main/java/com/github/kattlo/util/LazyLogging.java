@@ -12,7 +12,6 @@ public class LazyLogging<T> {
 
     public String toString() {
 
-        System.out.print("===============================================================");
         var result = value.get();
         return (null!= result ? result.toString() : "");
     }
