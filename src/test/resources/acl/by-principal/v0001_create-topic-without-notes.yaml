@@ -1,0 +1,16 @@
+create:
+  to:
+    principal: 'User:CN=Alice,OU=Sales,O=Unknown,L=Unknown,ST=SP,C=Unknown'
+
+  allow:
+    topic:
+      name: my-topic-name
+      operations:
+        - Write
+
+  deny:
+    topic:
+      name: my-topic-name
+      operations:
+        - Read
+        - Describe
