@@ -10,7 +10,6 @@ import static org.hamcrest.core.StringContains.containsString;
 import static org.hamcrest.Matchers.*;
 import static com.jayway.jsonpath.matchers.JsonPathMatchers.*;
 
-import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Path;
@@ -29,51 +28,33 @@ import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockedStatic;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.Mockito;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.mockito.InjectMock;
 import picocli.CommandLine;
-import picocli.CommandLine.Model.CommandSpec;
 
-@ExtendWith(MockitoExtension.class)
 @QuarkusTest
 public class ApplyACLCommandTest {
 
     @Inject
     CommandLine cli;
 
+    @InjectMock
+    Backend backend;
+
+    @InjectMock
+    Kafka kafka;
+
     private StringWriter out;
     private StringWriter err;
 
-    @Mock
-    private CommandSpec spec;
-
-    @Mock
-    private Backend backend;
-
-    @Mock
-    @InjectMock
-    private Kafka kafka;
-
-    @Mock
     private AdminClient admin;
-
-    @Mock
     private Strategy strategy;
 
-    @Captor
-    private ArgumentCaptor<JSONObject> jsonCaptor;
-
-    @InjectMocks
-    private ApplyACLCommand command;
-
+    private ArgumentCaptor<JSONObject> jsonCaptor = ArgumentCaptor.forClass(JSONObject.class);
     private MockedStatic<SharedOptionValues> mockedShared;
 
     private void mockitoWhen() throws Exception {
@@ -100,6 +81,8 @@ public class ApplyACLCommandTest {
 
         cli.setOut(new PrintWriter(out));
         cli.setErr(new PrintWriter(err));
+
+        strategy = Mockito.mock(Strategy.class);
     }
 
     @AfterEach
@@ -249,8 +232,13 @@ public class ApplyACLCommandTest {
     void should_execute_create_by_cluster() throws Exception {
 
         // setup
-        var directory = new File("src/test/resources/acl/by-principal/cluster/02_follow_schema");
-        command.setDirectory(directory);
+        String[] args = {
+            "--config-file=./src/test/resources/.kattlo.yaml",
+            "--kafka-config-file=./src/test/resources/kafka.properties",
+            "apply",
+            "acl",
+            "--directory=./src/test/resources/acl/by-principal/cluster/02_follow_schema"
+        };
 
         mockitoWhen();
 
@@ -259,7 +247,8 @@ public class ApplyACLCommandTest {
                 .thenReturn(strategy);
 
             // act
-            command.run();
+            var exitno = cli.execute(args);
+            assertEquals(0, exitno);
 
             mocked.verify(() -> Strategy.of(jsonCaptor.capture()));
             var actual = jsonCaptor.getAllValues();
@@ -268,7 +257,7 @@ public class ApplyACLCommandTest {
             assertEquals(1, actual.size());
 
             var json = actual.iterator().next().toString();
-            assertThat(json, hasJsonPath("$.create.deny.cluster.operations[0]", equalTo("Deny")));
+            assertThat(json, hasJsonPath("$.create.deny.cluster.operations[0]", equalTo("Alter")));
         }
     }
 
@@ -276,8 +265,13 @@ public class ApplyACLCommandTest {
     void should_execute_create_by_consumer() throws Exception {
 
         // setup
-        var directory = new File("src/test/resources/acl/by-principal/consumer/02_follow_schema");
-        command.setDirectory(directory);
+        String[] args = {
+            "--config-file=./src/test/resources/.kattlo.yaml",
+            "--kafka-config-file=./src/test/resources/kafka.properties",
+            "apply",
+            "acl",
+            "--directory=./src/test/resources/acl/by-principal/consumer/02_follow_schema"
+        };
 
         mockitoWhen();
 
@@ -286,7 +280,8 @@ public class ApplyACLCommandTest {
                 .thenReturn(strategy);
 
             // act
-            command.run();
+            var exitno = cli.execute(args);
+            assertEquals(0, exitno);
 
             mocked.verify(() -> Strategy.of(jsonCaptor.capture()));
             var actual = jsonCaptor.getAllValues();
@@ -304,8 +299,13 @@ public class ApplyACLCommandTest {
     void should_execute_create_by_group() throws Exception {
 
         // setup
-        var directory = new File("src/test/resources/acl/by-principal/group/02_follow_schema");
-        command.setDirectory(directory);
+        String[] args = {
+            "--config-file=./src/test/resources/.kattlo.yaml",
+            "--kafka-config-file=./src/test/resources/kafka.properties",
+            "apply",
+            "acl",
+            "--directory=./src/test/resources/acl/by-principal/group/02_follow_schema"
+        };
 
         mockitoWhen();
 
@@ -314,7 +314,8 @@ public class ApplyACLCommandTest {
                 .thenReturn(strategy);
 
             // act
-            command.run();
+            var exitno = cli.execute(args);
+            assertEquals(0, exitno);
 
             mocked.verify(() -> Strategy.of(jsonCaptor.capture()));
             var actual = jsonCaptor.getAllValues();
@@ -335,8 +336,13 @@ public class ApplyACLCommandTest {
     void should_execute_create_by_host() throws Exception {
 
         // setup
-        var directory = new File("src/test/resources/acl/by-principal/host/02_follow_schema");
-        command.setDirectory(directory);
+        String[] args = {
+            "--config-file=./src/test/resources/.kattlo.yaml",
+            "--kafka-config-file=./src/test/resources/kafka.properties",
+            "apply",
+            "acl",
+            "--directory=./src/test/resources/acl/by-principal/host/02_follow_schema"
+        };
 
         mockitoWhen();
 
@@ -345,7 +351,8 @@ public class ApplyACLCommandTest {
                 .thenReturn(strategy);
 
             // act
-            command.run();
+            var exitno = cli.execute(args);
+            assertEquals(0, exitno);
 
             mocked.verify(() -> Strategy.of(jsonCaptor.capture()));
             var actual = jsonCaptor.getAllValues();
@@ -362,8 +369,13 @@ public class ApplyACLCommandTest {
     void should_execute_create_by_producer() throws Exception {
 
         // setup
-        var directory = new File("src/test/resources/acl/by-principal/producer/02_follow_schema");
-        command.setDirectory(directory);
+        String[] args = {
+            "--config-file=./src/test/resources/.kattlo.yaml",
+            "--kafka-config-file=./src/test/resources/kafka.properties",
+            "apply",
+            "acl",
+            "--directory=./src/test/resources/acl/by-principal/producer/02_follow_schema"
+        };
 
         mockitoWhen();
 
@@ -372,7 +384,8 @@ public class ApplyACLCommandTest {
                 .thenReturn(strategy);
 
             // act
-            command.run();
+            var exitno = cli.execute(args);
+            assertEquals(0, exitno);
 
             mocked.verify(() -> Strategy.of(jsonCaptor.capture()));
             var actual = jsonCaptor.getAllValues();
@@ -390,8 +403,13 @@ public class ApplyACLCommandTest {
     void should_execute_create_by_topic() throws Exception {
 
         // setup
-        var directory = new File("src/test/resources/acl/by-principal/topic/02_follow_schema");
-        command.setDirectory(directory);
+        String[] args = {
+            "--config-file=./src/test/resources/.kattlo.yaml",
+            "--kafka-config-file=./src/test/resources/kafka.properties",
+            "apply",
+            "acl",
+            "--directory=./src/test/resources/acl/by-principal/topic/02_follow_schema"
+        };
 
         mockitoWhen();
 
@@ -400,7 +418,8 @@ public class ApplyACLCommandTest {
                 .thenReturn(strategy);
 
             // act
-            command.run();
+            var exitno = cli.execute(args);
+            assertEquals(0, exitno);
 
             mocked.verify(() -> Strategy.of(jsonCaptor.capture()));
             var actual = jsonCaptor.getAllValues();
@@ -418,8 +437,13 @@ public class ApplyACLCommandTest {
     void should_execute_create_by_transactional() throws Exception {
 
         // setup
-        var directory = new File("src/test/resources/acl/by-principal/transactional/02_follow_schema");
-        command.setDirectory(directory);
+        String[] args = {
+            "--config-file=./src/test/resources/.kattlo.yaml",
+            "--kafka-config-file=./src/test/resources/kafka.properties",
+            "apply",
+            "acl",
+            "--directory=./src/test/resources/acl/by-principal/transactional/02_follow_schema"
+        };
 
         mockitoWhen();
 
@@ -428,7 +452,8 @@ public class ApplyACLCommandTest {
                 .thenReturn(strategy);
 
             // act
-            command.run();
+            var exitno = cli.execute(args);
+            assertEquals(0, exitno);
 
             mocked.verify(() -> Strategy.of(jsonCaptor.capture()));
             var actual = jsonCaptor.getAllValues();
@@ -446,8 +471,13 @@ public class ApplyACLCommandTest {
     void should_execute_create_with_all_types_in_the_same_file() throws Exception {
 
         // setup
-        var directory = new File("src/test/resources/acl/by-principal/all/01_same_file");
-        command.setDirectory(directory);
+        String[] args = {
+            "--config-file=./src/test/resources/.kattlo.yaml",
+            "--kafka-config-file=./src/test/resources/kafka.properties",
+            "apply",
+            "acl",
+            "--directory=./src/test/resources/acl/by-principal/all/01_same_file"
+        };
 
         mockitoWhen();
 
@@ -456,7 +486,8 @@ public class ApplyACLCommandTest {
                 .thenReturn(strategy);
 
             // act
-            command.run();
+            var exitno = cli.execute(args);
+            assertEquals(0, exitno);
 
             mocked.verify(() -> Strategy.of(jsonCaptor.capture()));
             var actual = jsonCaptor.getAllValues();
@@ -487,8 +518,13 @@ public class ApplyACLCommandTest {
     void should_execute_create_with_all_types_separated_files() throws Exception {
 
         // setup
-        var directory = new File("src/test/resources/acl/by-principal/all/01_separated_files");
-        command.setDirectory(directory);
+        String[] args = {
+            "--config-file=./src/test/resources/.kattlo.yaml",
+            "--kafka-config-file=./src/test/resources/kafka.properties",
+            "apply",
+            "acl",
+            "--directory=./src/test/resources/acl/by-principal/all/02_separated_files"
+        };
 
         mockitoWhen();
 
@@ -497,14 +533,37 @@ public class ApplyACLCommandTest {
                 .thenReturn(strategy);
 
             // act
-            command.run();
+            var exitno = cli.execute(args);
+            System.out.println(err.toString());
+            assertEquals(0, exitno);
 
-            mocked.verify(() -> Strategy.of(jsonCaptor.capture()));
+            mocked.verify(Mockito.times(7), () -> Strategy.of(jsonCaptor.capture()));
             var actual = jsonCaptor.getAllValues();
 
             // assert
             assertEquals(7, actual.size());
 
+            var json = actual.get(0).toString();
+            assertThat(json, hasJsonPath("$.create.deny.cluster"));
+
+            json = actual.get(1).toString();
+            assertThat(json, hasJsonPath("$.create.allow.consumer"));
+
+            json = actual.get(2).toString();
+            assertThat(json, hasJsonPath("$.create.allow.group"));
+            assertThat(json, hasJsonPath("$.create.deny.group"));
+
+            json = actual.get(3).toString();
+            assertThat(json, hasJsonPath("$.create.allow.connection"));
+
+            json = actual.get(4).toString();
+            assertThat(json, hasJsonPath("$.create.allow.producer"));
+
+            json = actual.get(5).toString();
+            assertThat(json, hasJsonPath("$.create.allow.topic"));
+
+            json = actual.get(6).toString();
+            assertThat(json, hasJsonPath("$.create.allow.transactional"));
         }
     }
 
