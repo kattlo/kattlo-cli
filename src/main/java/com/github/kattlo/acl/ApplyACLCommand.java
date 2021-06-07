@@ -92,7 +92,9 @@ public class ApplyACLCommand implements Runnable {
 
             backend.init(kafkaProperties);
 
-            var files = MigrationLoader.list(directory).collect(Collectors.toList());
+            var files = MigrationLoader.list(directory)
+                .sorted()
+                .collect(Collectors.toList());
             var iterator = files.iterator();
             while(iterator.hasNext()){
                 var file = iterator.next();
@@ -114,6 +116,7 @@ public class ApplyACLCommand implements Runnable {
                 var currentVersion = latestMigration
                     .map(Resource::getVersion)
                     .orElseGet(() -> NO_VERSION);
+                log.debug("Current version {}", currentVersion);
 
                 // load migrations by principal name
                 var migrations = Loader.allByPrincipal(migration.getPrincipal(),
@@ -125,18 +128,19 @@ public class ApplyACLCommand implements Runnable {
                         files.removeIf(f -> f.equals(m.getFile().toAbsolutePath()));
                     })
                     .filter(m -> m.getVersion().compareTo(currentVersion) > 0)
+                    .sorted()
                     .collect(Collectors.toList());
-
-                log.debug("Current files in the migration list {}", files);
+                log.debug("Remaining files to process in the next file system loop {}", files);
 
                 // update the iterator with new list of files in the main loop
                 iterator = files.iterator();
+                log.debug("Migrations to apply {}", newers);
 
                 if(newers.isEmpty()){
                     reporter.uptodate();
                 } else {
                     newers.forEach(newer-> {
-                        log.debug("migration to apply {}", newer);
+                        log.debug("ACL migration to apply {}", newer);
 
                         final var strategy = Strategy.of(newer.getJson());
 
@@ -155,16 +159,16 @@ public class ApplyACLCommand implements Runnable {
             }
 
         }catch(IOException e){
-            log.info(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new CommandLine.ExecutionException(spec.commandLine(),
                 "failing to read migrations: " + e.getMessage());
         }catch(ValidationException e){
-            log.info(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new CommandLine.ExecutionException(spec.commandLine(),
                 "Does not follow the schema: " + e.getErrorMessage());
             // TODO Better synthax check messages
         }catch(BackendException e){
-            log.info(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             reporter.report(e);
             throw new CommandLine.ExecutionException(spec.commandLine(),
                 "general error: " + e.getMessage(), e);
