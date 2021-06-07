@@ -12,7 +12,7 @@ public interface Strategy {
 
     void execute(AdminClient admin);
 
-    static Strategy of(JSONObject migration) {
+    public static Strategy of(JSONObject migration) {
         Objects.requireNonNull(migration);
 
         if(null!= migration.getJSONObject(CreateStrategy.CREATE_ATT)){
