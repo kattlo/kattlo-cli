@@ -30,7 +30,7 @@ import lombok.ToString;
 @Getter
 @RequiredArgsConstructor
 @ToString
-public class ACLMigration {
+public class ACLMigration implements Comparable<ACLMigration> {
 
     private static final JSONObject NOT_FOUND = null;
 
@@ -119,5 +119,10 @@ public class ACLMigration {
         }
 
         return migration;
+    }
+
+    @Override
+    public int compareTo(ACLMigration other) {
+        return getVersion().compareTo(other.getVersion());
     }
 }
