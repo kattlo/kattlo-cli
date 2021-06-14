@@ -85,7 +85,6 @@ public class EntryCommandTest {
         String[] args = {
             "--config-file=./src/test/resources/.kattlo.yaml",
             "--kafka-config-file=./src/test/resources/kafka.properties",
-            "--bootstrap-servers=" + expected,
             "topic",
             "--directory=."
         };
