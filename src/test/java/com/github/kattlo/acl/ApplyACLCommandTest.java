@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import com.github.kattlo.SharedOptionValues;
 import com.github.kattlo.acl.migration.Strategy;
 import com.github.kattlo.core.backend.Backend;
+import com.github.kattlo.core.backend.Resource;
 import com.github.kattlo.core.kafka.Kafka;
 
 import org.apache.kafka.clients.admin.AdminClient;
@@ -64,9 +65,6 @@ public class ApplyACLCommandTest {
 
         when(kafka.adminFor(any()))
             .thenReturn(admin);
-
-        //when(parent.getConfiguration())
-        //    .thenReturn(new File("./src/test/resources/topics/rules/.kattlo_empty.yaml"));
 
         mockedShared = mockStatic(SharedOptionValues.class);
         mockedShared.when(() -> SharedOptionValues.getKafkaConfiguration())
@@ -534,7 +532,6 @@ public class ApplyACLCommandTest {
 
             // act
             var exitno = cli.execute(args);
-            System.out.println(err.toString());
             assertEquals(0, exitno);
 
             mocked.verify(Mockito.times(7), () -> Strategy.of(jsonCaptor.capture()));
@@ -569,6 +566,79 @@ public class ApplyACLCommandTest {
 
     @Test
     void should_execute_create_just_the_newest_migration_strategy() {
-        // TODO impl
+
+        String[] args = {
+            "--config-file=./src/test/resources/.kattlo.yaml",
+            "--kafka-config-file=./src/test/resources/kafka.properties",
+            "apply",
+            "acl",
+            "--directory=./src/test/resources/acl/by-principal/all/02_separated_files"
+        };
+
+        final var applied = new Resource();
+        applied.setVersion("v0006");
+
+        when(backend.current(any(), anyString()))
+            .thenReturn(Optional.of(applied));
+
+        when(kafka.adminFor(any()))
+            .thenReturn(admin);
+
+        mockedShared = mockStatic(SharedOptionValues.class);
+        mockedShared.when(() -> SharedOptionValues.getKafkaConfiguration())
+            .thenReturn(new Properties());
+
+        try(var mocked = mockStatic(Strategy.class)){
+            mocked.when(() -> Strategy.of(any()))
+                .thenReturn(strategy);
+
+            // act
+            var exitno = cli.execute(args);
+            assertEquals(0, exitno);
+
+            mocked.verify(Mockito.times(1), () -> Strategy.of(jsonCaptor.capture()));
+            var actual = jsonCaptor.getAllValues();
+
+            // assert
+            assertEquals(1, actual.size());
+
+            var json = actual.get(0).toString();
+            assertThat(json, hasJsonPath("$.create.allow.transactional"));
+        }
+    }
+
+    @Test
+    void should_exit_code_0_when_there_is_not_new_migrations() {
+
+        String[] args = {
+            "--config-file=./src/test/resources/.kattlo.yaml",
+            "--kafka-config-file=./src/test/resources/kafka.properties",
+            "apply",
+            "acl",
+            "--directory=./src/test/resources/acl/by-principal/all/02_separated_files"
+        };
+
+        final var applied = new Resource();
+        applied.setVersion("v0007");
+
+        when(backend.current(any(), anyString()))
+            .thenReturn(Optional.of(applied));
+
+        when(kafka.adminFor(any()))
+            .thenReturn(admin);
+
+        mockedShared = mockStatic(SharedOptionValues.class);
+        mockedShared.when(() -> SharedOptionValues.getKafkaConfiguration())
+            .thenReturn(new Properties());
+
+        try(var mocked = mockStatic(Strategy.class)){
+            mocked.when(() -> Strategy.of(any()))
+                .thenReturn(strategy);
+
+            // act
+            var exitno = cli.execute(args);
+            assertEquals(0, exitno);
+
+        }
     }
 }
