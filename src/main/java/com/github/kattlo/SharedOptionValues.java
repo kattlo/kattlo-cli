@@ -38,19 +38,20 @@ public class SharedOptionValues {
                 kafkaConfigurationValues
                     .load(new FileReader(kafkaConfiguration));
 
-                if(Objects.nonNull(getBootstrapServers())){
-                    var oldBootstrapServers =
-                      kafkaConfigurationValues
-                        .put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG,
-                            getBootstrapServers());
-
-                    log.debug("bootstrap.servers overwritten by {}", getBootstrapServers());
-                    log.debug("Old bootstrap.servers {}", oldBootstrapServers);
-                }
             }catch(IOException e){
                 throw new IllegalStateException(
                     kafkaConfiguration.getAbsolutePath() + " can't be read");
             }
+        }
+
+        if(Objects.nonNull(getBootstrapServers())){
+            var oldBootstrapServers =
+                kafkaConfigurationValues
+                .put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG,
+                    getBootstrapServers());
+
+            log.debug("bootstrap.servers overwritten by {}", getBootstrapServers());
+            log.debug("Old bootstrap.servers {}", oldBootstrapServers);
         }
         return kafkaConfigurationValues;
     }
