@@ -29,7 +29,7 @@ dependencies {
     testImplementation 'com.jayway.jsonpath:json-path-assert:2.5.0'
     testImplementation 'io.quarkus:quarkus-junit5-mockito'
     testImplementation 'org.mockito:mockito-inline:3.7.7'
-    testImplementation 'org.mockito:mockito-junit-jupiter:3.7.7'
+    testImplementation 'org.mockito:mockito-junit-jupiter:4.1.0'
 
     annotationProcessor enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
     annotationProcessor 'info.picocli:picocli-codegen'
