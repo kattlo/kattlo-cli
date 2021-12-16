@@ -16,7 +16,7 @@ dependencies {
     implementation 'io.quarkus:quarkus-picocli'
     implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
     implementation 'info.picocli:picocli-codegen'
-    implementation 'org.yaml:snakeyaml:1.27'
+    implementation 'org.yaml:snakeyaml:1.30'
     implementation "io.quarkus:quarkus-kafka-client:${quarkusPlatformVersion}"
     implementation 'io.quarkus:quarkus-jsonb'
     implementation 'org.apache.commons:commons-lang3:3.11'
